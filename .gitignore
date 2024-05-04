@@ -2,3 +2,5 @@ node_modules
 yarn.lock
 config.env
 .env
+.settings
+.project
