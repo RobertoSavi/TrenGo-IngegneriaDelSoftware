@@ -4,7 +4,7 @@ import "./loadEnvironment.mjs";
 import "express-async-errors";
 import utente from "./routes/utente.mjs";
 import proposta from "./routes/proposta.mjs";
-import swaggerjsdoc from "swagger-jsdoc";
+//import swaggerjsdoc from "swagger-jsdoc";
 import swaggerui from "swagger-ui-express";
 import YAML from "yamljs";
 const swaggerFile = YAML.load('./swagger.yml');
