@@ -1,0 +1,12 @@
+openapi: '3.0.2'
+info:
+  title: TrenGo API documentation
+  version: '1.0'
+servers:
+  - url: http://localhost:5050/
+paths:
+  /test:
+    get:
+      responses:
+        '200':
+          description: OK
