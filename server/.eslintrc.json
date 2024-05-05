@@ -1,6 +1,5 @@
 {
   "parserOptions": {
-    "sourceType": "module",
     "ecmaVersion": 2017
   },
   "env": {
@@ -11,6 +10,7 @@
     "no-unused-vars": [
       "error",
       {
+        // Ignore arguments starting with _
         "argsIgnorePattern": "^_"
       }
     ]
