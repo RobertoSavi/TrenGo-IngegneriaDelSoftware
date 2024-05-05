@@ -188,6 +188,34 @@ paths:
           description: Invalid username supplied
         '404':
           description: User not found
+    post:
+      tags:
+        - proposte
+      summary: Crea una nuova proposta
+      description: Può essere invocata solo da un user autenticato con successo
+      operationId: Crea proposta
+      requestBody:
+        description: Un oggetto proposta
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Proposta'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Proposta'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Proposta'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proposta'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Proposta' 
 components:
   schemas:
     Utente:
