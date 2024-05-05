@@ -188,6 +188,7 @@ paths:
           description: Invalid username supplied
         '404':
           description: User not found
+  /proposte:
     post:
       tags:
         - proposte
