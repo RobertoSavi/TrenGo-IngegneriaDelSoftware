@@ -1,167 +1,162 @@
-openapi: '3.0.2'
+openapi: '3.0.0'
 info:
   title: TrenGo API documentation
   version: '1.0'
 servers:
   - url: http://localhost:5050/
 paths:
-  /utenti:
+  /utenti/signup:
     post:
       tags:
         - utenti
-      summary: Crea un nuovo utente
+      summary: Registra un nuovo utente con i parametri passati
       description: Può essere invocata solo da un user autenticato con successo
-      operationId: Crea utente
+      operationId: utentiSignup
       requestBody:
-        description: Richiede username, email e password del nuovo utente
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Utente'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/Utente'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Utente'
-      responses:
-        default:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Utente'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Utente'
-  /user/login:
-    post:
-      tags:
-        - user
-      summary: Logs user into the system
-      description: ''
-      operationId: loginUser
-      parameters:
-        - name: username
-          in: query
-          description: The user name for login
-          required: false
-          schema:
-            type: string
-        - name: password
-          in: query
-          description: The password for login in clear text
-          required: false
-          schema:
-            type: string
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
       responses:
         '200':
-          description: successful operation
-          headers:
-            X-Rate-Limit:
-              description: calls per hour allowed by the user
-              schema:
-                type: integer
-                format: int32
-            X-Expires-After:
-              description: date in UTC when token expires
-              schema:
-                type: string
-                format: date-time
+          description: Utente registrato con successo
           content:
-            application/xml:
-              schema:
-                type: string
             application/json:
               schema:
-                type: string
+                type: object
+                properties:
+                  username:
+                    type: string
+                    description: Username dell'utente
         '400':
-          description: Invalid username/password supplied
+          description: Bad request
+        '500':
+          description: Internal server error
+  /utenti/login:
+    post:
+      tags:
+        - utenti
+      summary: Effettua il login dell'utente
+      description: ''
+      operationId: utentiLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Utente ha effettuato il login con successo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    description: Username dell'utente
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
   /user/logout:
     get:
       tags:
-        - user
-      summary: Logs out current logged in user session
+        - utenti
+      summary: Effettua il logout dell'utente
       description: ''
-      operationId: logoutUser
-      parameters: []
-      responses:
-        default:
-          description: successful operation
-  /user/{username}:
-    get:
-      tags:
-        - user
-      summary: Get user by user name
-      description: ''
-      operationId: getUserByName
-      parameters:
-        - name: username
-          in: path
-          description: 'The name that needs to be fetched. Use user1 for testing. '
-          required: true
-          schema:
-            type: string
+      operationId: utentiLogout
       responses:
         '200':
-          description: successful operation
+          description: Utente ha effettuato il logout con successo
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'          
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/User'
+                type: object
+                properties:
+                  username:
+                    type: string
+                    description: Username dell'utente
         '400':
-          description: Invalid username supplied
-        '404':
-          description: User not found
-    put:
+          description: Bad request
+        '500':
+          description: Internal server error
+  /utenti/{username}:
+    get:
       tags:
-        - user
-      summary: Update user
-      description: This can only be done by the logged in user.
-      operationId: updateUser
-      parameters:
-        - name: username
-          in: path
-          description: name that need to be deleted
-          required: true
-          schema:
-            type: string
+        - utenti
+      summary: Get utente by username
+      description: ''
+      operationId: utentiGetByUsername
       requestBody:
-        description: Update an existent user in the store
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Dati utente recuperati con successo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Utente'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+    put:
+      tags:
+        - utenti
+      summary: Update utente by username
+      description: Può essere chiamata solo da un user autenticato con successo
+      operationId: updateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Utente'
           application/xml:
             schema:
               $ref: '#/components/schemas/Utente'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/Utente'
       responses:
-        default:
-          description: successful operation
-    delete:
-      tags:
-        - user
-      summary: Delete user
-      description: This can only be done by the logged in user.
-      operationId: deleteUser
-      parameters:
-        - name: username
-          in: path
-          description: The name that needs to be deleted
-          required: true
-          schema:
-            type: string
-      responses:
+        '200':
+          description: Dati utente modificati con successo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Utente'
         '400':
-          description: Invalid username supplied
-        '404':
-          description: User not found
+          description: Bad request
+        '500':
+          description: Internal server error
   /proposte:
     post:
       tags:
@@ -170,39 +165,57 @@ paths:
       description: Può essere invocata solo da un user autenticato con successo
       operationId: Crea proposta
       requestBody:
-        description: Un oggetto proposta
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Proposta'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/Proposta'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Proposta'
+              type: object
+              properties:
+                usernameCreatore:
+                  type: string
+                intercategoriePropostaessi:
+                  type: array
+                  items:
+                    type: string
+                nomeLuogo:
+                  type: string
+                numeroPartecipantiDesiderato:
+                  type: integer
+                data:
+                  type: string
+                  format: date-time
+                stato:
+                  type: boolean
       responses:
-        default:
-          description: successful operation
+        '200':
+          description: Proposta creata con successo
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Proposta'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Proposta' 
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
 components:
   schemas:
     Utente:
       type: object
+      required:  
+        - username
+        - tipoUtente
+        - nome
+        - cognome
+        - email
+        - password
       properties:
         username:
           type: string
+          description: Username dell'utente
           example: Marcolino
-          required: true
         tipoUtente:
           type: string
-          description: tipo di utente
+          description: Il tipo di utente
           example: autenticato
           enum:
             - nonAutenticato
@@ -210,82 +223,112 @@ components:
             - grandeOrganizzatore
         nome:
           type: string
+          description: Nome dell'utente
           example: Marco
         cognome:
           type: string
+          description: Cognome dell'utente
           example: Lino
         email:
           type: string
+          description: Email dell'utente
           example: marcolino@email.com
         password:
           type: string
+          description: Password dell'utente
           example: Marcolino1!
         karma:
           type: integer
+          description: Karma dell'utente
           example: 70
         interessi:
           type: array
+          description: Interessi dell'utente
           items:
             type: string
           example: ["arrampicata", "escursioni", "corse"]
-        followers:
+          minItems: 0
+        following:
           type: array
+          description: Lista degli username degli utenti seguiti dall'utente 
           items:
             type: string
           example: ["Marcolino", " Marcoseta", "Marcolana"]
+          minItems: 0
       xml:
         name: utente
     Proposta:
       type: object
+      required:  
+        - idProposta
+        - usernameCreatore
+        - categorieProposta
+        - nomeLuogo
+        - numeroPartecipantiDesiderato
+        - data
+        - stato
       properties:
         idProposta:
           type: integer
           format: int64
+          description: Id della proposta
           example: 10
         usernameCreatore:
           type: string
+          description: Username del creatore della proposta
           example: Marcotone
         categorieProposta:
           type: array
           items:
             type: string
+          description: Lista delle categorie alle quali appartiene la proposta
           example: ["arrampicata", "escursioni", "corse"]
           minItems: 1
         nomeLuogo:
           type: string
+          description: Nome del luogo della proposta
           example: Piazza Dante
         coordinate:
           type: array
           items:
             type: number
+          description: Coordinate del luogo della proposta
           example: [4.49965, 52.06891]
           minItems: 2
         descrizione:
           type: string
+          description: Descrizione della proposta
           example: Vediamoci in piazza per poi andare a fare un giro
-        numeroPartecipantiDesidesrato: 
+        numeroPartecipantiDesiderato: 
           type: integer
           format: int64
+          description: Numero di partecipanti desiderato dal creatore della proposta
           example: 10
         numeroPartecipanti: 
           type: integer
           format: int64
+          description: Numero di partecipanti attuali della proposta
           example: 10
         data:
           type: string
           format: date-time
+          description: Data prevista per la proposta
           example: 2024-07-21T17:32:28Z
         idChat:
           type: integer
+          description: Id della chat allegata alla proposta
           format: int64
         partecipanti:
           type: array
           items: 
-            description: username dei partecipanti
             type: string
+          description: username dei partecipanti
           example: ["Marcolino", " Marcoseta", "Marcolana"]
           minItems: 1
         stato:
           type: boolean
+          description: Stato della proposta [false = chiusa, true = aperta]
+          default: true
+          example: true
       xml:
         name: proposta
