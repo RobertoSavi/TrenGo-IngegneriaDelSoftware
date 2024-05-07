@@ -13,7 +13,7 @@ paths:
       description: Può essere invocata solo da un user autenticato con successo
       operationId: Crea utente
       requestBody:
-        description: Un oggetto utente
+        description: Richiede username, email e password del nuovo utente
         content:
           application/json:
             schema:
@@ -34,34 +34,8 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/Utente'
-  /user/createWithList:
-    post:
-      tags:
-        - user
-      summary: Creates list of users with given input array
-      description: Creates list of users with given input array
-      operationId: createUsersWithListInput
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/User'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'          
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/User'
-        default:
-          description: successful operation
   /user/login:
-    get:
+    post:
       tags:
         - user
       summary: Logs user into the system
@@ -196,6 +170,7 @@ components:
         username:
           type: string
           example: Marcolino
+          required: true
         tipoUtente:
           type: string
           description: tipo di utente
