@@ -8,7 +8,7 @@ const schemaProposta = new mongoose.Schema({
     creatore: {
         type: ObjectId,
         required: true,
-        ref: "utente" // Riferimento al modello utente
+        ref: "Utente" // Riferimento al modello utente
     },
     // Categorie dell'attività proposta
     categorie: {
@@ -57,13 +57,13 @@ const schemaProposta = new mongoose.Schema({
     idChat: {
         type: ObjectId,
         required: true,
-        ref: "chats" // Riferimento al modello chats
+        ref: "Chats" // Riferimento al modello chats
     },
     // Elenco degli utenti che partecipano all'attività proposta
     partecipanti: {
         type: [ObjectId],
         default: [],
-        ref: "utente" // Riferimento al modello utente
+        ref: "Utente" // Riferimento al modello utente
     },
     // Stato dell'attività proposta
     stato: {
@@ -72,5 +72,5 @@ const schemaProposta = new mongoose.Schema({
 });
 
 // Creazione del modello Proposta
-const proposta = mongoose.model("proposta", schemaProposta);
-export default proposta;
+const Proposta = mongoose.model("Proposta", schemaProposta);
+export default Proposta;
