@@ -1,4 +1,4 @@
-import Utente from './models/utenteModel.js'
+import Utente from "../models/utenteModel.mjs"
 
 // Queste funzioni servono a validare i campi necessari per la registrazione e il login di un utente
 
@@ -34,33 +34,13 @@ function isPasswordValid(password) {
 }
 
 /**
- * Funzione per verificare se una password è considerata forte.
- * @param {string} password - La password da verificare.
- * @returns {boolean} - True se la password è forte, altrimenti False.
- */
-function isPasswordStrong(password) {
-    // La password deve avere almeno 8 caratteri
-    const isLengthyEnough = password.length >= 8;
-    // La password deve contenere almeno una lettera maiuscola
-    const hasUpperCase = /[A-Z]/.test(password);
-    // La password deve contenere almeno una lettera minuscola
-    const hasLowerCase = /[a-z]/.test(password);
-    // La password deve contenere almeno un numero
-    const hasDigit = /\d/.test(password);
-    // La password deve contenere almeno un carattere speciale
-    const hasSpecialChar = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
-    // La password deve soddisfare tutti i criteri di robustezza
-    return isLengthyEnough && hasUpperCase && hasLowerCase && hasDigit && hasSpecialChar;
-}
-
-/**
  * Verifica se un username è già presente nel database.
  * @param {string} username - L'username da controllare.
  * @returns {Promise<boolean>} - Una Promise che risolve a true se lo username è già presente, altrimenti false.
  */
 async function isUsernameTaken(username) {
     // Esegui una query nel database per verificare se lo username è già presente
-    const user = await Utente.findOne({ username });
+    const user = await Utente.findOne({username});
     return !!user; // Ritorna true se lo username è già presente, altrimenti false
 }
 
@@ -71,15 +51,47 @@ async function isUsernameTaken(username) {
  */
 async function isEmailTaken(email) {
     // Esegui una query nel database per verificare se l'email è già presente
-    const user = await Utente.findOne({ email });
+    const user = await Utente.findOne({email});
     return !!user; // Ritorna true se l'email è già presente, altrimenti false
 }
 
+/**
+ * Verifica se la password corrisponde a quella memorizzata nel database per un determinato utente.
+ * @param {string} email - L'email dell'utente.
+ * @param {string} password - La password inserita dall'utente.
+ * @returns {Promise<boolean>} - Una Promise che risolve a true se la password è corretta, altrimenti false.
+ */
+/*
+async function isPasswordCorrect(email,password) {
+    const user = await Utente.findOne({email, password});
+    return !!user;
+}
+*/
+
+/**
+ * Trova un utente nel database utilizzando l'username fornito.
+ * @param {string} username - L'username dell'utente da trovare.
+ * @returns {Promise<object|null>} - Una promise che restituisce l'utente trovato o null se non trovato.
+ */
+/*async function getUtenteByUsername(username) {
+    try {
+        // Trova l'utente nel database utilizzando lo username
+        const user = await UserModel.findOne({ username }).exec();
+        return user; // Restituisce l'utente trovato o null se non trovato
+    } catch (error) {
+        console.error("Errore durante il recupero dell'utente per username:", error);
+        throw error; // Rilancia l'errore in caso di problemi
+    }
+}
+*/
+
+// Esporta validatori
 module.exports = {  
     isUsernameValid,
     isEmailValid,
     isPasswordValid,
-    isPasswordStrong,
     isUsernameTaken,
-    isEmailTaken
+    isEmailTaken,
+    //isPasswordCorrect
+    //getUtenteByUsername
 };
