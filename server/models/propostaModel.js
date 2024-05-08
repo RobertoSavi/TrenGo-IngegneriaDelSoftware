@@ -1,77 +1,76 @@
-import mongoose  from "mongoose";
-//import bcrypt from "bcrypt";
+import mongoose from "mongoose";
 import { ObjectId } from "mongodb";
+import { interessiEnum } from './enums';
 
-const schemaProposta=new mongoose.Schema(
-{
-	creatore: 
-	{
-		type: ObjectId,
+// Definizione dello schema per le proposte di attività
+const schemaProposta = new mongoose.Schema({
+    // ID dell'utente creatore della proposta
+    creatore: {
+        type: ObjectId,
         required: true,
-        ref: "utente"
+        ref: "utente" // Riferimento al modello utente
     },
-    categorie:
-    {
-		type: [String],
-		enum: interessiEnum,
-		default: "Other"
-	},
-    nomeLuogo: 
-    {
+    // Categorie dell'attività proposta
+    categorie: {
+        type: [String],
+        enum: interessiEnum,
+        default: "Altro"
+    },
+    // Nome del luogo dell'attività proposta
+    nomeLuogo: {
         type: String,
     },
-    coordinate: 
-    {
-        type: [Float],
+    // Coordinate del luogo dell'attività proposta
+    coordinate: {
+        type: [Number],
         required: true
     },
-    descrizione: 
-    {
+    // Descrizione dell'attività proposta
+    descrizione: {
         type: String,
         required: true,
         minLength: 5
     },
-    numeroPartecipantiDesiderato: 
-    {
-		type: Integer,
-		required: true,
-		default: 10
+    // Numero desiderato di partecipanti all'attività proposta
+    numeroPartecipantiDesiderato: {
+        type: Number,
+        required: true,
+        default: 10
     },
-    numeroPartecipanti: 
-    {
-		type: Integer,
-		default: 0
+    // Numero effettivo di partecipanti all'attività proposta
+    numeroPartecipanti: {
+        type: Number,
+        default: 0
     },
-    data: 
-    {
-        type: Data,
-		required: true,
-		validate:
-		{
-			validator: function (date) 
-			{
-				return date<=new Date();
+    // Data e ora dell'attività proposta
+    data: {
+        type: Date,
+        required: true,
+        validate: {
+            validator: function (date) {
+                return date <= new Date();
             },
-            message: props => `data non valida`
+            message: _props => `Data non valida`
         }
     },
-    idChat: 
-    {
+    // ID della chat associata all'attività proposta
+    idChat: {
         type: ObjectId,
         required: true,
-        ref: "chats"
+        ref: "chats" // Riferimento al modello chats
     },
-    partecipanti: 
-    {
-        type: [ObjectID],
+    // Elenco degli utenti che partecipano all'attività proposta
+    partecipanti: {
+        type: [ObjectId],
         default: [],
-        ref: "utente"
+        ref: "utente" // Riferimento al modello utente
     },
-    stato:
-    {
-		type: Boolean
-	}
+    // Stato dell'attività proposta
+    stato: {
+        type: Boolean
+    }
 });
 
-const proposta=mongoose.model("Proposta", schemaProposta);
-module.exports=Proposta;
+// Creazione del modello Proposta
+const proposta = mongoose.model("proposta", schemaProposta);
+export default proposta;
