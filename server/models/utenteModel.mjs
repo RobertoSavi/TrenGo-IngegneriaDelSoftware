@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import { interessiEnum } from './enums';
+import { interessiEnum } from "./enums.mjs";
 import { ObjectId } from "mongodb";
 
 // Definizione dello schema per l'utente
@@ -114,5 +114,5 @@ schemaUtente.methods.isPasswordCorrect = async function (password) {
 };
 
 // Creazione del modello Utente
-const Utente = mongoose.model("Utente", schemaUtente);
+const Utente = mongoose.model("Utente", schemaUtente, "Utenti");
 export default Utente;

@@ -1,6 +1,18 @@
-import {isUsernameValid, isEmailValid, isPasswordValid, isUsernameTaken, isEmailTaken}from "../validators/utentiValidators.mjs";
 import Utente from "../models/utenteModel.mjs"
+import * as validators from "../validators/utentiValidators.mjs";
 import jwt  from "jsonwebtoken"
+
+async function getUtenti(req, res){
+
+    // Find users
+    const users = await Utente.find.toArray();
+
+    // Close the connection
+    await client.close();
+
+    // Send the users as response
+    res.status(200).json(users);
+}
 
 /**
  * Ottiene un utente dal database utilizzando l'ID fornito.
@@ -84,39 +96,42 @@ async function getUtenteByUsername(req, res) {
  * @param {object} res - L'oggetto della risposta.
  */
 async function signupUtente(req, res) {
+    console.log("Signup chiamato");
     // Estrai username, email e password dal body della richiesta
     const {username, email, password} = req.body;
+    console.log(username, email, password);
     // Inizializza un array per gli errori
     const errors = [];
 
     // Validazione dello username
-    if (!isUsernameValid(username)) 
+    if (!validators.isUsernameValid(username)) 
         errors.push({ field: "username", message: "Username non valido" });
 
     // Validazione dell'email
-    if (!isEmailValid(email)) 
+    if (!validators.isEmailValid(email)) 
         errors.push({ field: "email", message: "Email non valida" });
 
     // Validazione della password
-    if (!isPasswordValid(password)) 
+    if (!validators.isPasswordValid(password)) 
         errors.push({ field: "password", message: "Password non valida" });
 
     // Verifica se l'email è già in uso
-    if (await isEmailTaken(email)) 
+    if (await validators.isEmailTaken(email)) 
         errors.push({ field: "email", message: "Email già registrata" });
 
     // Verifica se lo username è già in uso
-    if (await isUsernameTaken(username)) 
+    if (await validators.isUsernameTaken(username)) 
         errors.push({ field: "username", message: "Username già in uso" });
 
+    console.log(errors);
     // Gestione degli errori
     if (errors.length > 0) 
         return res.status(400).json({ message: "error", errors });
 
     try {
         // Creazione dell'utente
-        await UserModel.create({ email, password, username });
-        return res.status(200).json({ message: "success" });
+        await Utente.create({username, email, password});
+        return res.status(200).json({message: "success"});
     } catch (error) {
         // Gestione dell'errore durante la creazione dell'utente
         console.error("Errore durante la registrazione dell'utente:", error);
@@ -158,7 +173,8 @@ async function loginUtente(req, res){
 }
 
 // Esporta handlers
-module.exports = {
+export {
+    getUtenti,
     getUtenteById,
     updateUtenteById,
     getUtenteByUsername,

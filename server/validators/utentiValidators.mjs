@@ -85,13 +85,14 @@ async function isPasswordCorrect(email,password) {
 }
 */
 
+
 // Esporta validatori
-module.exports = {  
+export {
     isUsernameValid,
     isEmailValid,
     isPasswordValid,
     isUsernameTaken,
-    isEmailTaken,
+    isEmailTaken
     //isPasswordCorrect
     //getUtenteByUsername
 };

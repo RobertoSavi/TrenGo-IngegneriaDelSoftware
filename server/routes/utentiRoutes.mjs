@@ -1,24 +1,25 @@
 import express from "express";
-import {getUtenteById, updateUtenteById, getUtenteByUsername, signupUtente, loginUtente} from "../handlers/utentiHandlers.mjs"
+import * as handlers from "../handlers/utentiHandlers.mjs"
+import { Router } from "express";
+const router = Router();
 
-
-const router = express.Router();
+router.get("/get", handlers.getUtenti)
 
 // Permette di ottenere i dati di un utente tramite l'id
-router.get("/:id", getUtenteById);
+router.get("/:id", handlers.getUtenteById);
 
 // Permette di modificare un utente tramite l'id
-router.put("/:id", updateUtenteById);
+router.put("/:id", handlers.updateUtenteById);
 
 // Permette di di ottenere i dati di un utente tramite l'username
-router.get("/:username", getUtenteByUsername);
+router.get("/:username", handlers.getUtenteByUsername);
 
 // Permette la registrazione di un utente
-router.post("/signup", signupUtente);
+router.post("/signup", handlers.signupUtente);
 
 // Permette il login di un utente
-router.post("/login", loginUtente);
+router.post("/login", handlers.loginUtente);
 
 
 // Esporta router
-module.exports = router;
+export default router;
