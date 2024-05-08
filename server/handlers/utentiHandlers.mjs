@@ -1,5 +1,4 @@
-
-
+import {isUsernameValid, isEmailValid, isPasswordValid, isPasswordStrong}from "./validators/utentiValidators.mjs";
 
 
 async function signupUtente(req, res){
