@@ -103,16 +103,25 @@ schemaUtente.pre('save', async function (next) {
 });
 
 // Metodo per confrontare la password fornita con quella hashata memorizzata
+/* Non si riesce ad usare in quanto this.password ritorna un'istanza della funzione e non del modello
 schemaUtente.methods.isPasswordCorrect = async function (password) {
     try {
-        // Usare bcrypt per confrontare la password fornita con quella hashata memorizzata nel database
+        if (!password || !this.password) {
+            throw new Error("Password or hashed password not provided.");
+        }
+
+        // Use bcrypt to compare the provided password with the hashed one stored in the database
         return await bcrypt.compare(password, this.password);
     }
     catch (error) {
-        throw new Error(error);
+        console.error("Errore nel login:", error);
+        return false; // Return false to indicate login failure
     }
-};
+};*/
 
 // Creazione del modello Utente
 const Utente = mongoose.model("Utente", schemaUtente, "Utenti");
-export default Utente;
+export {
+    Utente, 
+    schemaUtente
+};

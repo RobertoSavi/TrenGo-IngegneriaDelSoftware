@@ -1,9 +1,7 @@
-import express from "express";
+import  Router  from "express";
 import * as handlers from "../handlers/utentiHandlers.mjs"
-import { Router } from "express";
-const router = Router();
 
-router.get("/get", handlers.getUtenti)
+const router = Router();
 
 // Permette di ottenere i dati di un utente tramite l'id
 router.get("/:id", handlers.getUtenteById);
@@ -12,7 +10,10 @@ router.get("/:id", handlers.getUtenteById);
 router.put("/:id", handlers.updateUtenteById);
 
 // Permette di di ottenere i dati di un utente tramite l'username
-router.get("/:username", handlers.getUtenteByUsername);
+router.get("/username/:username", handlers.getUtenteByUsername);
+
+// Permette di modificare un utente tramite l'username
+router.put("/username/:username", handlers.updateUtenteByUsername);
 
 // Permette la registrazione di un utente
 router.post("/signup", handlers.signupUtente);

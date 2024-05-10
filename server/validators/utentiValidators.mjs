@@ -1,4 +1,5 @@
-import Utente from "../models/utenteModel.mjs"
+import * as utenteModel from "../models/utenteModel.mjs"
+import bcrypt from "bcrypt";
 
 // Queste funzioni servono a validare i campi necessari per la registrazione e il login di un utente
 
@@ -40,8 +41,8 @@ function isPasswordValid(password) {
  */
 async function isUsernameTaken(username) {
     // Esegui una query nel database per verificare se lo username è già presente
-    const user = await Utente.findOne({username});
-    return !!user; // Ritorna true se lo username è già presente, altrimenti false
+    const utente = await utenteModel.Utente.findOne({username});
+    return !!utente; // Ritorna true se lo username è già presente, altrimenti false
 }
 
 /**
@@ -51,8 +52,8 @@ async function isUsernameTaken(username) {
  */
 async function isEmailTaken(email) {
     // Esegui una query nel database per verificare se l'email è già presente
-    const user = await Utente.findOne({email});
-    return !!user; // Ritorna true se l'email è già presente, altrimenti false
+    const utente = await utenteModel.Utente.findOne({email});
+    return !!utente; // Ritorna true se l'email è già presente, altrimenti false
 }
 
 /**
@@ -61,29 +62,36 @@ async function isEmailTaken(email) {
  * @param {string} password - La password inserita dall'utente.
  * @returns {Promise<boolean>} - Una Promise che risolve a true se la password è corretta, altrimenti false.
  */
-/*
-async function isPasswordCorrect(email,password) {
-    const user = await Utente.findOne({email, password});
-    return !!user;
+
+async function verifyPasswordByUsername(username, password) {
+    try {
+        // Trova l'utente nel database utilizzando lo username
+        const utente = await utenteModel.Utente.findOne({username});
+        // Use bcrypt to compare the provided password with the hashed one stored in the database
+        return await bcrypt.compare(password, utente.password);
+    }
+    catch (error) {
+        console.error("Errore nel login:", error);
+        return false; // Return false to indicate login failure
+    }
 }
-*/
 
 /**
  * Trova un utente nel database utilizzando l'username fornito.
  * @param {string} username - L'username dell'utente da trovare.
  * @returns {Promise<object|null>} - Una promise che restituisce l'utente trovato o null se non trovato.
  */
-/*async function getUtenteByUsername(username) {
+async function getUtente(username) {
     try {
         // Trova l'utente nel database utilizzando lo username
-        const user = await UserModel.findOne({ username }).exec();
-        return user; // Restituisce l'utente trovato o null se non trovato
+        const utente = await utenteModel.Utente.findOne({username}).exec();
+        return utente; // Restituisce l'utente trovato o null se non trovato
     } catch (error) {
         console.error("Errore durante il recupero dell'utente per username:", error);
         throw error; // Rilancia l'errore in caso di problemi
     }
 }
-*/
+
 
 
 // Esporta validatori
@@ -92,7 +100,7 @@ export {
     isEmailValid,
     isPasswordValid,
     isUsernameTaken,
-    isEmailTaken
-    //isPasswordCorrect
-    //getUtenteByUsername
+    isEmailTaken,
+    verifyPasswordByUsername,
+    getUtente
 };
