@@ -1,64 +1,34 @@
 <!DOCTYPE html>
 <html lang="it">
+<title>TrenGo</title>
 <head>
     
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin=""/>
+    <link rel="stylesheet" href="../css/stileHomepage.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+	<script>
+  	const app = Vue.createApp({
+   		data() 
+   		{
+    		return 
+    		{
+      			usernames:
+      			[
+      				"marcolino",
+      				"marcolana"
+      			]
+    		}
+   		}
+  	})
+  	app.mount('#app')
+	</script>
     
-    <style>
-        .header
-        {
-            height: 50px;
-            background-color: #f1f1f1;
-            text-align: center;
-        }
-
-        .menubar
-        {
-            overflow: hidden;
-            background-color: #333;
-        }
-
-        .menubar a
-        {
-            float: left;
-            display: block;
-            color: #f2f2f2;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-        }
-
-        .menubar a:hover 
-        {
-            background-color: #ddd;
-            color: black;
-        }
-
-        .bacheca
-        {
-            float: left;
-            width: 33.33%;
-            background-color: red;
-            height: 470px;
-        }
-
-        .mappa
-        {
-            float: left;
-            width: 66.66%;
-            height: 470px;
-        }
-    </style>
 </head>
-<body>
-    <div class="header"><h1>Titolo</h1></div>
-   
+<body style="background-color: #333">
+    <div class="header"><h1>TrenGo</h1></div>
+
     <div class="menubar">
         <a href="#">Account</a>
         <a href="#">Chats</a>
@@ -66,17 +36,26 @@
     </div> 
 
     <div class="bacheca">
-        <h2>BACHECA</h2>
+        <h2 style="height: 5%">Bacheca</h2>
+        <input type="text" class="barraRicerca" placeholder="Cerca proposte..."></input>
+        <div class="contenitoreProposte">
+        	<div class="proposta" v-for="x in usernames" >
+        		<h3>Titolo proposta</h3>
+        		<br>
+        		<font>Creatore: <a href="#"></a>    Luogo: "luogo"   Data: "data"
+        		</font>
+        		<br><br>
+        		<font>Descrizione: Lorem ipsum bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla</font>
+        		<br><br>
+        		<font color="green">Interesse1 Interesse2 Interesse3</font>
+        	</div>
+        </div>
     </div>
 
     <div id="map" class="mappa"></div>
-
     <script type="text/javascript">
         var map = L.map('map').setView([46.0677, 11.1215], 12);
-
-        const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        }).addTo(map);
+        const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19}).addTo(map);
     </script>
 </body>
 </html>
