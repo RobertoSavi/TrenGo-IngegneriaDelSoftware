@@ -8,21 +8,19 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+	
 	<script>
-  	const app = Vue.createApp({
-   		data() 
-   		{
-    		return 
-    		{
-      			usernames:
-      			[
-      				"marcolino",
-      				"marcolana"
-      			]
-    		}
-   		}
-  	})
-  	app.mount('#app')
+  		const app = Vue.createApp({
+   			data() {
+    			return {
+      				usernames:[
+      					"marcolino",
+      					"marcolana"
+      				]
+    			}
+   			}
+  		})
+  		app.mount('#app')
 	</script>
     
 </head>
@@ -39,15 +37,14 @@
         <h2 style="height: 5%">Bacheca</h2>
         <input type="text" class="barraRicerca" placeholder="Cerca proposte..."></input>
         <div class="contenitoreProposte">
-        	<div class="proposta" v-for="x in usernames" >
+        	<div class="proposta" v-for="x in usernames" v-model="x">
         		<h3>Titolo proposta</h3>
         		<br>
-        		<font>Creatore: <a href="#"></a>    Luogo: "luogo"   Data: "data"
-        		</font>
+        		<p>Creatore: <a href="#">{{x}}</a>    Luogo: "luogo"   Data: "data"</p>
         		<br><br>
-        		<font>Descrizione: Lorem ipsum bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla</font>
+        		<p>Descrizione: Lorem ipsum bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla</p>
         		<br><br>
-        		<font color="green">Interesse1 Interesse2 Interesse3</font>
+        		<p>Interesse1 Interesse2 Interesse3</p>
         	</div>
         </div>
     </div>
