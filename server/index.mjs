@@ -1,6 +1,7 @@
 import connectToMongoDB  from "./db/connection.mjs"; 
 import utentiRouter from "./routes/utentiRoutes.mjs";
 import proposteRouter from "./routes/proposteRoutes.mjs";
+import richiesteRouter from "./routes/richiesteRoutes.mjs";
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -32,6 +33,7 @@ connectToMongoDB()
     // Utilizza le route
     app.use("/utenti", utentiRouter); // Route per gli utenti
     app.use("/proposte", proposteRouter); // Route per le proposte
+    app.use("/proposte", richiesteRouter); // Route per le proposte
 
     // Gestione errori globali
     app.use((err, _req, res, next) => {

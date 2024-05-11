@@ -15,10 +15,30 @@ async function getProposte(req, res){
         if (!proposte) {
             return res.status(400).json({message: "Nessuna proposta disponibile."});
         }
-        return res.status(200).json({proposte: proposte});
+        return res.status(200).json({proposte});
 
     } catch (error) {
         return res.status(500).json({message: "Errore durante il recupero delle proposte", error: error.message});
+    }
+}
+
+/**
+ * Ottiene una proposte dal database.
+ * @param {object} req - L'oggetto della richiesta.
+ * @param {object} res - L'oggetto della risposta.
+ */
+async function getPropostaById(req, res){
+    try {
+        const {id} = req.params;
+        const proposta = await propostaModel.Proposta.findById(id);
+        
+        if (!proposta) {
+            return res.status(400).json({message: "Proposta non trovata"});
+        }
+        return res.status(200).json({proposta});
+
+    } catch (error) {
+        return res.status(500).json({message: "Errore durante il recupero della proposta", error: error.message});
     }
 }
 
@@ -51,9 +71,7 @@ async function postProposta(req, res){
     try {
         // Creazione della proposta
         const idCreatore = new mongoose.Types.ObjectId(creatore);
-        console.log(idCreatore);
         const proposta = await propostaModel.Proposta.create({idCreatore, usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data});
-        console.log(proposta);
         return res.status(200).json({proposta});
 
     } catch (error) {
@@ -111,6 +129,7 @@ async function deletePropostaById(req, res){
 // Esporta handlers
 export {
     getProposte,
+    getPropostaById,
     postProposta,
     modifyPropostaById,
     deletePropostaById

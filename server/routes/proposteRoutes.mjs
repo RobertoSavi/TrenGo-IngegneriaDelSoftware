@@ -6,16 +6,16 @@ const router = Router();
 // Permette di ottenere le proposte
 router.get("", handlers.getProposte);
 
+// Permette di ottenere una proposta tramite l'id
+router.get("/:id", handlers.getPropostaById);
+
 // Permette di pubblicare una proposta
 router.post("", handlers.postProposta);
 
-// Permette di modificare una proposta
+// Permette di modificare una proposta tramite l'id
 router.put("/:id", handlers.modifyPropostaById);
 
-// Permette di eliminare una proposta
+// Permette di eliminare una proposta tramite l'id
 router.delete("/:id", handlers.deletePropostaById);
-
-// Permette di richiedere di partecipare ad una proposta
-//router.post("/proposta/:id/partecipa", handlers.partecipaProposta);
 
 export default router;
