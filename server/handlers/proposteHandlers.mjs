@@ -28,12 +28,21 @@ async function getProposte(req, res){
  * @param {object} res - L'oggetto della risposta.
  */
 async function postProposta(req, res){
-    const {creatore, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data} = req.body;
+    const {creatore, usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data} = req.body;
     const errors = [];
 
     // Validazione delle categorie
     if (!validators.categorieInEnum(categorie)) 
         errors.push({field: "categorie", message: "Categorie non valide"});
+
+    // Validazione del titolo
+    if (!validators.validateTitolo(titolo)) 
+        errors.push({field: "titolo", message: "Titolo troppo lungo o troppo corto"});
+
+    // Validazione della descrizione
+    if (!validators.validateDescrizione(descrizione)) 
+        errors.push({field: "descrizione", message: "Descrizione troppo lunga"});
+
 
     // Gestione degli errori
     if (errors.length > 0) 
@@ -42,12 +51,14 @@ async function postProposta(req, res){
     try {
         // Creazione della proposta
         const idCreatore = new mongoose.Types.ObjectId(creatore);
-        const proposta = await propostaModel.Proposta.create({idCreatore, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data});
-        return res.status(200).json({message: "success"});
+        console.log(idCreatore);
+        const proposta = await propostaModel.Proposta.create({idCreatore, usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data});
+        console.log(proposta);
+        return res.status(200).json({proposta});
 
     } catch (error) {
         // Gestione dell'errore durante la creazione della proposta
-        return res.status(500).json({ message: "error", reason: "Errore interno del server" });
+        return res.status(500).json({message: "Errore durante la creazione della proposta", error: error.message});
     }
 }
 
