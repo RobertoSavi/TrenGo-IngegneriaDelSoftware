@@ -1,6 +1,3 @@
 node_modules
-yarn.lock
-config.env
+package-lock.json
 .env
-.settings
-.project
