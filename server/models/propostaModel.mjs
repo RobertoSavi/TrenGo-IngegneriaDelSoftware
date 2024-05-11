@@ -10,6 +10,18 @@ const schemaProposta = new mongoose.Schema({
         required: true,
         ref: "Utente" // Riferimento al modello utente
     },
+    // Username del creatore della proposta
+    usernameCreatore: {
+        type: String,
+        required: true
+    },
+    // Titolo della proposta
+    titolo: {
+        type: String,
+        required: true,
+        minLength: 5,
+        maxLength: 30
+    },
     // Categorie dell'attività proposta
     categorie: {
         type: [String],
@@ -30,14 +42,13 @@ const schemaProposta = new mongoose.Schema({
     // Descrizione dell'attività proposta
     descrizione: {
         type: String,
-        required: true,
-        minLength: 5
+        maxLength: 200
     },
     // Numero desiderato di partecipanti all'attività proposta
     numeroPartecipantiDesiderato: {
         type: Number,
         required: true,
-        default: 10
+        default: 5
     },
     // Numero effettivo di partecipanti all'attività proposta
     numeroPartecipanti: {
