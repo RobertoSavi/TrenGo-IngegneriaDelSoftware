@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
-import { ObjectId } from "mongodb";
-import { interessiEnum } from './enums';
+import  {ObjectId}  from "mongodb";
+import  {interessiEnum}  from './enums.mjs';
 
 // Definizione dello schema per le proposte di attività
 const schemaProposta = new mongoose.Schema({
     // ID dell'utente creatore della proposta
-    creatore: {
+    idCreatore: {
         type: ObjectId,
         required: true,
         ref: "Utente" // Riferimento al modello utente
@@ -14,11 +14,13 @@ const schemaProposta = new mongoose.Schema({
     categorie: {
         type: [String],
         enum: interessiEnum,
+        required: true,
         default: "Altro"
     },
     // Nome del luogo dell'attività proposta
     nomeLuogo: {
         type: String,
+        required: true
     },
     // Coordinate del luogo dell'attività proposta
     coordinate: {
@@ -48,7 +50,7 @@ const schemaProposta = new mongoose.Schema({
         required: true,
         validate: {
             validator: function (date) {
-                return date <= new Date();
+                return date >= new Date();
             },
             message: _props => `Data non valida`
         }
@@ -56,7 +58,7 @@ const schemaProposta = new mongoose.Schema({
     // ID della chat associata all'attività proposta
     idChat: {
         type: ObjectId,
-        required: true,
+        //required: true,
         ref: "Chats" // Riferimento al modello chats
     },
     // Elenco degli utenti che partecipano all'attività proposta
@@ -67,10 +69,14 @@ const schemaProposta = new mongoose.Schema({
     },
     // Stato dell'attività proposta
     stato: {
-        type: Boolean
+        type: Boolean,
+        default: true
     }
 });
 
 // Creazione del modello Proposta
 const Proposta = mongoose.model("Proposta", schemaProposta, "Proposte");
-export default Proposta;
+export {
+    Proposta,
+    schemaProposta
+};
