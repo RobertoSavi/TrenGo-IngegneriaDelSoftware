@@ -9,11 +9,8 @@ router.get("/:id", handlers.getUtenteById);
 // Permette di modificare un utente tramite l'id
 router.put("/:id", handlers.updateUtenteById);
 
-// Permette di di ottenere i dati di un utente tramite l'username
+// Permette di ottenere i dati di un utente tramite l'username
 router.get("/username/:username", handlers.getUtenteByUsername);
-
-// Permette di modificare un utente tramite l'username
-router.put("/username/:username", handlers.updateUtenteByUsername);
 
 // Permette la registrazione di un utente
 router.post("/signup", handlers.signupUtente);

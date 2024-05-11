@@ -1,20 +1,20 @@
+import connectToMongoDB  from "./db/connection.mjs"; 
+import utentiRouter from "./routes/utentiRoutes.mjs";
+import proposteRouter from "./routes/proposteRoutes.mjs";
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import mongoose from "mongoose";
-import "./loadEnvironment.mjs";
-import utentiRouter from "./routes/utentiRoutes.mjs";
-import proposteRouter from "./routes/proposteRoutes.mjs";
 import swaggerui from "swagger-ui-express";
 import YAML from "yamljs";
-import connectToMongoDB  from "./db/connection.mjs"; 
-//import "express-async-errors";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const swaggerFile = YAML.load('./swagger.yml');
 
-
-const PORT = process.env.PORT || 5050;
 const app = express();
+
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors({
@@ -25,36 +25,40 @@ app.use(
   swaggerui.serve, 
   swaggerui.setup(swaggerFile)
 );
+
+// Connessione al database MongoDB
 connectToMongoDB()
   .then(() => {
-    // Use routes
-    app.use("/utenti", utentiRouter);
-    app.use("/proposte", proposteRouter);
-    // Global error handling
+    // Utilizza le route
+    app.use("/utenti", utentiRouter); // Route per gli utenti
+    app.use("/proposte", proposteRouter); // Route per le proposte
+
+    // Gestione errori globali
     app.use((err, _req, res, next) => {
-      res.status(500).send("Uh oh! An unexpected error occured.")
-    })
-    // Start the server
-    const server = app.listen(PORT, () => {
-      console.log(`Server is running on port: ${PORT}`);
+      res.status(500).send("Uh oh! Si è verificato un errore imprevisto.");
     });
-    //close MongoDB connection on process exit
+
+    // Avvia il server
+    const server = app.listen(process.env.PORT, () => {
+      console.log(`Il server è in esecuzione sulla porta: ${process.env.PORT}`);
+    });
+
+    // Chiudi la connessione a MongoDB quando il processo viene arrestato
     process.on('SIGINT', async () => {
       try {
         await mongoose.disconnect();
-        console.log('MongoDB connection closed');
+        console.log('Connessione a MongoDB chiusa');
       } catch (error) {
-        console.error('Error closing MongoDB connection:', error);
+        console.error('Errore durante la chiusura della connessione a MongoDB:', error);
       } finally {
         server.close(() => {
-          console.log('Server stopped');
+          console.log('Server fermato');
           process.exit(0);
         });
       }
     });
   })
   .catch((error) => {
-    console.error('Error connecting to MongoDB:', error);
-    process.exit(1); // Exit the process with an error code
+    console.error('Errore durante la connessione a MongoDB:', error);
+    process.exit(1); // Esce dal processo con un codice di errore
   });
-

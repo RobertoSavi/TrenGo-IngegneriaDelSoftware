@@ -92,8 +92,6 @@ async function getUtente(username) {
     }
 }
 
-
-
 // Esporta validatori
 export {
     isUsernameValid,

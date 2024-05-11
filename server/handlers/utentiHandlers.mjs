@@ -18,7 +18,7 @@ async function getUtenteById(req, res) {
             return res.status(400).json({message: "Utente non trovato"});
         }
         
-        return res.status(200).json({utente: utente});
+        return res.status(200).json({utente});
     } catch (error) {
         return res.status(500).json({message: "Errore durante il recupero dell'utente", error: error.message});
     }
@@ -33,53 +33,16 @@ async function updateUtenteById(req, res) {
     try {
         const {id} = req.params;
         const updates = req.body;
-        console.log("il cazzo di id è" + id);
 
         // Aggiorna il documento utente con tutti i campi forniti nel corpo della richiesta
         const utente = await utenteModel.Utente.findByIdAndUpdate(id, updates, {new: true});
-        console.log(utente);
 
         if (!utente) {
-            console.log("Utente non trovato.");
             return res.status(404).json({message: "Utente non trovato"});
         }
-
-        console.log("Utente aggiornato con successo.");
         return res.status(200).json({utente});
+
     } catch (error) {
-        console.error("Errore durante l'aggiornamento dell'utente:", error);
-        return res.status(500).json({message: "Errore durante l'aggiornamento dell'utente", error: error.message});
-    }
-}
-
-/**
- * Ottiene un utente dal database utilizzando l'username fornito.
- * @param {object} req - L'oggetto della richiesta.
- * @param {object} res - L'oggetto della risposta.
- */
-
-/**
- * Aggiorna un utente nel database utilizzando l'username fornito e i dati di aggiornamento.
- * @param {object} req - L'oggetto della richiesta.
- * @param {object} res - L'oggetto della risposta.
- */
-async function updateUtenteByUsername(req, res) {
-    try {
-        const {username} = req.params;
-        const updates = req.body;
-
-        // Aggiorna il documento utente con tutti i campi forniti nel corpo della richiesta
-        const utente = await utenteModel.Utente.findOneAndUpdate({username}, updates, {new: true});
-    
-        if (!utente) {
-            console.log("Utente non trovato.");
-            return res.status(404).json({message: "Utente non trovato"});
-        }
-
-        console.log("Utente aggiornato con successo.");
-        return res.status(200).json({utente});
-    } catch (error) {
-        console.error("Errore durante l'aggiornamento dell'utente:", error);
         return res.status(500).json({message: "Errore durante l'aggiornamento dell'utente", error: error.message});
     }
 }
@@ -92,15 +55,15 @@ async function updateUtenteByUsername(req, res) {
 async function getUtenteByUsername(req, res) {
     try {
         const {username} = req.params;
+
         // Trova l'utente nel database utilizzando lo username
         const utente = await utenteModel.Utente.findOne({username: username});
 
         if (!utente) {
-            console.log("Utente non trovato.");
             return res.status(400).json({message: "Utente non trovato"});
         }
+        return res.status(200).json({utente});
 
-        return res.status(200).json({utente: utente});
     } catch (error) {
         return res.status(500).json({message: "Errore durante il recupero dell'utente", error: error.message});
     }
@@ -114,7 +77,6 @@ async function getUtenteByUsername(req, res) {
 async function signupUtente(req, res) {
     // Estrai username, email e password dal body della richiesta
     const {username, email, password} = req.body;
-    console.log(username,email,password);
     // Inizializza un array per gli errori
     const errors = [];
 
@@ -146,9 +108,9 @@ async function signupUtente(req, res) {
         // Creazione dell'utente
         await utenteModel.Utente.create({username, email, password});
         return res.status(200).json({message: "success"});
+
     } catch (error) {
         // Gestione dell'errore durante la creazione dell'utente
-        console.error("Errore durante la registrazione dell'utente:", error);
         return res.status(500).json({ message: "error", reason: "Errore interno del server" });
     }
 }
@@ -180,8 +142,8 @@ async function loginUtente(req, res){
         }
         //TODO!! implementare token per autenticazione
         return res.status(200).json({utente});
+        
     } catch (error) {
-        console.error("Errore nel login:", error);
         return res.status(500).json({success: false, message: "Errore interno del server"});
     } 
 }
@@ -191,7 +153,6 @@ export {
     getUtenteById,
     updateUtenteById,
     getUtenteByUsername,
-    updateUtenteByUsername,
     signupUtente,
     loginUtente   
 };
