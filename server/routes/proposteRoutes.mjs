@@ -1,16 +1,21 @@
-import express from "express";
-import db from "../db/connection.mjs";
-import { ObjectId } from "mongodb";
+import  Router  from "express";
+import * as handlers from "../handlers/proposteHandlers.mjs"
 
-const router = express.Router();
+const router = Router();
 
-// Ottieni ogni proposta nel database
-router.get("/", async (req, res) => {
-  let collection = await db.collection("Proposte");
-  let results = await collection.find({})
-    .limit(50)
-    .toArray();
-  res.send(results).status(200);
-});
+// Permette di ottenere le proposte
+router.get("", handlers.getProposte);
+
+// Permette di pubblicare una proposta
+router.post("", handlers.postProposta);
+
+// Permette di modificare una proposta
+router.put("/:id", handlers.modifyPropostaById);
+
+// Permette di eliminare una proposta
+router.delete("/:id", handlers.deletePropostaById);
+
+// Permette di richiedere di partecipare ad una proposta
+//router.post("/proposta/:id/partecipa", handlers.partecipaProposta);
 
 export default router;
