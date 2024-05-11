@@ -6,53 +6,59 @@
     <link rel="stylesheet" href="../css/stileHomepage.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-	
-	<script>
-  		const app = Vue.createApp({
-   			data() {
-    			return {
-      				usernames:[
-      					"marcolino",
-      					"marcolana"
-      				]
-    			}
-   			}
-  		})
-  		app.mount('#app')
-	</script>
     
 </head>
 <body style="background-color: #333">
-    <div class="header"><h1>TrenGo</h1></div>
+    <div id="app">
+    	<div class="header"><h1>TrenGo</h1></div>
 
-    <div class="menubar">
-        <a href="#">Account</a>
-        <a href="#">Chats</a>
-        <a href="#">Impostazioni</a>
-    </div> 
+    	<div class="menubar">
+        	<a href="#">Mie proposte</a>
+        	<a href="#">Account</a>
+    	</div> 
 
-    <div class="bacheca">
-        <h2 style="height: 5%">Bacheca</h2>
-        <input type="text" class="barraRicerca" placeholder="Cerca proposte..."></input>
-        <div class="contenitoreProposte">
-        	<div class="proposta" v-for="x in usernames" v-model="x">
-        		<h3>Titolo proposta</h3>
-        		<br>
-        		<p>Creatore: <a href="#">{{x}}</a>    Luogo: "luogo"   Data: "data"</p>
-        		<br><br>
-        		<p>Descrizione: Lorem ipsum bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla</p>
-        		<br><br>
-        		<p>Interesse1 Interesse2 Interesse3</p>
+    	<div class="bacheca">
+        	<h2 style="height: 5%">Bacheca</h2>
+        	<input type="text" class="barraRicerca" placeholder="Cerca proposte..."></input>
+        	<div class="contenitoreProposte">
+        		<div class="proposta" v-for="proposta in proposte">
+       	 			<h3><a href="#">{{ proposta.titolo }}</a></h3>
+        			<br>
+        			<p><strong>Creatore:</strong> <a href="#">{{ proposta.usernameCreatore }}</a> 
+        			<br> 
+        			<strong>Luogo:</strong> {{ proposta.nomeLuogo }} 
+        			<br>  
+        			<strong>Data:</strong> {{ proposta.data }} </p>
+        			<br>
+        			<p><strong>Descrizione:</strong> {{ proposta.descrizione }}</p>
+        			<br>
+        			<p v-for="categoria in proposta.categorie">{{ categorie }}</p>
+        		</div>
         	</div>
-        </div>
+    	</div>
     </div>
-
+    
     <div id="map" class="mappa"></div>
+    
     <script type="text/javascript">
-        var map = L.map('map').setView([46.0677, 11.1215], 12);
-        const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19}).addTo(map);
+		var map = L.map('map').setView([46.0677, 11.1215], 12);
+		const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19}).addTo(map);
     </script>
+    
+	<script>
+  	const app = Vue.createApp({
+   		data() {
+    		return {
+				proposte: null
+    		}
+   		},
+   	  	mounted () {
+			axios.get('http://localhost:5050/proposte').then(response => (this.proposte = response.data.proposte));
+		}
+  	})
+  	app.mount('#app');
+	</script>
 </body>
 </html>
