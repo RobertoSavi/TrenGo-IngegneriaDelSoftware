@@ -97,13 +97,13 @@ paths:
           description: Bad request
         '500':
           description: Internal server error
-  /utenti/{username}:
+  /utenti/{id}:
     get:
       tags:
         - utenti
-      summary: Get utente by username
+      summary: Ottiene i dati utente a partire dall'id
       description: ''
-      operationId: utentiGetByUsername
+      operationId: getUtenteById
       requestBody:
         required: true
         content:
@@ -111,11 +111,7 @@ paths:
             schema:
               type: object
               properties:
-                username:
-                  type: string
-                email:
-                  type: string
-                password:
+                id:
                   type: string
       responses:
         '200':
@@ -131,9 +127,9 @@ paths:
     put:
       tags:
         - utenti
-      summary: Update utente by username
-      description: Può essere chiamata solo da un user autenticato con successo
-      operationId: updateUser
+      summary: Modifica i dati utente a partire dall'id
+      description: ''
+      operationId: updateUtenteById
       requestBody:
         required: true
         content:
@@ -152,18 +148,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Utente'
-        '400':
-          description: Bad request
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Descrizione dello stato della richiesta
+                  self:
+                    type: string
+                    description: Link in formato API alla risorsa appena creata
+        '403':
+          description: Impossibile modificare account altrui
+        '404':
+          description: Utente non trovato
         '500':
-          description: Internal server error
+          description: Errore durante l'aggiornamento dell'utente
   /proposte:
     post:
       tags:
         - proposte
       summary: Crea una nuova proposta
-      description: Può essere invocata solo da un user autenticato con successo
-      operationId: Crea proposta
+      description: ''
+      operationId: postProposta
       requestBody:
         required: true
         content:
@@ -171,13 +176,19 @@ paths:
             schema:
               type: object
               properties:
+                idCreatore:
+                  type: string
                 usernameCreatore:
                   type: string
-                intercategoriePropostaessi:
+                titolo:
+                  type: string
+                categorie:
                   type: array
                   items:
                     type: string
                 nomeLuogo:
+                  type: string
+                descrizione:
                   type: string
                 numeroPartecipantiDesiderato:
                   type: integer
@@ -187,16 +198,25 @@ paths:
                 stato:
                   type: boolean
       responses:
-        '200':
+        '201':
           description: Proposta creata con successo
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Proposta'
-        '400':
-          description: Bad request
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Descrizione dello stato della richiesta
+                  self:
+                    type: string
+                    description: Link in formato API alla risorsa appena creata
+        '403':
+          description: Impossibile modificare proposte altrui
+        '404':
+          description: Proposta non trovata
         '500':
-          description: Internal server error
+          description: Errore durante la creazione della proposta
 components:
   schemas:
     Utente:

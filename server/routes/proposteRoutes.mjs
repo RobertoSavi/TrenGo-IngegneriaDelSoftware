@@ -1,7 +1,14 @@
 import  Router  from "express";
 import * as handlers from "../handlers/proposteHandlers.mjs"
+import tokenChecker from "../validators/tokenChecker.mjs";
 
 const router = Router();
+
+// Permette di ottenere le proposte pubblicate da grandi organizzatori
+router.get("/NA", handlers.getProposteNA);
+
+// Uso il middleware per verificare che l'utente sia utenticato
+router.use("", tokenChecker);
 
 // Permette di ottenere le proposte
 router.get("", handlers.getProposte);

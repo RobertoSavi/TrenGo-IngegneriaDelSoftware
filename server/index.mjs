@@ -8,7 +8,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import swaggerui from "swagger-ui-express";
 import YAML from "yamljs";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -17,7 +17,7 @@ const swaggerFile = YAML.load('./swagger.yml');
 const app = express();
 
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true}));
 app.use(cors({
   origin: "*", // Permette l'accesso da qualsiasi indirizzo
 }))
@@ -35,10 +35,18 @@ connectToMongoDB()
     app.use("/proposte", proposteRouter); // Route per le proposte
     app.use("/proposte", richiesteRouter); // Route per le proposte
 
-    // Gestione errori globali
-    app.use((err, _req, res, next) => {
-      res.status(500).send("Uh oh! Si è verificato un errore imprevisto.");
+    // Gestione status 404
+    app.use((req, res) => {
+      res.status(404);
+      res.json({error: "Not found"});
     });
+    
+    // Gestione status 500
+    app.use((req, res) => {
+      res.status(500);
+      res.json({error: "Internal Server Error"});
+    });
+    
 
     // Avvia il server
     const server = app.listen(process.env.PORT, () => {

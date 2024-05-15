@@ -1,4 +1,5 @@
 import * as propostaModel from "../models/propostaModel.mjs"
+import * as utenteModel from "../models/utenteModel.mjs"
 import * as validators from "../validators/proposteValidators.mjs";
 import mongoose from "mongoose";
 //import {ObjectId} from "mongodb";
@@ -11,6 +12,33 @@ import mongoose from "mongoose";
 async function getProposte(req, res){
     try {
         const proposte = await propostaModel.Proposta.find();
+        
+        if (!proposte) {
+            return res.status(400).json({message: "Nessuna proposta disponibile."});
+        }
+        return res.status(200).json({proposte});
+
+    } catch (error) {
+        return res.status(500).json({message: "Errore durante il recupero delle proposte", error: error.message});
+    }
+}
+
+/**
+ * Ottiene le proposte pubblicate da grandi organizzatori dal database (usato da utenti non autenticati).
+ * @param {object} req - L'oggetto della richiesta.
+ * @param {object} res - L'oggetto della risposta.
+ */
+async function getProposteNA(req, res){
+    try {
+        const grandiOrganizzatori = await utenteModel.Utente.find({
+            "tipoUtente": "grandeOrganizzatore"
+          });
+        console.log(grandiOrganizzatori.map((u) => u._id));
+        const proposte = await propostaModel.Proposta.find({
+            "idCreatore": {
+              $in: grandiOrganizzatori.map((u) => u._id)
+            }
+          });
         
         if (!proposte) {
             return res.status(400).json({message: "Nessuna proposta disponibile."});
@@ -72,7 +100,7 @@ async function postProposta(req, res){
         // Creazione della proposta
         const idCreatore = new mongoose.Types.ObjectId(creatore);
         const proposta = await propostaModel.Proposta.create({idCreatore, usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data});
-        return res.status(200).json({proposta});
+        return res.status(201).json({message: "success", self: "proposte/" + proposta._id});
 
     } catch (error) {
         // Gestione dell'errore durante la creazione della proposta
@@ -89,17 +117,28 @@ async function modifyPropostaById(req, res){
     try {
         const {id} = req.params;
         const updates = req.body;
+        const loggedId = req.utenteLoggato.loggedId; // ID dell'utente loggato
 
-        // Aggiorna il documento proposta con tutti i campi forniti nel corpo della richiesta
-        const proposta = await propostaModel.Proposta.findByIdAndUpdate(id, updates, {new: true});
+        // Trovo la proposta da modificare
+        var proposta = await propostaModel.Proposta.findById(id);
 
         if (!proposta) {
             console.log("Proposta non trovata.");
             return res.status(404).json({message: "Proposta non trovata"});
         }
 
+        // Permetto la modifica dei dati utente solo se il chiamante dell'API è il creatore della proposta
+        if(proposta.idCreatore==loggedId){
+            // Aggiorna il documento proposta con tutti i campi forniti nel corpo della richiesta
+            proposta=await propostaModel.Proposta.findByIdAndUpdate(id, updates, {new: true});
+        }
+        else{
+            return res.status(403).json({message: "Impossibile modificare proposte altrui"});
+        }
+
         return res.status(200).json({proposta});
     } catch (error) {
+        console.log(error);
         return res.status(500).json({message: "Errore durante la modifica della proposta", error: error.message});
     }
 }
@@ -112,23 +151,35 @@ async function modifyPropostaById(req, res){
 async function deletePropostaById(req, res){
     try {
         const { id } = req.params;
+        const loggedId = req.utenteLoggato.loggedId; // ID dell'utente loggato
 
-        // Trova e elimina la proposta dal database
-        const proposta = await propostaModel.Proposta.findByIdAndDelete(id);
+        // Trovo la proposta da modificare
+        var proposta = await propostaModel.Proposta.findById(id);
 
         if (!proposta) {
-            return res.status(404).json({ message: "Proposta non trovata" });
+            console.log("Proposta non trovata.");
+            return res.status(404).json({message: "Proposta non trovata"});
         }
 
-        return res.status(200).json({proposta});
+        // Permetto la modifica dei dati utente solo se il chiamante dell'API è il creatore della proposta
+        if(proposta.idCreatore==loggedId){
+            // Trova e elimina la proposta dal database
+            await propostaModel.Proposta.findByIdAndDelete(id);
+        }
+        else{
+            return res.status(403).json({message: "Impossibile eliminare proposte altrui"});
+        }
+        return res.status(204).json({message: "Risorsa eliminata con successo"});
+
     } catch (error) {
-        return res.status(500).json({ message: "Errore durante l'eliminazione della proposta", error: error.message });
+        return res.status(500).json({message: "Errore durante l'eliminazione della proposta", error: error.message});
     }
 }
 
 // Esporta handlers
 export {
     getProposte,
+    getProposteNA,
     getPropostaById,
     postProposta,
     modifyPropostaById,
