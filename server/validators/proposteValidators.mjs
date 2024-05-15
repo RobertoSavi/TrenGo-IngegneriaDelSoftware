@@ -11,7 +11,6 @@ function categorieInEnum(categorie) {
     if (!Array.isArray(categorie)) {
         categorie = [categorie];
     }
-
     // Controlla se ogni categoria è presente nell'elenco delle categorie consentite
     return categorie.every(categoria => interessiEnum.includes(categoria));
 }

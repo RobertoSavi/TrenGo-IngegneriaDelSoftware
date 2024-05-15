@@ -1,6 +1,6 @@
 import * as richiestaModel from "../models/richiestaModel.mjs"
 import * as propostaModel from "../models/propostaModel.mjs"
-//import * as validators from "../validators/richiesteValidators.mjs";
+import validateStato from "../validators/richiesteValidators.mjs";
 import mongoose from "mongoose";
 
 /**
@@ -113,16 +113,29 @@ async function handleRichiestaById(req, res){
         const loggedId = req.utenteLoggato.loggedId; // ID dell'utente loggato
         const stato = req.body;
         var richiesta = await richiestaModel.Richiesta.findById(id);
+        const errors = [];
 
         if (!richiesta) {
             console.log("Richiesta non trovata.");
             return res.status(404).json({message: "Richiesta non trovata"});
         }
 
+        if(!validateStato(stato.stato))
+            errors.push({field: "stato", message: "Stato non valido - stati accettati['accettata','rifiutata']"});
+
+        // Gestione degli errori
+        if (errors.length > 0) 
+            return res.status(400).json({message: "error", errors});
+
         // Modifico la richiesta solo se sono il creatore della proposta
         if(loggedId==proposta.idCreatore.toString()){
             // Aggiorna la richiesta cambiando il campo stato
             richiesta = await richiestaModel.Richiesta.findByIdAndUpdate(id, stato, {new: true});
+            // Se accetto la richiesta aggiungo il richiedente ai partecipanti
+            if(stato.stato=="accettata"){
+                proposta.partecipanti.push(richiesta.idRichiedente);
+                proposta.save();
+            }
             return res.status(200).json({self: "richeste/" + richiesta._id});
         }
         else{

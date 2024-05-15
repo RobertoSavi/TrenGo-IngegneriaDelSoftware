@@ -53,7 +53,7 @@ const schemaProposta = new mongoose.Schema({
     // Numero effettivo di partecipanti all'attività proposta
     numeroPartecipanti: {
         type: Number,
-        default: 0
+        default: 1
     },
     // Data e ora dell'attività proposta
     data: {
@@ -74,7 +74,7 @@ const schemaProposta = new mongoose.Schema({
     },
     // Elenco degli utenti che partecipano all'attività proposta
     partecipanti: {
-        type: [ObjectId],
+        type: [String],
         default: [],
         ref: "Utente" // Riferimento al modello utente
     },

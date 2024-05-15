@@ -94,13 +94,15 @@ async function getUtenteByUsername(req, res) {
 
         // Altrimenti ritorna solo le informazioni pubbliche
         return res.status(200).json({
-            username: utente.username, 
-            tipoUtente: utente.tipoUtente,
-            nome: utente.nome,
-            cognome: utente.cognome,
-            karma: utente.karma,
-            interessi: utente.interessi
-            });
+            "utente": {
+                username: utente.username, 
+                tipoUtente: utente.tipoUtente,
+                nome: utente.nome,
+                cognome: utente.cognome,
+                karma: utente.karma,
+                interessi: utente.interessi
+            }
+        });
     } catch (error) {
         return res.status(500).json({message: "Errore durante il recupero dell'utente", error: error.message});
     }

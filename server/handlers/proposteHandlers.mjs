@@ -100,6 +100,8 @@ async function postProposta(req, res){
         // Creazione della proposta
         const idCreatore = new mongoose.Types.ObjectId(creatore);
         const proposta = await propostaModel.Proposta.create({idCreatore, usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data});
+        proposta.partecipanti.push(idCreatore);
+        proposta.save();
         return res.status(201).json({self: "proposte/" + proposta._id});
 
     } catch (error) {

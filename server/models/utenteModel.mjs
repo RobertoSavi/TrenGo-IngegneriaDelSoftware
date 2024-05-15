@@ -71,7 +71,7 @@ const schemaUtente = new mongoose.Schema({
     },
     // Elenco degli utenti seguiti dall'utente
     followed: {
-        type: [ObjectId],
+        type: [String],
         default: [],
         ref: "Utente" // Riferimento al modello utente
     }
