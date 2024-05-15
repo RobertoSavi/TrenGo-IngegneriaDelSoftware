@@ -4,8 +4,7 @@ import jwt from "jsonwebtoken";
 // Middleware per verificare e decodificare un token JWT
 function tokenChecker (req, res, next) {
 	// Controlla l'header per trovare il token
-	const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[2];
+	const token = req.get('Token');
 
 	// Se non è presente alcun token
 	if (!token) {

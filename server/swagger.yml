@@ -5,13 +5,14 @@ info:
 servers:
   - url: http://localhost:5050/
 paths:
+  /middleware: 
   /utenti/signup:
     post:
       tags:
         - utenti
       summary: Registra un nuovo utente con i parametri passati
-      description: Può essere invocata solo da un user autenticato con successo
-      operationId: utentiSignup
+      description: ''
+      operationId: signupUtente
       requestBody:
         required: true
         content:
@@ -26,27 +27,27 @@ paths:
                 password:
                   type: string
       responses:
-        '200':
+        '201':
           description: Utente registrato con successo
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  username:
+                  self:
                     type: string
-                    description: Username dell'utente
+                    description: Link in formato API alla risorsa appena creata
         '400':
           description: Bad request
         '500':
-          description: Internal server error
+          description: Errore durante la registrazione dell'utente
   /utenti/login:
     post:
       tags:
         - utenti
       summary: Effettua il login dell'utente
       description: ''
-      operationId: utentiLogin
+      operationId: loginUtente
       requestBody:
         required: true
         content:
@@ -55,8 +56,6 @@ paths:
               type: object
               properties:
                 username:
-                  type: string
-                email:
                   type: string
                 password:
                   type: string
@@ -68,13 +67,22 @@ paths:
               schema:
                 type: object
                 properties:
-                  username:
+                  token:
                     type: string
-                    description: Username dell'utente
-        '400':
-          description: Bad request
+                    description: Token JWT necessario per accedere alle risorse
+                  loggedId:
+                    type: string
+                    description: ID dell'utente associato al token
+                  loggedUsername:
+                    type: string
+                    description: Username dell'utente associato al token
+                  self:
+                    type: string
+                    description: Link in formato API all'utente loggato
+        '401':
+          description: Username o password errati
         '500':
-          description: Internal server error
+          description: Errore durante l'accesso dell'utente
   /user/logout:
     get:
       tags:
@@ -85,14 +93,6 @@ paths:
       responses:
         '200':
           description: Utente ha effettuato il logout con successo
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  username:
-                    type: string
-                    description: Username dell'utente
         '400':
           description: Bad request
         '500':
@@ -101,7 +101,7 @@ paths:
     get:
       tags:
         - utenti
-      summary: Ottiene i dati utente a partire dall'id
+      summary: Ottiene i dati utente tramite dall'id
       description: ''
       operationId: getUtenteById
       requestBody:
@@ -120,14 +120,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Utente'
-        '400':
-          description: Bad request
+        '404':
+          description: Utente non trovato
         '500':
-          description: Internal server error
+          description: Errore durante il recupero dell'utente
     put:
       tags:
         - utenti
-      summary: Modifica i dati utente a partire dall'id
+      summary: Modifica i dati utente tramite dall'id
       description: ''
       operationId: updateUtenteById
       requestBody:
@@ -135,13 +135,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Utente'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/Utente'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Utente'
+              type: object
+              properties:
+                id:
+                  type: string
+                updates:
+                  type: array
+                  description: Array di modifiche da applicare all'utente
       responses:
         '200':
           description: Dati utente modificati con successo
@@ -150,19 +150,62 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
-                    description: Descrizione dello stato della richiesta
                   self:
                     type: string
-                    description: Link in formato API alla risorsa appena creata
+                    description: Link in formato API alla risorsa appena modificata
         '403':
           description: Impossibile modificare account altrui
         '404':
           description: Utente non trovato
         '500':
           description: Errore durante l'aggiornamento dell'utente
+  /utenti/username/{username}:
+    get:
+        tags:
+          - utenti
+        summary: Ottiene i dati utente tramite l'username
+        description: ''
+        operationId: getUtenteByUsername
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+        responses:
+          '200':
+            description: Dati utente recuperati con successo
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Utente'
+          '404':
+            description: Utente non trovato
+          '500':
+            description: Errore durante il recupero dell'utente
   /proposte:
+    get:
+      tags:
+        - proposte
+      summary: Ottiene le proposte
+      description: ''
+      operationId: getProposte
+      responses:
+        '200':
+          description: Proposte recuperate con successo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Proposta'
+        '400':
+          description: Nessuna proposta disponibile
+        '500':
+          description: Errore durante il recupero delle proposte
     post:
       tags:
         - proposte
@@ -195,8 +238,6 @@ paths:
                 data:
                   type: string
                   format: date-time
-                stato:
-                  type: boolean
       responses:
         '201':
           description: Proposta creata con successo
@@ -205,18 +246,225 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
-                    description: Descrizione dello stato della richiesta
                   self:
                     type: string
                     description: Link in formato API alla risorsa appena creata
+        '400':
+          description: Bad request
+        '500':
+          description: Errore durante la creazione della proposta
+  /proposte/NA:
+    get:
+      tags:
+        - proposte
+      summary: Ottiene le proposte pubblicate da grandi organizzatori (usato da utenti non autenticati).
+      description: ''
+      operationId: getProposteNA
+      responses:
+        '200':
+          description: Proposte recuperate con successo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Proposta'
+        '400':
+          description: Nessuna proposta disponibile
+        '500':
+          description: Errore durante il recupero delle proposte
+  /proposte/{id}:
+    get:
+      tags:
+        - proposte
+      summary: Ottiene una proposta tramite l'id
+      description: ''
+      operationId: getPropostaById
+      responses:
+        '200':
+          description: Proposta recuperata con successo
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Proposta'
+        '400':
+          description: Proposta non trovata
+        '500':
+          description: Errore durante il recupero della proposta
+    put:
+      tags:
+        - proposte
+      summary: Modifica una proposta tramite l'id
+      description: ''
+      operationId: modifyPropostaById
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                updates:
+                  type: array
+                  description: Array di modifiche da applicare alla proposta
+      responses:
+        '200':
+          description: Proposta modificata con successo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  self:
+                    type: string
+                    description: Link in formato API alla risorsa appena modificata
         '403':
           description: Impossibile modificare proposte altrui
         '404':
           description: Proposta non trovata
         '500':
-          description: Errore durante la creazione della proposta
+          description: Errore durante la modifica della proposta
+    delete:
+      tags:
+        - proposte
+      summary: Elimina una proposta tramite l'id
+      description: ''
+      operationId: deletePropostaById
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+      responses:
+        '204':
+          description: Proposta eliminata con successo
+        '403':
+          description: Impossibile eliminare proposte altrui
+        '404':
+          description: Proposta non trovata
+        '500':
+          description: Errore durante l'eliminazione della proposta
+  /proposte/{idProposta}/richieste:
+    get:
+      tags:
+        - richieste
+      summary: Ottiene le richieste di partecipazione per una richiesta non ancora gestite (stato=pending)
+      description: ''
+      operationId: getRichieste
+      responses:
+        '200':
+          description: Richieste recuperate con successo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Richiesta'
+        '403':
+          description: Impossibile ottenere le richieste alle proposte altrui
+        '404':
+          description: Nessuna richiesta trovata
+        '500':
+          description: Errore durante il recupero delle richieste
+    post:
+      tags:
+        - richieste
+      summary: Crea una nuova richiesta di partecipazione ad una proposta
+      description: ''
+      operationId: postRichiesta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idRichiedente:
+                  type: integer
+                usernameRichiedente:
+                  type: string
+                idProposta:
+                  type: integer
+                titoloProposta:
+                  type: string
+      responses:
+        '201':
+          description: Richiesta creata con successo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  self:
+                    type: string
+                    description: Link in formato API alla risorsa appena creata
+        '403':
+          description: Impossibile richiedere di partecipare alle proprie proposte
+        '404':
+          description: Proposta non trovata
+        '500':
+          description: Errore durante la creazione della richiesta
+  /proposte/{idProposta}/richieste/{id}:
+    get:
+      tags:
+        - richieste
+      summary: Ottiene una richiesta tramite l'id
+      description: ''
+      operationId: getRichiestaById
+      responses:
+        '200':
+          description: Richiesta recuperata con successo
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Richiesta'
+        '403':
+          description: Impossibile ottenere una richiesta ad una proposta altrui
+        '404':
+          description: Richiesta non trovat
+        '500':
+          description: Errore durante il recupero della richiesta
+    put:
+      tags:
+        - richieste
+      summary: Permette di accettarre o rifiutare una richiesta tramite l'id
+      description: ''
+      operationId: modifyPropostaById
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                stato:
+                  type: string
+                  description: Stato da mettere al posto di pending (accettata o rifiutata)
+      responses:
+        '200':
+          description: Dati utente modificati con successo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  self:
+                    type: string
+                    description: Link in formato API alla risorsa appena modificata
+        '403':
+          description: Impossibile modificare una richiesta ad una proposta altrui
+        '404':
+          description: Richiesta non trovata
+        '500':
+          description: Errore durante la modifica della richiesta
 components:
   schemas:
     Utente:
@@ -238,7 +486,6 @@ components:
           description: Il tipo di utente
           example: autenticato
           enum:
-            - nonAutenticato
             - autenticato
             - grandeOrganizzatore
         nome:
@@ -293,10 +540,19 @@ components:
           format: int64
           description: Id della proposta
           example: 10
+        idCreatore:
+          type: integer
+          format: int64
+          description: Id dell'utente creatore della proposta
+          example: 10
         usernameCreatore:
           type: string
           description: Username del creatore della proposta
           example: Marcotone
+        titolo:
+          type: string
+          description: Titolo della proposta
+          example: Arrampicata vicino via Brennero
         categorieProposta:
           type: array
           items:
@@ -318,6 +574,7 @@ components:
         descrizione:
           type: string
           description: Descrizione della proposta
+          maxLength: 200
           example: Vediamoci in piazza per poi andare a fare un giro
         numeroPartecipantiDesiderato: 
           type: integer
@@ -352,3 +609,39 @@ components:
           example: true
       xml:
         name: proposta
+    Richiesta:
+      properties:
+        idRichiedente:
+          type: integer
+          format: int64
+          description: Id dell'utente che richiede di partecipare alla proposta
+          example: 10
+        usernameRichiedente:
+          type: string
+          description: Username dell'utente che richiede di partecipare alla proposta
+          example: Marcotone
+        idProposta:
+          type: integer
+          format: int64
+          description: Id della proposta
+          example: 10
+        titoloProposta:
+          type: string
+          description: Titolo della proposta
+          example: Arrampicata vicino via Brennero
+        stato:
+          description: Stato della richiesta
+          example: accettata
+          enum:
+            - pending
+            - accettata
+            - rifiutata
+      xml:
+        name: richiesta
+        
+        
+
+
+        
+
+

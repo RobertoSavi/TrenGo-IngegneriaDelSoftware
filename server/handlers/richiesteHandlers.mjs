@@ -13,10 +13,10 @@ async function getRichieste(req, res){
         const idProposta = req.params.idProposta;
         const proposta = await propostaModel.Proposta.findById(idProposta);
         const loggedId = req.utenteLoggato.loggedId; // ID dell'utente loggato
-        const richieste = await richiestaModel.Richiesta.find({idProposta});
+        const richieste = await richiestaModel.Richiesta.find({idProposta, stato: "pending"});
         
         if (!richieste) {
-            return res.status(400).json({message: "Nessuna richiesta trovata"});
+            return res.status(404).json({message: "Nessuna richiesta trovata"});
         }
 
         // Restituisco le richieste alla proposta solo se sono il creatore della proposta
@@ -46,7 +46,7 @@ async function getRichiestaById(req, res){
         const richiesta = await richiestaModel.Richiesta.findById(id);
         
         if (!richiesta) {
-            return res.status(400).json({message: "Richiesta non trovata"});
+            return res.status(404).json({message: "Richiesta non trovata"});
         }
 
         // Restituisco la richiesta alla proposta solo se sono il creatore della proposta
@@ -90,7 +90,7 @@ async function postRichiesta(req, res){
         else{
             return res.status(403).json({message: "Impossibile richiedere di partecipare alle proprie proposte"});
         }
-        return res.status(201).json({message: "success", self: "richieste/" + richiesta._id});
+        return res.status(201).json({self: "richieste/" + richiesta._id});
 
     } catch (error) {
         console.log(error);
@@ -123,9 +123,7 @@ async function handleRichiestaById(req, res){
         if(loggedId==proposta.idCreatore.toString()){
             // Aggiorna la richiesta cambiando il campo stato
             richiesta = await richiestaModel.Richiesta.findByIdAndUpdate(id, stato, {new: true});
-            return res.status(200).json({
-                self: "richeste/" + richiesta._id // Link alla risorsa dell'utente appena modificato
-            });
+            return res.status(200).json({self: "richeste/" + richiesta._id});
         }
         else{
             return res.status(403).json({message: "Impossibile modificare una richiesta ad una proposta altrui"});

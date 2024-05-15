@@ -16,7 +16,7 @@ async function getUtenteById(req, res) {
         
         if (!utente) {
             console.log("Utente non trovato.");
-            return res.status(400).json({message: "Utente non trovato"});
+            return res.status(404).json({message: "Utente non trovato"});
         }
 
         // Se l'utente cercato è uguale all'utente loggato resituisco tutte le informazioni dell'utente
@@ -59,7 +59,7 @@ async function updateUtenteById(req, res) {
         if(utente.id==loggedId){
             // Aggiorna il documento utente con tutti i campi forniti nel corpo della richiesta
             const utente = await utenteModel.Utente.findByIdAndUpdate(id, updates, {new: true});
-            return res.status(200).json({message: "success", self: "utenti/" + utente._id});
+            return res.status(200).json({self: "utenti/" + utente._id});
         }
         else{
             return res.status(403).json({message: "Impossibile modificare account altrui"});
@@ -84,7 +84,7 @@ async function getUtenteByUsername(req, res) {
         const utente = await utenteModel.Utente.findOne({username: username});
 
         if (!utente) {
-            return res.status(400).json({message: "Utente non trovato"});
+            return res.status(404).json({message: "Utente non trovato"});
         }
 
         // Se l'utente cercato è uguale all'utente loggato resituisco tutte le informazioni dell'utente
@@ -144,11 +144,11 @@ async function signupUtente(req, res) {
     try {
         // Creazione dell'utente
         const utente = await utenteModel.Utente.create({username, email, password});
-        return res.status(201).json({message: "success", self: "utenti/" + utente._id});
+        return res.status(201).json({self: "utenti/" + utente._id});
 
     } catch (error) {
         // Gestione dell'errore durante la creazione dell'utente
-        return res.status(500).json({ message: "error", reason: "Errore interno del server" });
+        return res.status(500).json({message: "Errore durante la registrazione dell'utente", error: error.message});
     }
 }
 
@@ -202,7 +202,7 @@ async function loginUtente(req, res){
         
     } catch (error) {
         console.log(error);
-        return res.status(500).json({success: false, message: "Errore interno del server"});
+        return res.status(500).json({message: "Errore durante l'accesso dell'utente", error: error.message});
     } 
 }
 

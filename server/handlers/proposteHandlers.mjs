@@ -14,7 +14,7 @@ async function getProposte(req, res){
         const proposte = await propostaModel.Proposta.find();
         
         if (!proposte) {
-            return res.status(400).json({message: "Nessuna proposta disponibile."});
+            return res.status(400).json({message: "Nessuna proposta disponibile"});
         }
         return res.status(200).json({proposte});
 
@@ -100,7 +100,7 @@ async function postProposta(req, res){
         // Creazione della proposta
         const idCreatore = new mongoose.Types.ObjectId(creatore);
         const proposta = await propostaModel.Proposta.create({idCreatore, usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data});
-        return res.status(201).json({message: "success", self: "proposte/" + proposta._id});
+        return res.status(201).json({self: "proposte/" + proposta._id});
 
     } catch (error) {
         // Gestione dell'errore durante la creazione della proposta
@@ -150,7 +150,7 @@ async function modifyPropostaById(req, res){
  */
 async function deletePropostaById(req, res){
     try {
-        const { id } = req.params;
+        const {id} = req.params;
         const loggedId = req.utenteLoggato.loggedId; // ID dell'utente loggato
 
         // Trovo la proposta da modificare
@@ -169,7 +169,7 @@ async function deletePropostaById(req, res){
         else{
             return res.status(403).json({message: "Impossibile eliminare proposte altrui"});
         }
-        return res.status(204).json({message: "Risorsa eliminata con successo"});
+        return res.status(204).json({message: "Proposta eliminata con successo"});
 
     } catch (error) {
         return res.status(500).json({message: "Errore durante l'eliminazione della proposta", error: error.message});
