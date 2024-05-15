@@ -13,6 +13,12 @@ router.use("", tokenChecker);
 // Permette di ottenere le proposte
 router.get("", handlers.getProposte);
 
+// Permette di ottenere le mie proposte
+router.get("/mie", handlers.getMieProposte);
+
+// Permette di ottenere le proposte alle quali sono iscritto
+router.get("/iscritto", handlers.getProposteIscritto);
+
 // Permette di ottenere una proposta tramite l'id
 router.get("/:id", handlers.getPropostaById);
 

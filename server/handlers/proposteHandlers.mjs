@@ -33,12 +33,51 @@ async function getProposteNA(req, res){
         const grandiOrganizzatori = await utenteModel.Utente.find({
             "tipoUtente": "grandeOrganizzatore"
           });
-        console.log(grandiOrganizzatori.map((u) => u._id));
         const proposte = await propostaModel.Proposta.find({
             "idCreatore": {
               $in: grandiOrganizzatori.map((u) => u._id)
             }
           });
+        
+        if (!proposte) {
+            return res.status(400).json({message: "Nessuna proposta disponibile."});
+        }
+        return res.status(200).json({proposte});
+
+    } catch (error) {
+        return res.status(500).json({message: "Errore durante il recupero delle proposte", error: error.message});
+    }
+}
+
+/**
+ * Ottiene le proposte pubblicate dall'utente loggato
+ * @param {object} req - L'oggetto della richiesta.
+ * @param {object} res - L'oggetto della risposta.
+ */
+async function getMieProposte(req, res){
+    try {
+        const loggedUsername = req.utenteLoggato.loggedUsername; // Username dell'utente loggato
+        const proposte = await propostaModel.Proposta.find({"usernameCreatore": loggedUsername});
+        
+        if (!proposte) {
+            return res.status(400).json({message: "Nessuna proposta disponibile."});
+        }
+        return res.status(200).json({proposte});
+
+    } catch (error) {
+        return res.status(500).json({message: "Errore durante il recupero delle proposte", error: error.message});
+    }
+}
+
+/**
+ * Ottiene le proposte alle quali l'utente loggato partecipa
+ * @param {object} req - L'oggetto della richiesta.
+ * @param {object} res - L'oggetto della risposta.
+ */
+async function getProposteIscritto(req, res){
+    try {
+        const loggedUsername = req.utenteLoggato.loggedUsername; // Username dell'utente loggato
+        const proposte = await propostaModel.Proposta.find({partecipanti: loggedUsername});
         
         if (!proposte) {
             return res.status(400).json({message: "Nessuna proposta disponibile."});
@@ -100,8 +139,6 @@ async function postProposta(req, res){
         // Creazione della proposta
         const idCreatore = new mongoose.Types.ObjectId(creatore);
         const proposta = await propostaModel.Proposta.create({idCreatore, usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data});
-        proposta.partecipanti.push(idCreatore);
-        proposta.save();
         return res.status(201).json({self: "proposte/" + proposta._id});
 
     } catch (error) {
@@ -182,6 +219,8 @@ async function deletePropostaById(req, res){
 export {
     getProposte,
     getProposteNA,
+    getMieProposte,
+    getProposteIscritto,
     getPropostaById,
     postProposta,
     modifyPropostaById,

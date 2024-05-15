@@ -6,6 +6,7 @@ servers:
   - url: http://localhost:5050/
 paths:
   /middleware: 
+    
   /utenti/signup:
     post:
       tags:

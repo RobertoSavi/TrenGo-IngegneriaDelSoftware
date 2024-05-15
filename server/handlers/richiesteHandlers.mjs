@@ -133,7 +133,7 @@ async function handleRichiestaById(req, res){
             richiesta = await richiestaModel.Richiesta.findByIdAndUpdate(id, stato, {new: true});
             // Se accetto la richiesta aggiungo il richiedente ai partecipanti
             if(stato.stato=="accettata"){
-                proposta.partecipanti.push(richiesta.idRichiedente);
+                proposta.partecipanti.push(richiesta.usernameRichiedente);
                 proposta.save();
             }
             return res.status(200).json({self: "richeste/" + richiesta._id});
@@ -141,7 +141,6 @@ async function handleRichiestaById(req, res){
         else{
             return res.status(403).json({message: "Impossibile modificare una richiesta ad una proposta altrui"});
         }
-
     } catch (error) {
         return res.status(500).json({message: "Errore durante la modifica della richiesta", error: error.message});
     }
