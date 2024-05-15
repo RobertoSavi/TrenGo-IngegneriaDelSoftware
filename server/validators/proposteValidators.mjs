@@ -23,8 +23,8 @@ function categorieInEnum(categorie) {
  * @returns {boolean} - True se il titolo è valido, altrimenti False.
  */
 function validateTitolo (titolo) {
-    // Verifica se il titolo ha una lunghezza compresa tra 5 e 30 caratteri
-    return titolo.length >= 5 && titolo.length <= 30;
+    // Utilizza una regex per verificare la lunghezza del titolo
+    return /^(?=.{5,30}$).*$/.test(titolo);
 };
 
 /**
@@ -34,8 +34,8 @@ function validateTitolo (titolo) {
  * @returns {boolean} - True se la descrizione è valida, altrimenti False.
  */
 function validateDescrizione (descrizione) {
-    // Verifica se la descrizione ha una lunghezza massima di 200 caratteri
-    return descrizione.length <= 200;
+    // Utilizza una regex per verificare la lunghezza della descrizione
+    return /^(?=.{0,200}$).*$/.test(descrizione);
 };
 
 export {
