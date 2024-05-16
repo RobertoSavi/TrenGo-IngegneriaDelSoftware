@@ -12,7 +12,7 @@ async function getRichieste(req, res){
     try {
         const idProposta = req.params.idProposta;
         const proposta = await propostaModel.Proposta.findById(idProposta);
-        const loggedId = req.utenteLoggato.loggedId; // ID dell'utente loggato
+        const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
         const richieste = await richiestaModel.Richiesta.find({idProposta, stato: "pending"});
         
         if (!richieste) {
@@ -20,7 +20,7 @@ async function getRichieste(req, res){
         }
 
         // Restituisco le richieste alla proposta solo se sono il creatore della proposta
-        if(loggedId==proposta.idCreatore.toString()){
+        if(loggedUsername==proposta.usernameCreatore.toString()){
             return res.status(200).json({richieste});
         }
         else{
@@ -42,7 +42,7 @@ async function getRichiestaById(req, res){
         const {id} = req.params;
         const idProposta = req.params.idProposta;
         const proposta = await propostaModel.Proposta.findById(idProposta);
-        const loggedId = req.utenteLoggato.loggedId; // ID dell'utente loggato
+        const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
         const richiesta = await richiestaModel.Richiesta.findById(id);
         
         if (!richiesta) {
@@ -50,7 +50,7 @@ async function getRichiestaById(req, res){
         }
 
         // Restituisco la richiesta alla proposta solo se sono il creatore della proposta
-        if(loggedId==proposta.idCreatore.toString()){
+        if(loggedUsername==proposta.usernameCreatore.toString()){
             return res.status(200).json({richiesta});
         }
         else{
