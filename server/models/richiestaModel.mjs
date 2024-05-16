@@ -21,7 +21,7 @@ const schemaRichiesta = new mongoose.Schema({
         required: true
     },
     stato: {
-        type: [String],
+        type: String,
         enum: ["pending", "accettata", "rifiutata"], // Possibili stati per la richiesta
         default: "pending"
     }
