@@ -8,6 +8,7 @@ const API_URL = import.meta.env.VITE_API_HOST || `http://localhost:5050`
 const PROPOSTE_URL = API_URL+'/proposte/'
 
 const proposte = ref({})
+const proposteIscritto = ref({})
 
 async function fetchProposte() {
 	const response = await axios.get(PROPOSTE_URL,  {headers: {'Token': loggedUser.token}});
@@ -19,30 +20,42 @@ async function fetchPropostaId(id) {
 	proposte.value = response.data;
 }
 
+async function fetchProposteMie() {
+	const response = await axios.get(PROPOSTE_URL+'mie',  {headers: {'Token': loggedUser.token}});
+	proposte.value = response.data.proposte;
+}
+
+async function fetchProposteIscritto() {
+	const response = await axios.get(PROPOSTE_URL+'iscritto',  {headers: {'Token': loggedUser.token}});
+	proposteIscritto.value = response.data.proposte;
+}
+
+async function fetchProposteNA(){
+	const response = await axios.get(PROPOSTE_URL+'NA');
+	proposte.value = response.data.proposte;
+}
+
 async function creaProposta(dati) {
-	console.log(dati);
 	await axios.post(PROPOSTE_URL, dati, {headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token}});;
 };
 
-/*async function deleteBook(book) {
-    await fetch(HOST+book.self, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
-    })
-    fetchBooks()
+async function modificaProposta(dati, id) {
+	await axios.put(PROPOSTE_URL+id, dati, {headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token}});;
 };
 
-async function takeBook(book) {
-    await fetch(LENDINGS_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-access-token': loggedUser.token
-        },
-        body: JSON.stringify( { student: loggedUser.self, book: book.self } ),
-    })
-};*/
+async function eliminaProposta(id) {
+	await axios.delete(PROPOSTE_URL+id, {headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token}});;
+};
 
-
-
-export { proposte, fetchPropostaId, fetchProposte, creaProposta } 
+export { 
+	proposte, 
+	proposteIscritto, 
+	fetchProposte, 
+	fetchPropostaId, 
+	fetchProposteMie, 
+	fetchProposteIscritto, 
+	fetchProposteNA, 
+	creaProposta, 
+	modificaProposta, 
+	eliminaProposta 
+} 

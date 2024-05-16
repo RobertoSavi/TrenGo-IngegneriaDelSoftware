@@ -9,9 +9,6 @@ const UTENTI_URL = API_URL+`/utenti`
 const username = ref('example_username')
 const password = ref('example_passworD1')
 
-// const loggedUser = ref({})
-// const loggedUser = defineProps(['loggedUser'])
-
 async function login() {
 	const response = await axios.post(
 		UTENTI_URL+'/login',

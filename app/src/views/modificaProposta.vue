@@ -1,8 +1,11 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { loggedUser } from '../states/loggedUser.js';
-import { creaProposta } from '../states/proposte.js';
+import { proposte, modificaProposta, fetchPropostaId } from '../states/proposte.js';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
+const id=route.params.id;
 const warningMessage = ref('');
 const dati = ref({
 	usernameCreatore: loggedUser.username,
@@ -15,14 +18,23 @@ const dati = ref({
 	categorie: ["Altro"]
 });
 
-function creaProposteButton() {
+onMounted( () => {
+	fetchPropostaId(id)
+	dati.value.titolo=proposte.value.proposta.titolo;
+	dati.value.nomeLuogo=proposte.value.proposta.nomeLuogo;
+	dati.value.numeroPartecipantiDesiderato=proposte.value.proposta.numeroPartecipantiDesiderato;
+	dati.value.descrizione=proposte.value.proposta.descrizione;
+	dati.value.data=proposte.value.proposta.data.split('T')[0];
+	dati.value.categorie=proposte.value.proposta.categorie;
+});
+
+function modificaProposteButton() {
 	if (dati.value.titolo==""||dati.value.nomeLuogo==""||dati.value.descrizione==""||dati.value.numeroPartecipantiDesiderato<=1) {
     	warningMessage.value = 'Compilare i campi'
     	return;
 	}
-	const datiJson = JSON.stringify(dati.value);
 	warningMessage.value = ''
-  	creaProposta(datiJson).catch( err => console.error(err) );
+  	modificaProposta(dati.value, id).catch( err => console.error(err) );
 };
 
 watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
@@ -31,7 +43,7 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
 </script>
 
 <template>
-	<form class="container">
+	<form class="container" v-for="prposta in proposte">
 		<label for="titolo">Titolo:</label> <input type="text" id="titolo" v-model="dati.titolo"/>
 		<br>
 		<label for="luogo">Luogo:</label> <input type="text" id="luogo" v-model="dati.nomeLuogo"/>
@@ -42,7 +54,7 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
 		<br>
 		<label for="data">Data dell'evento:</label> <input type="date" id="data" v-model="dati.data"/>
 		<br>
-		<button type="button" @click="creaProposteButton()">Fine</button>
+		<button type="button" @click="modificaProposteButton()">Fine</button>
 		<br>
 		<span style="color: red">{{ warningMessage }}</span>
 	</form>
