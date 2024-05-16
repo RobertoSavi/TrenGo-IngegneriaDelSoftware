@@ -65,8 +65,10 @@ const schemaUtente = new mongoose.Schema({
     },
     // Interessi dell'utente
     interessi: {
-        type: String,
-        enum: interessiEnum,
+        type: [{
+            type: String,
+            enum: interessiEnum
+        }],
         default: "Altro"
     },
     // Elenco degli utenti seguiti dall'utente
