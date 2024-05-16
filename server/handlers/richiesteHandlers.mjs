@@ -14,6 +14,10 @@ async function getRichieste(req, res){
         const proposta = await propostaModel.Proposta.findById(idProposta);
         const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
         const richieste = await richiestaModel.Richiesta.find({idProposta, stato: "pending"});
+
+        if(!proposta){
+            return res.status(404).json({message: "Proposta non trovata"});
+        }
         
         if (!richieste) {
             return res.status(404).json({message: "Nessuna richiesta trovata"});
@@ -39,11 +43,15 @@ async function getRichieste(req, res){
  */
 async function getRichiestaById(req, res){
     try {
-        const {id} = req.params;
+        const id = req.params.id;
         const idProposta = req.params.idProposta;
         const proposta = await propostaModel.Proposta.findById(idProposta);
         const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
         const richiesta = await richiestaModel.Richiesta.findById(id);
+
+        if(!proposta){
+            return res.status(404).json({message: "Proposta non trovata"});
+        }
         
         if (!richiesta) {
             return res.status(404).json({message: "Richiesta non trovata"});
@@ -106,7 +114,7 @@ async function postRichiesta(req, res){
  */
 async function handleRichiestaById(req, res){
     try {
-        const {id} = req.params;
+        const id = req.params.id;
         const idProposta = req.params.idProposta;
         const proposta = await propostaModel.Proposta.findById(idProposta);
         const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
@@ -114,8 +122,11 @@ async function handleRichiestaById(req, res){
         var richiesta = await richiestaModel.Richiesta.findById(id);
         const errors = [];
 
+        if (!proposta) {
+            return res.status(404).json({message: "Proposta non trovata"});
+        }
+
         if (!richiesta) {
-            console.log("Richiesta non trovata.");
             return res.status(404).json({message: "Richiesta non trovata"});
         }
 
@@ -127,7 +138,7 @@ async function handleRichiestaById(req, res){
             return res.status(400).json({message: "error", errors});
 
         // Modifico la richiesta solo se sono il creatore della proposta
-        if(loggedUsername==proposta.usernameCreatore.toString()){
+        if(loggedUsername==proposta.usernameCreatore){
             // Aggiorna la richiesta cambiando il campo stato
             richiesta = await richiestaModel.Richiesta.findByIdAndUpdate(id, stato, {new: true});
             // Se accetto la richiesta aggiungo il richiedente ai partecipanti
