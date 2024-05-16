@@ -69,11 +69,11 @@ async function getRichiestaById(req, res){
  */
 async function postRichiesta(req, res){
     try {
-        const {usernameRichiedente, propostaId} = req.body;
+        const idProposta = req.params.idProposta;
+        const {usernameRichiedente} = req.body;
         const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
         
-        const idProposta = new mongoose.Types.ObjectId(propostaId);
-        const proposta = await propostaModel.Proposta.findById(propostaId);
+        const proposta = await propostaModel.Proposta.findById(idProposta);
         
         if(!proposta){
             return res.status(404).json({message: "Proposta non trovata"});
