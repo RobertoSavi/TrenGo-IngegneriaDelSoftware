@@ -115,7 +115,7 @@ async function getPropostaById(req, res){
  * @param {object} res - L'oggetto della risposta.
  */
 async function postProposta(req, res){
-    const {creatore, usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data} = req.body;
+    const {usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data} = req.body;
     const errors = [];
 
     // Validazione delle categorie
@@ -130,15 +130,13 @@ async function postProposta(req, res){
     if (!validators.validateDescrizione(descrizione)) 
         errors.push({field: "descrizione", message: "Descrizione troppo lunga"});
 
-
     // Gestione degli errori
     if (errors.length > 0) 
         return res.status(400).json({message: "error", errors});
 
     try {
         // Creazione della proposta
-        const idCreatore = new mongoose.Types.ObjectId(creatore);
-        const proposta = await propostaModel.Proposta.create({idCreatore, usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data});
+        const proposta = await propostaModel.Proposta.create({usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data});
         return res.status(201).json({self: "proposte/" + proposta._id});
 
     } catch (error) {
@@ -156,7 +154,7 @@ async function modifyPropostaById(req, res){
     try {
         const {id} = req.params;
         const updates = req.body;
-        const loggedId = req.utenteLoggato.loggedId; // ID dell'utente loggato
+        const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
 
         // Trovo la proposta da modificare
         var proposta = await propostaModel.Proposta.findById(id);
@@ -167,7 +165,7 @@ async function modifyPropostaById(req, res){
         }
 
         // Permetto la modifica dei dati utente solo se il chiamante dell'API è il creatore della proposta
-        if(proposta.idCreatore==loggedId){
+        if(proposta.usernameCreatore==loggedUsername){
             // Aggiorna il documento proposta con tutti i campi forniti nel corpo della richiesta
             proposta=await propostaModel.Proposta.findByIdAndUpdate(id, updates, {new: true});
         }
@@ -190,7 +188,7 @@ async function modifyPropostaById(req, res){
 async function deletePropostaById(req, res){
     try {
         const {id} = req.params;
-        const loggedId = req.utenteLoggato.loggedId; // ID dell'utente loggato
+        const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
 
         // Trovo la proposta da modificare
         var proposta = await propostaModel.Proposta.findById(id);
@@ -201,7 +199,7 @@ async function deletePropostaById(req, res){
         }
 
         // Permetto la modifica dei dati utente solo se il chiamante dell'API è il creatore della proposta
-        if(proposta.idCreatore==loggedId){
+        if(proposta.usernameCreatore==loggedUsername){
             // Trova e elimina la proposta dal database
             await propostaModel.Proposta.findByIdAndDelete(id);
         }

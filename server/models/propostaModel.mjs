@@ -4,16 +4,11 @@ import  {interessiEnum}  from './enums.mjs';
 
 // Definizione dello schema per le proposte di attività
 const schemaProposta = new mongoose.Schema({
-    // ID dell'utente creatore della proposta
-    idCreatore: {
-        type: ObjectId,
-        required: true,
-        ref: "Utente" // Riferimento al modello utente
-    },
     // Username del creatore della proposta
     usernameCreatore: {
         type: String,
-        required: true
+        required: true,
+        ref: "Utente" // Riferimento al modello utente
     },
     // Titolo della proposta
     titolo: {

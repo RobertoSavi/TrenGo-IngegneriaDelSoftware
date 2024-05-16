@@ -16,8 +16,8 @@ const schemaUtente = new mongoose.Schema({
     // Tipo di utente: nonAutenticato, autenticato o grandeOrganizzatore
     tipoUtente: {
         type: String,
-        enum: ["nonAutenticato", "autenticato", "grandeOrganizzatore"],
-        default: "nonAutenticato"
+        enum: ["autenticato", "grandeOrganizzatore"],
+        default: "autenticato"
     },
     // Nome dell'utente
     nome: {

@@ -69,23 +69,22 @@ async function getRichiestaById(req, res){
  */
 async function postRichiesta(req, res){
     try {
-        const {richiedente, usernameRichiedente, proposta, titoloProposta} = req.body;
-        const loggedId = req.utenteLoggato.loggedId; // ID dell'utente loggato
+        const {usernameRichiedente, propostaId} = req.body;
+        const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
         
-        const idRichiedente = new mongoose.Types.ObjectId(richiedente);
-        const idProposta = new mongoose.Types.ObjectId(proposta);
-        const propostaTrovata = await propostaModel.Proposta.findById(proposta);
+        const idProposta = new mongoose.Types.ObjectId(propostaId);
+        const proposta = await propostaModel.Proposta.findById(propostaId);
         
-        if(!propostaTrovata){
-            console.log("Proposta non trovata.");
+        if(!proposta){
             return res.status(404).json({message: "Proposta non trovata"});
         }
 
-        // Pubblico la richiesta solo se il richiedente è diverso dal creatore della proposta
+        const titoloProposta = proposta.titolo;
+        // Pubblico la richiesta solo se il richiedente è diverso dal creatore della proposta   
         var richiesta;
-        if(loggedId!=propostaTrovata.idCreatore.toString()){
+        if(loggedUsername!=proposta.usernameCreatore.toString()){
             // Creazione della richiesta
-            richiesta = await richiestaModel.Richiesta.create({idRichiedente, usernameRichiedente,idProposta, titoloProposta});
+            richiesta = await richiestaModel.Richiesta.create({usernameRichiedente, idProposta, titoloProposta});
         }
         else{
             return res.status(403).json({message: "Impossibile richiedere di partecipare alle proprie proposte"});
@@ -110,7 +109,7 @@ async function handleRichiestaById(req, res){
         const {id} = req.params;
         const idProposta = req.params.idProposta;
         const proposta = await propostaModel.Proposta.findById(idProposta);
-        const loggedId = req.utenteLoggato.loggedId; // ID dell'utente loggato
+        const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
         const stato = req.body;
         var richiesta = await richiestaModel.Richiesta.findById(id);
         const errors = [];
@@ -128,12 +127,13 @@ async function handleRichiestaById(req, res){
             return res.status(400).json({message: "error", errors});
 
         // Modifico la richiesta solo se sono il creatore della proposta
-        if(loggedId==proposta.idCreatore.toString()){
+        if(loggedUsername==proposta.usernameCreatore.toString()){
             // Aggiorna la richiesta cambiando il campo stato
             richiesta = await richiestaModel.Richiesta.findByIdAndUpdate(id, stato, {new: true});
             // Se accetto la richiesta aggiungo il richiedente ai partecipanti
             if(stato.stato=="accettata"){
                 proposta.partecipanti.push(richiesta.usernameRichiedente);
+                proposta.numeroPartecipanti=proposta.numeroPartecipanti+1;
                 proposta.save();
             }
             return res.status(200).json({self: "richeste/" + richiesta._id});

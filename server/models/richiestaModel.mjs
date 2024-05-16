@@ -3,16 +3,11 @@ import  {ObjectId}  from "mongodb";
 
 // Definizione dello schema per le richieste di partecipazione alle proposte di attività
 const schemaRichiesta = new mongoose.Schema({
-    // ID dell'utente richiedente alla proposta
-    idRichiedente: {
-        type: ObjectId,
-        required: true,
-        ref: "Utente" // Riferimento al modello utente
-    },
     // Username del richiedente alla proposta
     usernameRichiedente: {
         type: String,
-        required: true
+        required: true,
+        ref: "Utente" // Riferimento al modello utente
     },
     // Id della proposta al quale si richiede la partecipazione
     idProposta: {
