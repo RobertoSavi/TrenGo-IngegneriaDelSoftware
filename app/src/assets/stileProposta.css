@@ -1,0 +1,11 @@
+.container
+{
+	border-radius: 25px;
+	width: 66%;
+	background-color: #F2F2F2;
+	color: #333;
+	text-align: left;
+	overflow: scroll;
+	scrollbar-width: none;
+	padding: 20px;
+}
