@@ -160,7 +160,6 @@ async function modifyPropostaById(req, res){
         var proposta = await propostaModel.Proposta.findById(id);
 
         if (!proposta) {
-            console.log("Proposta non trovata.");
             return res.status(404).json({message: "Proposta non trovata"});
         }
 
@@ -175,7 +174,6 @@ async function modifyPropostaById(req, res){
 
         return res.status(200).json({proposta});
     } catch (error) {
-        console.log(error);
         return res.status(500).json({message: "Errore durante la modifica della proposta", error: error.message});
     }
 }
@@ -194,7 +192,6 @@ async function deletePropostaById(req, res){
         var proposta = await propostaModel.Proposta.findById(id);
 
         if (!proposta) {
-            console.log("Proposta non trovata.");
             return res.status(404).json({message: "Proposta non trovata"});
         }
 

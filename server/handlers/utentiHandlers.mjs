@@ -15,7 +15,6 @@ async function getUtenteById(req, res) {
         const loggedId = req.utenteLoggato.loggedId; // ID dell'utente loggato
         
         if (!utente) {
-            console.log("Utente non trovato.");
             return res.status(404).json({message: "Utente non trovato"});
         }
 
@@ -203,7 +202,6 @@ async function loginUtente(req, res){
         });
         
     } catch (error) {
-        console.log(error);
         return res.status(500).json({message: "Errore durante l'accesso dell'utente", error: error.message});
     } 
 }

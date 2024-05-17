@@ -5,8 +5,6 @@ info:
 servers:
   - url: http://localhost:5050/
 paths:
-  /middleware: 
-    
   /utenti/signup:
     post:
       tags:
@@ -84,36 +82,22 @@ paths:
           description: Username o password errati
         '500':
           description: Errore durante l'accesso dell'utente
-  /user/logout:
-    get:
-      tags:
-        - utenti
-      summary: Effettua il logout dell'utente
-      description: ''
-      operationId: utentiLogout
-      responses:
-        '200':
-          description: Utente ha effettuato il logout con successo
-        '400':
-          description: Bad request
-        '500':
-          description: Internal server error
   /utenti/{id}:
     get:
       tags:
         - utenti
-      summary: Ottiene i dati utente tramite dall'id
-      description: ''
+      summary: Ottiene i dati utente tramite l'id
+      description: Se l'utente cercato è l'utente loggato restituisco tutte le informazioni, altrimenti solo [username, tipoUtente, nome, cognome, karma, interessi]
       operationId: getUtenteById
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                id:
-                  type: string
+      security:
+        - TokenAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: L'id dell'utente da trovare
       responses:
         '200':
           description: Dati utente recuperati con successo
@@ -129,8 +113,17 @@ paths:
       tags:
         - utenti
       summary: Modifica i dati utente tramite dall'id
-      description: ''
+      description: Permetto la modifica solo se l'utente da modificare è l'utente loggato
       operationId: updateUtenteById
+      security:
+        - TokenAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: L'id dell'utente da modificare
       requestBody:
         required: true
         content:
@@ -138,8 +131,6 @@ paths:
             schema:
               type: object
               properties:
-                id:
-                  type: string
                 updates:
                   type: array
                   description: Array di modifiche da applicare all'utente
@@ -165,17 +156,17 @@ paths:
         tags:
           - utenti
         summary: Ottiene i dati utente tramite l'username
-        description: ''
+        description: Se l'utente cercato è l'utente loggato restituisco tutte le informazioni, altrimenti solo [username, tipoUtente, nome, cognome, karma, interessi]
         operationId: getUtenteByUsername
-        requestBody:
+        security:
+        - TokenAuth: []
+        parameters:
+        - name: username
+          in: path
           required: true
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  username:
-                    type: string
+          schema:
+            type: string
+          description: L'username dell'utente da trovare
         responses:
           '200':
             description: Dati utente recuperati con successo
@@ -192,8 +183,10 @@ paths:
       tags:
         - proposte
       summary: Ottiene le proposte
-      description: ''
+      description: Restituisce ogni proposta presente nel database, comprese quelle pubblicate dall'utente loggato
       operationId: getProposte
+      security:
+        - TokenAuth: []
       responses:
         '200':
           description: Proposte recuperate con successo
@@ -213,6 +206,8 @@ paths:
       summary: Crea una nuova proposta
       description: ''
       operationId: postProposta
+      security:
+        - TokenAuth: []
       requestBody:
         required: true
         content:
@@ -220,8 +215,6 @@ paths:
             schema:
               type: object
               properties:
-                idCreatore:
-                  type: string
                 usernameCreatore:
                   type: string
                 titolo:
@@ -274,6 +267,50 @@ paths:
           description: Nessuna proposta disponibile
         '500':
           description: Errore durante il recupero delle proposte
+  /proposte/mie:
+    get:
+      tags:
+        - proposte
+      summary: Ottiene le proposte pubblicate dall'utente loggato.
+      description: ''
+      operationId: getMieProposte
+      security:
+        - TokenAuth: []
+      responses:
+        '200':
+          description: Proposte recuperate con successo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Proposta'
+        '400':
+          description: Nessuna proposta disponibile
+        '500':
+          description: Errore durante il recupero delle proposte
+  /proposte/iscritto:
+    get:
+      tags:
+        - proposte
+      summary: Ottiene le proposte alle quali l'utente loggato partecipa.
+      description: ''
+      operationId: getProposteIscritto
+      security:
+        - TokenAuth: []
+      responses:
+        '200':
+          description: Proposte recuperate con successo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Proposta'
+        '400':
+          description: Nessuna proposta disponibile
+        '500':
+          description: Errore durante il recupero delle proposte
   /proposte/{id}:
     get:
       tags:
@@ -281,6 +318,15 @@ paths:
       summary: Ottiene una proposta tramite l'id
       description: ''
       operationId: getPropostaById
+      security:
+        - TokenAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: L'id della proposta
       responses:
         '200':
           description: Proposta recuperata con successo
@@ -296,8 +342,17 @@ paths:
       tags:
         - proposte
       summary: Modifica una proposta tramite l'id
-      description: ''
+      description: La richiesta ha successo solo se l'utente loggato è il creatore della proposta
       operationId: modifyPropostaById
+      security:
+        - TokenAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: L'id della proposta
       requestBody:
         required: true
         content:
@@ -305,8 +360,6 @@ paths:
             schema:
               type: object
               properties:
-                id:
-                  type: string
                 updates:
                   type: array
                   description: Array di modifiche da applicare alla proposta
@@ -331,17 +384,17 @@ paths:
       tags:
         - proposte
       summary: Elimina una proposta tramite l'id
-      description: ''
+      description: La richiesta ha successo solo se l'utente loggato è il creatore della proposta
       operationId: deletePropostaById
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                id:
-                  type: string
+      security:
+        - TokenAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: L'id della proposta
       responses:
         '204':
           description: Proposta eliminata con successo
@@ -355,9 +408,11 @@ paths:
     get:
       tags:
         - richieste
-      summary: Ottiene le richieste di partecipazione per una richiesta non ancora gestite (stato=pending)
-      description: ''
+      summary: Ottiene le richieste di partecipazione per una proposta non ancora gestite (stato=pending)
+      description: La richiesta ha successo solo se l'utente loggato è il creatore della proposta
       operationId: getRichieste
+      security:
+        - TokenAuth: []
       responses:
         '200':
           description: Richieste recuperate con successo
@@ -370,15 +425,24 @@ paths:
         '403':
           description: Impossibile ottenere le richieste alle proposte altrui
         '404':
-          description: Nessuna richiesta trovata
+          description: Nessuna richiesta trovata o Proposta non trovata
         '500':
           description: Errore durante il recupero delle richieste
     post:
       tags:
         - richieste
       summary: Crea una nuova richiesta di partecipazione ad una proposta
-      description: ''
+      description: La richiesta ha successo solo se l'utente loggato non è il creatore della proposta
       operationId: postRichiesta
+      security:
+        - TokenAuth: []
+      parameters:
+        - name: idProposta
+          in: path
+          required: true
+          schema:
+            type: string
+          description: L'id della proposta alla quale è stata fatta la richiesta
       requestBody:
         required: true
         content:
@@ -386,13 +450,7 @@ paths:
             schema:
               type: object
               properties:
-                idRichiedente:
-                  type: integer
                 usernameRichiedente:
-                  type: string
-                idProposta:
-                  type: integer
-                titoloProposta:
                   type: string
       responses:
         '201':
@@ -416,8 +474,23 @@ paths:
       tags:
         - richieste
       summary: Ottiene una richiesta tramite l'id
-      description: ''
+      description: La richiesta ha successo solo se l'utente loggato è il creatore della proposta
       operationId: getRichiestaById
+      security:
+        - TokenAuth: []
+      parameters:
+        - name: idProposta
+          in: path
+          required: true
+          schema:
+            type: string
+          description: L'id della proposta alla quale è stata fatta la richiesta
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: L'id della richiesta
       responses:
         '200':
           description: Richiesta recuperata con successo
@@ -428,15 +501,30 @@ paths:
         '403':
           description: Impossibile ottenere una richiesta ad una proposta altrui
         '404':
-          description: Richiesta non trovat
+          description: Richiesta non trovata o proposta non trovata
         '500':
           description: Errore durante il recupero della richiesta
     put:
       tags:
         - richieste
       summary: Permette di accettarre o rifiutare una richiesta tramite l'id
-      description: ''
-      operationId: modifyPropostaById
+      description: La richiesta ha successo solo se l'utente loggato è il creatore della proposta
+      operationId: handleRichiestaById
+      security:
+        - TokenAuth: []
+      parameters:
+        - name: idProposta
+          in: path
+          required: true
+          schema:
+            type: string
+          description: L'id della proposta alla quale è stata fatta la richiesta
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: L'id della richiesta
       requestBody:
         required: true
         content:
@@ -444,8 +532,6 @@ paths:
             schema:
               type: object
               properties:
-                id:
-                  type: string
                 stato:
                   type: string
                   description: Stato da mettere al posto di pending (accettata o rifiutata)
@@ -460,10 +546,12 @@ paths:
                   self:
                     type: string
                     description: Link in formato API alla risorsa appena modificata
+        '400':
+          description: Bad request
         '403':
           description: Impossibile modificare una richiesta ad una proposta altrui
         '404':
-          description: Richiesta non trovata
+          description: Richiesta non trovata o proposta non trovata
         '500':
           description: Errore durante la modifica della richiesta
 components:
@@ -639,10 +727,8 @@ components:
             - rifiutata
       xml:
         name: richiesta
-        
-        
-
-
-        
-
-
+  securitySchemes:
+    TokenAuth:
+      type: apiKey
+      in: header
+      name: Token  # Custom header name

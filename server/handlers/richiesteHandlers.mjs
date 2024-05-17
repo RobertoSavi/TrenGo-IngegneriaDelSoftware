@@ -100,7 +100,6 @@ async function postRichiesta(req, res){
         return res.status(201).json({self: "richieste/" + richiesta._id});
 
     } catch (error) {
-        console.log(error);
         // Gestione dell'errore durante la creazione della richiesta
         return res.status(500).json({message: "Errore durante la creazione della richiesta", error: error.message});
     }
