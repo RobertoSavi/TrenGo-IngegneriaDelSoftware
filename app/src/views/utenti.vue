@@ -19,14 +19,14 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
 </script>
 
 <template>
-	<div class="container">
+	<div class="container" v-if="utenti">
 		<div v-for="utente in utenti">
-			<h1> {{ utente.username }} ({{ utente.tipoUtente }})</h1>
+			<h1> {{ utente.username }} ({{ utente.karma }})</h1>
 			<h2 v-if="utente.tipoUtente=='grandeOrganizzatore'"> Grande organizzatore </h2>
 			<br>
-			<label>Nome: </label>{{ loggedUser.username }}
+			<label>Nome: </label>{{ loggedUser.nome }}
 			<br>
-			<label>Cognome: </label>{{ utente.karma }}
+			<label>Cognome: </label>{{ utente.cognome }}
 			<br>
 			<label>Interessi: </label>
 			<span v-for="interesse in utente.interessi">{{ interesse+", " }}</span>

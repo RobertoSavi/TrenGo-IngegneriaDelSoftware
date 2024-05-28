@@ -1,28 +1,32 @@
 <script setup>
-import { ref, computed, watch, onBeforeMount, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { loggedUser } from '../states/loggedUser.js';
 import { proposte, fetchPropostaId, eliminaProposta } from '../states/proposte.js';
 import { RouterLink, useRoute } from 'vue-router';
 import { richieste, fetchRichieste, creaRichiesta, gestisciRichiesta } from '../states/richieste.js';
+import router from '../router/index.js'
 
 const route = useRoute();
 const id=route.params.id;
 const warningMessage = ref('');
 const HOST_UTENTI="/utenti/";
 
-onBeforeMount( () => {
-	fetchPropostaId(id)
-});
-
-onMounted( () => {
-	if(proposte.value.usernameCreatore==loggedUser.username){
-		fetchRichieste(id)
+onMounted( async () => {
+	await fetchPropostaId(id);
+	if(proposte.value.proposta.usernameCreatore==loggedUser.username)
+	{
+		await fetchRichieste(id);
 	}
 });
 
 watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
 	warningMessage.value = ''
 });
+
+function modifica(propostaId)
+{
+	router.push('modifica/'+propostaId);
+}
 
 async function eliminaPropostaButton()
 {
@@ -38,6 +42,8 @@ async function inviaRichiestaButton()
 {
 	const dati = ref({'usernameRichiedente': loggedUser.username});
 	await creaRichiesta(dati.value, id);
+	
+	location.reload;
 }
 
 async function gestisciRichiestaButton(idRichiesta, acc)
@@ -49,41 +55,54 @@ async function gestisciRichiestaButton(idRichiesta, acc)
 	else{
 		const dati = ref({'stato': "accettata"});
 		await gestisciRichiesta(dati.value, id, idRichiesta);
-	}	
+	}
+	
+	location.reload;
 }
 
-const isRichiedente = computed(() => {
-	return false; //for the future
+var isRichiedente = computed(() => {
+	
+	for(var richiesta in richieste)
+	{
+		console.log(richiesta);
+		
+		if(richiesta.value.usernameRichiedente==loggedUser.username)
+		{
+			return true;
+		}
+	}
+	
+	return false;
+	
 });
 
-const isIscritto = computed(() => {
-	try{return proposte.value.partecipanti.includes(loggedUser.username);}
+var isIscritto = computed(() => {
+	try{return proposte.value.proposta.partecipanti.includes(loggedUser.username);}
 	catch{}
 });
 </script>
 
 <template>
-	<div class="container" v-for="proposta in proposte">	
+	<div class="container" v-if="proposte" v-for="proposta in proposte">	
 		<h1>Titolo: {{ proposta.titolo }}</h1>
 		<br>
 		<label>Username creatore: </label><RouterLink :to="HOST_UTENTI+proposta.usernameCreatore"> {{ proposta.usernameCreatore }} </RouterLink>
 		<br>
 		<div v-if="proposta.usernameCreatore==loggedUser.username">
-			<div v-for="richiesta in richieste">
-				<label>Accettare la richiesta di: <RouterLink :to="HOST_UTENTI+richiesta.usernameRichiedente"> {{ richiesta.usernameRichiedente }} </RouterLink>?</label>
-				<br>
-				<button type="button" @click="gestisciRichiestaButton(proposta.idProposta, true)">Accetta</button>
-				<button type="button" @click="gestisciRichiestaButton(proposta.idProposta, false)">Rifiuta</button>
+			<div v-if="richieste" v-for="richiesta in richieste">
+				<label>Accettare la richiesta di: </label><RouterLink :to="HOST_UTENTI+richiesta.usernameRichiedente"> {{ richiesta.usernameRichiedente }} </RouterLink>?
+				<button type="button" @click="gestisciRichiestaButton(richiesta._id, true)">Accetta</button>
+				<button type="button" @click="gestisciRichiestaButton(richiesta._id, false)">Rifiuta</button>
 				<br>
 			</div>
-			<RouterLink :to="'modifica/'+proposta._id" :v-slot="modifica">
-				<button :href="modifica">Modifica</button>
-			</RouterLink>
+			<button @click="modifica(proposta._id)">Modifica</button>
 			<button @click="eliminaPropostaButton()">Elimina</button>
 		</div>
-		<button type="button" @click="" v-else-if="isIscritto">Annulla partecipazione</button>
-		<button type="button" @click="" v-else-if="isRichiedente">Annulla richiesta</button>
-		<button type="button" @click="inviaRichiestaButton()" v-else>Richiedi di partecipare!</button>
+		<div v-else>
+			<button type="button" @click="" v-if="isIscritto">Annulla partecipazione</button>
+			<button type="button" @click="" v-else-if="isRichiedente">Annulla richiesta</button>
+			<button type="button" @click="inviaRichiestaButton()" v-else>Richiedi di partecipare!</button>
+		</div>
 	</div>
 </template>
 

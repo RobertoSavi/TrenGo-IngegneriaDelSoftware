@@ -3,6 +3,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { loggedUser } from '../states/loggedUser.js'
+import { richieste, fetchRichieste } from '../states/richieste.js';
 
 const API_URL = import.meta.env.VITE_API_HOST || `http://localhost:5050`
 const PROPOSTE_URL = API_URL+'/proposte/'
