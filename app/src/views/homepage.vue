@@ -18,7 +18,7 @@ onMounted( () => {
 });
 
 watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
-  warningMessage.value = ''
+	warningMessage.value = ''
 });
 </script>
 
@@ -26,7 +26,7 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
     <div class="bacheca">
        	<h2 style="height: 5%">Bacheca</h2>
        	<input type="text" class="barraRicerca" placeholder="Cerca proposte...">
-       	<div class="contenitoreProposte">
+       	<div v-if="proposte" class="contenitoreProposte">
        		<div class="proposta" v-for="proposta in proposte">
      	 		<h3><RouterLink :to="HOST_PROPOSTA+proposta._id">{{ proposta.titolo }}</RouterLink></h3>
         		<br>
@@ -34,13 +34,15 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
         		<br> 
         		<label>Luogo: </label> {{ proposta.nomeLuogo }} 
         		<br>  
-        		<label>Data: </label> {{ proposta.data }} </p>
+        		<label>Data: </label> {{ proposta.data }} 
         		<br>
+				<label>Partecipanti: </label> {{ proposta.numeroPartecipanti }} / {{ proposta.numeroPartecipantiDesiderato }} </p>
         		<p><label>Descrizione:</label> {{ proposta.descrizione }}</p>
         		<br>
         		<p v-for="categoria in proposta.categorie">{{ categoria }}</p>
         	</div>
         </div>
+    <div v-else><strong>Loading...</strong></div>
     </div>
 </template>
 

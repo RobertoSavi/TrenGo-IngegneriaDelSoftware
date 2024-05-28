@@ -10,7 +10,6 @@
     "no-unused-vars": [
       "error",
       {
-        // Ignore arguments starting with _
         "argsIgnorePattern": "^_"
       }
     ]

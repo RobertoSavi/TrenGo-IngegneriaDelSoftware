@@ -9,8 +9,7 @@ const richieste = ref({})
 
 async function fetchRichieste(id) {
 	const response = await axios.get(PROPOSTE_URL+id+'/richieste',  {headers: {'Token': loggedUser.token}});
-	console.log(response.data.proposte);
-	proposte.value = response.data.proposte;
+	richieste.value = response.data.richieste;
 }
 
 async function creaRichiesta(dati, id) {
@@ -18,6 +17,9 @@ async function creaRichiesta(dati, id) {
 }
 
 async function gestisciRichiesta(dati, id, idRichiesta) {
+	console.log(dati);
+	console.log(id)
+	console.log(idRichiesta);
 	await axios.put(PROPOSTE_URL+id+'/richieste/'+idRichiesta, dati, {headers: {'Token': loggedUser.token}});
 }
 
