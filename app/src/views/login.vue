@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { loggedUser, setLoggedUser, clearLoggedUser } from '../states/loggedUser.js'
 import axios from 'axios'
+import { RouterLink } from 'vue-router'
 
 const API_URL = import.meta.env.VITE_API_HOST || `http://localhost:5050`
 const UTENTI_URL = API_URL+`/utenti`
@@ -31,7 +32,7 @@ function logout() {
   <form>
     <span v-if="loggedUser.token">
       Welcome {{loggedUser.username}}
-      <button type="button" @click="logout">LogOut</button>
+      <button type="button" @click="logout()">LogOut</button>
     </span>
     
     <span v-if="!loggedUser.token">
@@ -39,5 +40,8 @@ function logout() {
       <input name="password" v-model="password" />
       <button type="button" @click="login()">LogIn</button>
     </span>
+
+    <RouterLink :to="'/cambiopassword'">Password dimenticata?</RouterLink>
+    
   </form>
 </template>

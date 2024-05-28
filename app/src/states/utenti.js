@@ -16,8 +16,14 @@ async function modificaUtente(dati, id) {
 	await axios.put(UTENTI_URL+id, dati, {headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token}});;
 };
 
+async function changePasswordRequest(dati) {
+	await axios.put(UTENTI_URL+"cambiopassword", dati, {headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token}});;
+};
+
+
 export { 
 	utenti, 
 	fetchUtenteUsername, 
-	modificaUtente 
+	modificaUtente,
+	changePasswordRequest
 } 

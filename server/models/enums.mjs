@@ -7,6 +7,5 @@ export const interessiEnum = [
     "Cucina",
     "Pittura",
     "Musica",
-    "Altro",
-    ""
+    "Altro"
 ];
