@@ -1,7 +1,9 @@
 import * as utenteModel from "../models/utenteModel.mjs"
 import * as validators from "../validators/utentiValidators.mjs";
+import { interessiEnum } from "../models/enums.mjs";
+import Token from "../models/tokenModel.mjs";
 import jwt  from "jsonwebtoken"
-// import ObjectId from "mongodb";
+import crypto from 'crypto';
 
 /**
  * Ottiene un utente dal database utilizzando l'ID fornito.
@@ -159,10 +161,10 @@ async function signupUtente(req, res) {
  * @param {object} res - L'oggetto della risposta.
  */
 async function loginUtente(req, res){
-    // Estrai username e password dal body della richiesta
-    const {username, password} = req.body;
-
     try {
+        // Estrai username e password dal body della richiesta
+        const {username, password} = req.body;
+
         // Find the user by username
         const utente = await validators.getUtente(username);
 
@@ -206,11 +208,91 @@ async function loginUtente(req, res){
     } 
 }
 
+/**
+ * Restituisce l'elenco degli interessi
+ * @param {object} req - L'oggetto della richiesta.
+ * @param {object} res - L'oggetto della risposta.
+ */
+async function getInteressi(req, res){
+    try {
+        const interessi = interessiEnum;
+        return res.status(200).json({interessi});
+    } catch (error) {
+        return res.status(500).json({message: "Errore durante il recupero degli interessi", error: error.message});
+    }
+}
+
+async function changePasswordRequest(req, res){
+    try {
+        const {email} = req.body;
+        const utente = await utenteModel.Utente.findOne({email});
+
+        if (!utente) {
+            return res.status(400).json({ message: "Utente non trovato" });
+        }
+
+        // Creo un token e lo salvo nel database
+        const token = crypto.randomBytes(20).toString('hex');
+        await Token.create({username:utente.username, token})
+
+        // Crea il link per il reset della password
+        const urlFrontend = process.env.URL_FRONTEND;
+        const resetLink = `${urlFrontend}/cambiopassword/${token}`;
+
+        // Send password reset email to the usesr
+        await sendResetPasswordMail(utente.email, resetLink);
+
+        return res.status(200).json({message: "Email per il reset della password inviata"});
+    } catch (error) {
+        return res.status(500).json({message: "Errore nell\'invio dell\'email per il reset della password ", error: error.message});
+    }
+}
+
+async function changePassword(req, res) {
+    try {
+        const {token} = req.params;
+        const {password} = req.body;
+
+        // Verifica il token
+        const tokenPassed = await Token.findOne({token});
+
+        // Se il token non viene trovato, restituisce un errore
+        if (!tokenPassed) {
+            return res.status(404).json({message: "Token non valido"});
+        }
+
+        // Verifica la scadenza del token
+        const tokenExpiration = new Date(tokenPassed.expirationDate).getTime();
+        if (tokenExpiration < Date.now()) {
+            // Se il token è scaduto, cancellalo dal database e restituisci un errore
+            await Token.deleteOne({tokenPassed});
+            return res.status(404).json({message: "Token scaduto"});
+        }
+
+        // Trova l'utente associato al token
+        const utente = await utenteModel.Utente.findOne({username: tokenPassed.username});
+
+        // Aggiorna la password dell'utente
+        utente.password = password;
+        await utente.save();
+
+        // Cancella il token dal database
+        await Token.deleteOne({tokenPassed});
+
+        return res.status(200).json({ message: "Password aggiornata con successo"});
+    } catch (error) {
+        return res.status(500).json({ message: "Errore nell\'aggiornamento della password:", error: error.message});
+    }
+}
+
 // Esporta handlers
 export {
     getUtenteById,
     updateUtenteById,
     getUtenteByUsername,
     signupUtente,
-    loginUtente   
+    loginUtente,
+    getInteressi,
+    changePasswordRequest,
+    changePassword  
 };

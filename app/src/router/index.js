@@ -6,6 +6,9 @@ import np from '../views/nuovaProposta.vue'
 import login from '../views/login.vue'
 import mp from '../views/modificaProposta.vue'
 import miep from '../views/mieProposte.vue'
+import richiedicambiop from '../views/richiediCambioPassword.vue'
+import cambiop from '../views/cambioPassword.vue'
+
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,7 +47,17 @@ const router = createRouter({
       	path: '/login',
       	name: 'login',
       	component: login
-    }
+    },
+	{
+		path: '/cambiopassword',
+		name: 'richiedi cambio password',
+		component: richiedicambiop
+  	},
+	{
+		path: '/cambiopassword/:token',
+		name: 'cambio password',
+		component: cambiop
+  	}
   ]
 })
 
