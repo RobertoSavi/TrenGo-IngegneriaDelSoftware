@@ -1,5 +1,5 @@
-import * as richiestaModel from "../models/richiestaModel.mjs"
-import * as propostaModel from "../models/propostaModel.mjs"
+import Richiesta from "../models/richiestaModel.mjs"
+import Proposta from "../models/propostaModel.mjs"
 import validateStato from "../validators/richiesteValidators.mjs";
 import mongoose from "mongoose";
 
@@ -11,9 +11,9 @@ import mongoose from "mongoose";
 async function getRichieste(req, res){
     try {
         const idProposta = req.params.idProposta;
-        const proposta = await propostaModel.Proposta.findById(idProposta);
+        const proposta = await Proposta.findById(idProposta);
         const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
-        const richieste = await richiestaModel.Richiesta.find({idProposta, stato: "pending"});
+        const richieste = await Richiesta.find({idProposta, stato: "pending"});
 
         if(!proposta){
             return res.status(404).json({message: "Proposta non trovata"});
@@ -45,9 +45,9 @@ async function getRichiestaById(req, res){
     try {
         const id = req.params.id;
         const idProposta = req.params.idProposta;
-        const proposta = await propostaModel.Proposta.findById(idProposta);
+        const proposta = await Proposta.findById(idProposta);
         const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
-        const richiesta = await richiestaModel.Richiesta.findById(id);
+        const richiesta = await Richiesta.findById(id);
 
         if(!proposta){
             return res.status(404).json({message: "Proposta non trovata"});
@@ -81,7 +81,7 @@ async function postRichiesta(req, res){
         const {usernameRichiedente} = req.body;
         const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
         
-        const proposta = await propostaModel.Proposta.findById(idProposta);
+        const proposta = await Proposta.findById(idProposta);
         
         if(!proposta){
             return res.status(404).json({message: "Proposta non trovata"});
@@ -92,7 +92,7 @@ async function postRichiesta(req, res){
         var richiesta;
         if(loggedUsername!=proposta.usernameCreatore.toString()){
             // Creazione della richiesta
-            richiesta = await richiestaModel.Richiesta.create({usernameRichiedente, idProposta, titoloProposta});
+            richiesta = await Richiesta.create({usernameRichiedente, idProposta, titoloProposta});
         }
         else{
             return res.status(403).json({message: "Impossibile richiedere di partecipare alle proprie proposte"});
@@ -115,10 +115,10 @@ async function handleRichiestaById(req, res){
     try {
         const id = req.params.id;
         const idProposta = req.params.idProposta;
-        const proposta = await propostaModel.Proposta.findById(idProposta);
+        const proposta = await Proposta.findById(idProposta);
         const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
         const stato = req.body;
-        var richiesta = await richiestaModel.Richiesta.findById(id);
+        var richiesta = await Richiesta.findById(id);
         const errors = [];
 
         if (!proposta) {
@@ -139,7 +139,7 @@ async function handleRichiestaById(req, res){
         // Modifico la richiesta solo se sono il creatore della proposta
         if(loggedUsername==proposta.usernameCreatore){
             // Aggiorna la richiesta cambiando il campo stato
-            richiesta = await richiestaModel.Richiesta.findByIdAndUpdate(id, stato, {new: true});
+            richiesta = await Richiesta.findByIdAndUpdate(id, stato, {new: true});
             // Se accetto la richiesta aggiungo il richiedente ai partecipanti
             if(stato.stato=="accettata"){
                 proposta.partecipanti.push(richiesta.usernameRichiedente);

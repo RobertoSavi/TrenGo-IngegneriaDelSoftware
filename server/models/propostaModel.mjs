@@ -82,7 +82,4 @@ const schemaProposta = new mongoose.Schema({
 
 // Creazione del modello Proposta
 const Proposta = mongoose.model("Proposta", schemaProposta, "Proposte");
-export {
-    Proposta,
-    schemaProposta
-};
+export default Proposta;

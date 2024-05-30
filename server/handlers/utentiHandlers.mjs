@@ -1,4 +1,4 @@
-import * as utenteModel from "../models/utenteModel.mjs"
+import Utente from "../models/utenteModel.mjs"
 import * as validators from "../validators/utentiValidators.mjs";
 import { interessiEnum } from "../models/enums.mjs";
 import { sendResetPasswordMail } from "../services/emailService.mjs";
@@ -14,7 +14,7 @@ import crypto from 'crypto';
 async function getUtenteById(req, res) {
     try {
         const {id} = req.params;
-        const utente = await utenteModel.Utente.findById(id);
+        const utente = await Utente.findById(id);
         const loggedId = req.utenteLoggato.loggedId; // ID dell'utente loggato
         
         if (!utente) {
@@ -52,7 +52,7 @@ async function updateUtenteById(req, res) {
         const loggedId = req.utenteLoggato.loggedId; // ID dell'utente loggato
         
         // Aggiorna il documento utente con tutti i campi forniti nel corpo della richiesta
-        const utente = await utenteModel.Utente.findByIdAndUpdate(id, updates, {new: true});
+        const utente = await Utente.findByIdAndUpdate(id, updates, {new: true});
         if (!utente) {
             return res.status(404).json({message: "Utente non trovato"});
         }
@@ -60,7 +60,7 @@ async function updateUtenteById(req, res) {
         // Permetto la modifica dei dati utente solo se il chiamante dell'API è l'utente da modificare
         if(utente.id==loggedId){
             // Aggiorna il documento utente con tutti i campi forniti nel corpo della richiesta
-            const utente = await utenteModel.Utente.findByIdAndUpdate(id, updates, {new: true});
+            const utente = await Utente.findByIdAndUpdate(id, updates, {new: true});
             return res.status(200).json({self: "utenti/" + utente._id});
         }
         else{
@@ -83,7 +83,7 @@ async function getUtenteByUsername(req, res) {
         const loggedId = req.utenteLoggato.loggedId; // ID dell'utente loggatow
 
         // Trova l'utente nel database utilizzando lo username
-        const utente = await utenteModel.Utente.findOne({username: username});
+        const utente = await Utente.findOne({username: username});
 
         if (!utente) {
             return res.status(404).json({message: "Utente non trovato"});
@@ -147,7 +147,7 @@ async function signupUtente(req, res) {
 
     try {
         // Creazione dell'utente
-        const utente = await utenteModel.Utente.create({username, email, password});
+        const utente = await Utente.create({username, email, password});
         return res.status(201).json({self: "utenti/" + utente._id});
 
     } catch (error) {
@@ -226,7 +226,7 @@ async function getInteressi(req, res){
 async function changePasswordRequest(req, res){
     try {
         const {email} = req.body;
-        const utente = await utenteModel.Utente.findOne({email});
+        const utente = await Utente.findOne({email});
 
         if (!utente) {
             return res.status(400).json({ message: "Utente non trovato" });
@@ -282,7 +282,7 @@ async function changePassword(req, res) {
         }
 
         // Trova l'utente associato al token
-        const utente = await utenteModel.Utente.findOne({username: passedToken.username});
+        const utente = await Utente.findOne({username: passedToken.username});
 
         // Aggiorna la password dell'utente
         utente.password = new_password;

@@ -1,5 +1,5 @@
-import * as propostaModel from "../models/propostaModel.mjs"
-import * as utenteModel from "../models/utenteModel.mjs"
+import Proposta from "../models/propostaModel.mjs"
+import Utente from "../models/utenteModel.mjs"
 import * as validators from "../validators/proposteValidators.mjs";
 import mongoose from "mongoose";
 //import {ObjectId} from "mongodb";
@@ -11,7 +11,7 @@ import mongoose from "mongoose";
  */
 async function getProposte(req, res){
     try {
-        const proposte = await propostaModel.Proposta.find();
+        const proposte = await Proposta.find();
         
         if (!proposte) {
             return res.status(400).json({message: "Nessuna proposta disponibile"});
@@ -30,10 +30,10 @@ async function getProposte(req, res){
  */
 async function getProposteNA(req, res){
     try {
-        const grandiOrganizzatori = await utenteModel.Utente.find({
+        const grandiOrganizzatori = await Utente.find({
             "tipoUtente": "grandeOrganizzatore"
           });
-        const proposte = await propostaModel.Proposta.find({
+        const proposte = await Proposta.find({
             "idCreatore": {
               $in: grandiOrganizzatori.map((u) => u._id)
             }
@@ -57,7 +57,7 @@ async function getProposteNA(req, res){
 async function getMieProposte(req, res){
     try {
         const loggedUsername = req.utenteLoggato.loggedUsername; // Username dell'utente loggato
-        const proposte = await propostaModel.Proposta.find({"usernameCreatore": loggedUsername});
+        const proposte = await Proposta.find({"usernameCreatore": loggedUsername});
         
         if (!proposte) {
             return res.status(400).json({message: "Nessuna proposta disponibile."});
@@ -77,7 +77,7 @@ async function getMieProposte(req, res){
 async function getProposteIscritto(req, res){
     try {
         const loggedUsername = req.utenteLoggato.loggedUsername; // Username dell'utente loggato
-        const proposte = await propostaModel.Proposta.find({partecipanti: loggedUsername});
+        const proposte = await Proposta.find({partecipanti: loggedUsername});
         
         if (!proposte) {
             return res.status(400).json({message: "Nessuna proposta disponibile."});
@@ -97,7 +97,7 @@ async function getProposteIscritto(req, res){
 async function getPropostaById(req, res){
     try {
         const {id} = req.params;
-        const proposta = await propostaModel.Proposta.findById(id);
+        const proposta = await Proposta.findById(id);
         
         if (!proposta) {
             return res.status(400).json({message: "Proposta non trovata"});
@@ -136,7 +136,7 @@ async function postProposta(req, res){
 
     try {
         // Creazione della proposta
-        const proposta = await propostaModel.Proposta.create({usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data});
+        const proposta = await Proposta.create({usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data});
         return res.status(201).json({self: "proposte/" + proposta._id});
 
     } catch (error) {
@@ -157,7 +157,7 @@ async function modifyPropostaById(req, res){
         const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
 
         // Trovo la proposta da modificare
-        var proposta = await propostaModel.Proposta.findById(id);
+        var proposta = await Proposta.findById(id);
 
         if (!proposta) {
             return res.status(404).json({message: "Proposta non trovata"});
@@ -166,7 +166,7 @@ async function modifyPropostaById(req, res){
         // Permetto la modifica dei dati utente solo se il chiamante dell'API è il creatore della proposta
         if(proposta.usernameCreatore==loggedUsername){
             // Aggiorna il documento proposta con tutti i campi forniti nel corpo della richiesta
-            proposta=await propostaModel.Proposta.findByIdAndUpdate(id, updates, {new: true});
+            proposta=await Proposta.findByIdAndUpdate(id, updates, {new: true});
         }
         else{
             return res.status(403).json({message: "Impossibile modificare proposte altrui"});
@@ -189,7 +189,7 @@ async function deletePropostaById(req, res){
         const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
 
         // Trovo la proposta da modificare
-        var proposta = await propostaModel.Proposta.findById(id);
+        var proposta = await Proposta.findById(id);
 
         if (!proposta) {
             return res.status(404).json({message: "Proposta non trovata"});
@@ -198,7 +198,7 @@ async function deletePropostaById(req, res){
         // Permetto la modifica dei dati utente solo se il chiamante dell'API è il creatore della proposta
         if(proposta.usernameCreatore==loggedUsername){
             // Trova e elimina la proposta dal database
-            await propostaModel.Proposta.findByIdAndDelete(id);
+            await Proposta.findByIdAndDelete(id);
         }
         else{
             return res.status(403).json({message: "Impossibile eliminare proposte altrui"});
