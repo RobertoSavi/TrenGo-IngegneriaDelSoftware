@@ -3,7 +3,7 @@ import { ref, onMounted, watch } from 'vue';
 import { loggedUser } from '../states/loggedUser.js';
 import { proposte, fetchProposte, fetchProposteNA } from '../states/proposte.js';
 import { RouterLink } from 'vue-router'
-
+ 
 const HOST_PROPOSTA="/proposte/"
 const HOST_UTENTI="/utenti/"
 const warningMessage = ref('');

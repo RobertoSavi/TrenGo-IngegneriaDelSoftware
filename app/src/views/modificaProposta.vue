@@ -30,10 +30,6 @@ onMounted( () => {
 });
 
 function modificaProposteButton() {
-	if (dati.value.titolo==""||dati.value.nomeLuogo==""||dati.value.descrizione==""||dati.value.numeroPartecipantiDesiderato<=1) {
-    	warningMessage.value = 'Compilare i campi'
-    	return;
-	}
 	warningMessage.value = ''
   	modificaProposta(dati.value, id).catch( err => console.error(err) );
 	router.back();
@@ -46,15 +42,15 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
 
 <template>
 	<form class="container" v-if="proposte">
-		<label for="titolo">Titolo:</label> <input type="text" id="titolo" v-model="dati.titolo"/>
+		<label for="titolo">Titolo:</label> <input type="text" id="titolo" v-model="dati.titolo" required/>
 		<br>
-		<label for="luogo">Luogo:</label> <input type="text" id="luogo" v-model="dati.nomeLuogo"/>
+		<label for="luogo">Luogo:</label> <input type="text" id="luogo" v-model="dati.nomeLuogo" required/>
 		<br>
-		<label for="descrizione">Descrizione:</label> <input type="text" id="descrizione" v-model="dati.descrizione"/>
+		<label for="descrizione">Descrizione:</label> <input type="text" id="descrizione" v-model="dati.descrizione" required/>
 		<br>
-		<label for="nParecipanti">Numero partecipanti desiderato:</label> <input type="number" id="nPartecipanti" v-model="dati.numeroPartecipantiDesiderato"/>
+		<label for="nParecipanti">Numero partecipanti desiderato:</label> <input type="number" id="nPartecipanti" v-model="dati.numeroPartecipantiDesiderato" required/>
 		<br>
-		<label for="data">Data dell'evento:</label> <input type="datetime-local" id="data" v-model="dati.data"/>
+		<label for="data">Data dell'evento:</label> <input type="datetime-local" id="data" v-model="dati.data" required="true"/>
 		<br>
 		<button type="button" @click="modificaProposteButton()">Fine</button>
 		<br>
@@ -63,5 +59,5 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
 </template>
 
 <style>
-@import '@/assets/stileProposta.css';
+	@import '@/assets/stileProposta.css';
 </style>

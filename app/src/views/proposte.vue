@@ -64,7 +64,7 @@ var isRichiedente = computed(() => {
 	
 	/*for(var richiesta in richieste)
 	{
-		console.log(richiesta);
+		console.log(richiesta.value);
 		
 		if(richiesta.usernameRichiedente==loggedUser.username)
 		{
