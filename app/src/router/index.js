@@ -49,7 +49,7 @@ const router = createRouter({
       	component: login
     },
 	{
-		path: '/cambiopassword',
+		path: '/passworddimenticata',
 		name: 'richiedi cambio password',
 		component: richiedicambiop
   	},

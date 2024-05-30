@@ -13,11 +13,15 @@ async function fetchUtenteUsername(username) {
 }
 
 async function modificaUtente(dati, id) {
-	await axios.put(UTENTI_URL+id, dati, {headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token}});;
+	await axios.put(UTENTI_URL+id, dati, {headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token}});
 };
 
 async function changePasswordRequest(dati) {
-	await axios.put(UTENTI_URL+"cambiopassword", dati, {headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token}});;
+	await axios.post(UTENTI_URL+"passworddimenticata", dati, {headers: { 'Content-Type': 'application/json'}});
+};
+
+async function changePassword(dati, token) {
+	await axios.post(UTENTI_URL+"cambiopassword/"+token, dati, {headers: { 'Content-Type': 'application/json'}});
 };
 
 
@@ -25,5 +29,6 @@ export {
 	utenti, 
 	fetchUtenteUsername, 
 	modificaUtente,
-	changePasswordRequest
+	changePasswordRequest,
+	changePassword
 } 

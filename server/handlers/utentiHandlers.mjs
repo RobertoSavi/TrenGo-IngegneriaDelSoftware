@@ -1,6 +1,7 @@
 import * as utenteModel from "../models/utenteModel.mjs"
 import * as validators from "../validators/utentiValidators.mjs";
 import { interessiEnum } from "../models/enums.mjs";
+import { sendResetPasswordMail } from "../services/emailService.mjs";
 import Token from "../models/tokenModel.mjs";
 import jwt  from "jsonwebtoken"
 import crypto from 'crypto';
@@ -251,33 +252,44 @@ async function changePasswordRequest(req, res){
 async function changePassword(req, res) {
     try {
         const {token} = req.params;
-        const {password} = req.body;
+        const {new_password} = req.body;
+        // Inizializza un array per gli errori
+        const errors = [];
 
         // Verifica il token
-        const tokenPassed = await Token.findOne({token});
+        const passedToken = await Token.findOne({token});
 
         // Se il token non viene trovato, restituisce un errore
-        if (!tokenPassed) {
+        if (!passedToken) {
             return res.status(404).json({message: "Token non valido"});
         }
 
+        // Validazione della password
+        if (!validators.isPasswordValid(new_password)) 
+            errors.push({field: "password", message: "Password non valida"});
+
+        // Gestione degli errori
+        if (errors.length > 0) 
+            return res.status(400).json({message: "error", errors});
+
+
         // Verifica la scadenza del token
-        const tokenExpiration = new Date(tokenPassed.expirationDate).getTime();
+        const tokenExpiration = new Date(passedToken.expirationDate).getTime();
         if (tokenExpiration < Date.now()) {
             // Se il token è scaduto, cancellalo dal database e restituisci un errore
-            await Token.deleteOne({tokenPassed});
+            await Token.deleteOne({passedToken});
             return res.status(404).json({message: "Token scaduto"});
         }
 
         // Trova l'utente associato al token
-        const utente = await utenteModel.Utente.findOne({username: tokenPassed.username});
+        const utente = await utenteModel.Utente.findOne({username: passedToken.username});
 
         // Aggiorna la password dell'utente
-        utente.password = password;
+        utente.password = new_password;
         await utente.save();
 
         // Cancella il token dal database
-        await Token.deleteOne({tokenPassed});
+        await Token.deleteOne({passedToken});
 
         return res.status(200).json({ message: "Password aggiornata con successo"});
     } catch (error) {

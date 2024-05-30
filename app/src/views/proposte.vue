@@ -62,15 +62,15 @@ async function gestisciRichiestaButton(idRichiesta, acc)
 
 var isRichiedente = computed(() => {
 	
-	for(var richiesta in richieste)
+	/*for(var richiesta in richieste)
 	{
 		console.log(richiesta);
 		
-		if(richiesta.value.usernameRichiedente==loggedUser.username)
+		if(richiesta.usernameRichiedente==loggedUser.username)
 		{
 			return true;
 		}
-	}
+	}*/
 	
 	return false;
 	

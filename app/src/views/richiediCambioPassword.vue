@@ -1,12 +1,13 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { loggedUser } from '../states/loggedUser.js';
-import { RouterLink } from 'vue-router'
+import {ref} from 'vue';
+import {useRoute} from 'vue-router'
+import router from '../router/index.js';
 import {changePasswordRequest} from '../states/utenti.js';
 
 async function richiediCambioPassword() {
     const dati = { email: email.value };
-    changePasswordRequest(dati);
+    await changePasswordRequest(dati);
+    router.push('');
 }
 
 </script>

@@ -41,7 +41,7 @@ function logout() {
       <button type="button" @click="login()">LogIn</button>
     </span>
 
-    <RouterLink :to="'/cambiopassword'">Password dimenticata?</RouterLink>
+    <RouterLink :to="'/passworddimenticata'">Password dimenticata?</RouterLink>
     
   </form>
 </template>
