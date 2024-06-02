@@ -1,0 +1,43 @@
+form {
+	max-width: 50%;
+	margin: 0 auto;
+	padding: 20px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+}
+
+.container-flex {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.container-flex label
+{
+	display: block;
+	margin-bottom: 10px;
+	float: left;
+	width: 33%;
+	padding: 10px;
+}
+
+.checkbox-item {
+  display: flex;
+  width: auto;
+  padding: 10px;
+}
+
+.checkbox-item label
+{
+	color: #f2f2f2;
+	float: left;
+}
+
+.checkbox-item input
+{
+	float: right;
+}
+
+form div {
+	margin-bottom: 10px;
+	width: 100%;
+}

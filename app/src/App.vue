@@ -1,6 +1,6 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-import { loggedUser } from './states/loggedUser.js'
+import { loggedUser } from './states/loggedUser.js' 
 </script>
 
 <template>
@@ -19,5 +19,5 @@ import { loggedUser } from './states/loggedUser.js'
 </template>
 
 <style>
-@import '@/assets/general.css';
+	@import '@/assets/stile.css';
 </style>

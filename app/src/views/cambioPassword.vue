@@ -22,7 +22,7 @@ async function cambioPassword() {
 </script>
 
 <template>
-    <form class="container">
+    <form class="container-flex">
         <label for="new_password">Nuova password:</label>
         <input type="password" id="new_password" name="new_password" required>
         <label for="confirm_password">Conferma nuova password:</label>
@@ -31,7 +31,3 @@ async function cambioPassword() {
         <button type="button" @click="cambioPassword()">Cambia password</button>
     </form>
 </template>
-
-<style>
-    @import '@/assets/stileForms.css';
-</style>

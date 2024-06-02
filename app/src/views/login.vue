@@ -1,24 +1,24 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { loggedUser, setLoggedUser, clearLoggedUser } from '../states/loggedUser.js'
-import axios from 'axios'
+import { login } from '../states/utenti.js'
 import { RouterLink } from 'vue-router'
+import router from '../router/index.js'
 
 const API_URL = import.meta.env.VITE_API_HOST || `http://localhost:5050/api`
 const UTENTI_URL = API_URL+`/utenti`
 
-const username = ref('example_username')
-const password = ref('example_passworD1')
+const dati=ref({
+	username: "",
+	password: ""
+})
 
-async function login() {
-	const response = await axios.post(
-		UTENTI_URL+'/login',
-		JSON.stringify( { username: username.value, password: password.value }), 
-		{headers: { 'Content-Type': 'application/json' }}
-	);
+async function loginButton() {
+	const response = await login(dati.value)	
+	setLoggedUser(response.data);
 	
-	const dati= response.data;
-	setLoggedUser(dati);
+	console.log(loggedUser.username);
+	router.push('/');
 };
 
 
@@ -29,19 +29,23 @@ function logout() {
 </script>
 
 <template>
-  <form>
-    <span v-if="loggedUser.token">
-      Welcome {{loggedUser.username}}
-      <button type="button" @click="logout()">LogOut</button>
-    </span>
-    
-    <span v-if="!loggedUser.token">
-      <input name="username" v-model="username" />
-      <input name="password" v-model="password" />
-      <button type="button" @click="login()">LogIn</button>
-    </span>
-
-    <RouterLink :to="'/passworddimenticata'">Password dimenticata?</RouterLink>
-    
-  </form>
+	<form @submit="loginButton()" @submit.prevent="submitForm" 	v-if="!loggedUser.token">
+		<div>
+			<h2>Login</h2>
+		</div>
+		<div>
+			<label>Username: </label>
+			<input name="username" v-model="dati.username" required />
+		</div>
+		<div>
+			<label>Password: </label>
+			<input name="password" v-model="dati.password" required />
+		</div>
+		<div>
+			<button type="submit">Accedi</button>
+			<RouterLink :to="'/passworddimenticata'">Password dimenticata?</RouterLink>
+			<br>
+			<RouterLink :to="'/signup'">Non hai un account?</RouterLink>
+		</div>
+  	</form>
 </template>

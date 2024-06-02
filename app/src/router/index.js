@@ -9,6 +9,8 @@ import miep from '../views/mieProposte.vue'
 import richiedicambiop from '../views/richiediCambioPassword.vue'
 import cambiop from '../views/cambioPassword.vue'
 import notifiche from '../views/notifiche.vue'
+import signup from '../views/signup.vue'
+
 
 
 const router = createRouter({
@@ -63,8 +65,13 @@ const router = createRouter({
 		path: '/notifiche/',
 		name: 'notifiche',
 		component: notifiche
+	},
+	{
+		path: '/signup',
+		name: 'signup',
+		component: signup
 	}
-  ]
+	]
 })
 
 export default router

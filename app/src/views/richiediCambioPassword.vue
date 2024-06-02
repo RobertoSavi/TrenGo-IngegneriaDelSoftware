@@ -20,7 +20,3 @@ async function richiediCambioPassword() {
         <button type="button" @click="richiediCambioPassword()">Invia link di reset password</button>
     </form>
 </template>
-
-<style>
-    @import '@/assets/stileHomepage.css';
-</style>

@@ -59,7 +59,3 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
 		<span style="color: red">{{ warningMessage }}</span>
 	</form>
 </template>
-
-<style>
-@import '@/assets/stileProposta.css';
-</style>
