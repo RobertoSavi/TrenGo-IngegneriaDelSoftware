@@ -8,6 +8,7 @@ import mp from '../views/modificaProposta.vue'
 import miep from '../views/mieProposte.vue'
 import richiedicambiop from '../views/richiediCambioPassword.vue'
 import cambiop from '../views/cambioPassword.vue'
+import notifiche from '../views/notifiche.vue'
 
 
 const router = createRouter({
@@ -57,7 +58,12 @@ const router = createRouter({
 		path: '/cambiopassword/:token',
 		name: 'cambio password',
 		component: cambiop
-  	}
+  	},
+	{
+		path: '/notifiche/',
+		name: 'notifiche',
+		component: notifiche
+	}
   ]
 })
 

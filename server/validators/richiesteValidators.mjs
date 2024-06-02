@@ -1,5 +1,5 @@
-import * as richiestaModel from "../models/richiestaModel.mjs"
-import  {interessiEnum}  from '../models/enums.mjs';
+//import Richiesta from "../models/richiestaModel.mjs"
+//import  {interessiEnum}  from '../models/enums.mjs';
 
 /**
  * Validatore per lo stato delle proposte.

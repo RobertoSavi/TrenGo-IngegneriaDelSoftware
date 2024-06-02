@@ -1,6 +1,6 @@
 import  Router  from "express";
 import * as handlers from "../handlers/richiesteHandlers.mjs"
-import tokenChecker from "../validators/tokenChecker.mjs";
+import tokenChecker from "../middlewares/tokenChecker.mjs";
 
 const router = Router();
 

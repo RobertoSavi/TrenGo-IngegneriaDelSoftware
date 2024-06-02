@@ -29,7 +29,7 @@ async function cambioPassword() {
         <input type="password" id="confirm_password" name="confirm_password" required>
         <span style="color: red">{{ warningMessage }}</span>
         <button type="button" @click="cambioPassword()">Cambia password</button>
-</form>
+    </form>
 </template>
 
 <style>

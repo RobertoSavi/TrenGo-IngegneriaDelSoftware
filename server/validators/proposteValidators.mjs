@@ -1,4 +1,4 @@
-import * as propostaModel from "../models/propostaModel.mjs"
+//import Proposta from "../models/propostaModel.mjs"
 import  {interessiEnum}  from '../models/enums.mjs';
 
 /**

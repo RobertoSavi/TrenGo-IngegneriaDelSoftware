@@ -1,4 +1,4 @@
-export const interessiEnum = [
+const interessiEnum = [
     "Scalata",
     "Giochi da tavolo",
     "Sport",
@@ -9,3 +9,20 @@ export const interessiEnum = [
     "Musica",
     "Altro"
 ];
+
+const statoNotificaEnum = {
+    NOT_SEEN: 'Non vista',
+    SEEN: 'Vista'
+};
+
+/*const tipoNotificaEnum = {
+    RICHIESTA: 'Richiesta',
+    INVITO: 'Invito',
+    CONFERMA: 'Conferma',
+    RIFIUTO: 'Rifiuto'
+};*/
+
+export{
+    interessiEnum,
+    statoNotificaEnum
+}

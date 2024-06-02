@@ -1,4 +1,4 @@
-import * as utenteModel from "../models/utenteModel.mjs"
+import Utente from "../models/utenteModel.mjs"
 import bcrypt from "bcrypt";
 
 // Queste funzioni servono a validare i campi necessari per la registrazione e il login di un utente
@@ -41,7 +41,7 @@ function isPasswordValid(password) {
  */
 async function isUsernameTaken(username) {
     // Esegui una query nel database per verificare se lo username è già presente
-    const utente = await utenteModel.Utente.findOne({username});
+    const utente = await Utente.findOne({username});
     return !!utente; // Ritorna true se lo username è già presente, altrimenti false
 }
 
@@ -52,7 +52,7 @@ async function isUsernameTaken(username) {
  */
 async function isEmailTaken(email) {
     // Esegui una query nel database per verificare se l'email è già presente
-    const utente = await utenteModel.Utente.findOne({email});
+    const utente = await Utente.findOne({email});
     return !!utente; // Ritorna true se l'email è già presente, altrimenti false
 }
 
@@ -66,7 +66,7 @@ async function isEmailTaken(email) {
 async function verifyPasswordByUsername(username, password) {
     try {
         // Trova l'utente nel database utilizzando lo username
-        const utente = await utenteModel.Utente.findOne({username});
+        const utente = await Utente.findOne({username});
         // Use bcrypt to compare the provided password with the hashed one stored in the database
         return await bcrypt.compare(password, utente.password);
     }
@@ -84,7 +84,7 @@ async function verifyPasswordByUsername(username, password) {
 async function getUtente(username) {
     try {
         // Trova l'utente nel database utilizzando lo username
-        const utente = await utenteModel.Utente.findOne({username}).exec();
+        const utente = await Utente.findOne({username}).exec();
         return utente; // Restituisce l'utente trovato o null se non trovato
     } catch (error) {
         console.error("Errore durante il recupero dell'utente per username:", error);
