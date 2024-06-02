@@ -3,6 +3,7 @@ import utentiRouter from "./routes/utentiRoutes.mjs";
 import proposteRouter from "./routes/proposteRoutes.mjs";
 import richiesteRouter from "./routes/richiesteRoutes.mjs";
 import notificheRouter from "./routes/notificheRoutes.mjs";
+import followRouter from "./routes/followRoutes.mjs";
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -32,10 +33,11 @@ app.use(
 connectToMongoDB()
   .then(() => {
     // Utilizza le route
-    app.use("/utenti", utentiRouter); // Route per gli utenti
-    app.use("/proposte", proposteRouter); // Route per le proposte
-    app.use("/proposte", richiesteRouter); // Route per le richieste
-    app.use("/notifiche", notificheRouter); // Route per le notifiche
+    app.use("/api/utenti", utentiRouter); // Route per gli utenti
+    app.use("/api/proposte", proposteRouter); // Route per le proposte
+    app.use("/api/proposte", richiesteRouter); // Route per le richieste
+    app.use("/api/notifiche", notificheRouter); // Route per le notifiche
+    app.use("/api/segui", followRouter); // Route per i follow
 
     // Gestione status 404
     app.use((req, res) => {
