@@ -12,7 +12,7 @@ async function getRichieste(req, res){
     try {
         const idProposta = req.params.idProposta;
         const proposta = await Proposta.findById(idProposta);
-        const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
+        const loggedUsername = req.utenteLoggato.loggedUsername; // Username dell'utente loggato
         const richieste = await Richiesta.find({idProposta, stato: "pending"});
 
         if(!proposta){
@@ -46,7 +46,7 @@ async function getRichiestaById(req, res){
         const id = req.params.id;
         const idProposta = req.params.idProposta;
         const proposta = await Proposta.findById(idProposta);
-        const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
+        const loggedUsername = req.utenteLoggato.loggedUsername; // Username dell'utente loggato
         const richiesta = await Richiesta.findById(id);
 
         if(!proposta){
@@ -79,7 +79,7 @@ async function postRichiesta(req, res){
     try {
         const idProposta = req.params.idProposta;
         const {usernameRichiedente} = req.body;
-        const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
+        const loggedUsername = req.utenteLoggato.loggedUsername; // Username dell'utente loggato
         
         const proposta = await Proposta.findById(idProposta);
         
@@ -116,7 +116,7 @@ async function handleRichiestaById(req, res){
         const id = req.params.id;
         const idProposta = req.params.idProposta;
         const proposta = await Proposta.findById(idProposta);
-        const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
+        const loggedUsername = req.utenteLoggato.loggedUsername; // Username dell'utente loggato
         const stato = req.body;
         var richiesta = await Richiesta.findById(id);
         const errors = [];
