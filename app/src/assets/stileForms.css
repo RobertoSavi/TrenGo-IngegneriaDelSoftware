@@ -1,46 +1,54 @@
-.container {
-    border-radius: 25px;
-    float: left;
-    width: 33%;
-    height: 82vh;
-    background-color: #333;
-    color: #f2f2f2;
-    text-align: center;
-    border-style: solid;
-    border-width: 5px;
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
+
+
+.container-flex {
+  display: flex;
+  flex-wrap: wrap;
 }
-h2 {
-    margin-top: 0;
-    text-align: center;
+
+.container-flex label
+{
+	font-size: medium;
+	font-weight: bold;
+	color: #f2f2f2;
 }
+
+.checkbox-item {
+  display: flex;
+  width: auto;
+  padding: 10px;
+}
+
+.checkbox-item label
+{
+	color: #f2f2f2;
+	float: left;
+}
+
+.checkbox-item input
+{
+	float: right;
+}
+
+form div {
+	margin-bottom: 10px;
+	width: 100%;
+}
+
 label {
-    display: block;
-    margin-bottom: 5px;
+	display: block;
+	margin-bottom: 10px;
+	float: left;
+	width: 33%;
+	padding: 10px;
 }
+
+input[type="text"],
+input[type="email"],
 input[type="password"] {
-    width: 80%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: none;
-    border-radius: 40px;
-    background-color: #f2f2f2;
-    color: #333;
-    border-color: #f2f2f2;
-    margin-bottom: 5%;
-}
-input[type="submit"] {
-    width: 80%;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 10px;
-    border-radius: 40px;
-    cursor: pointer;
-    margin-bottom: 10px;
-}
-input[type="submit"]:hover {
-    background-color: #0056b3;
+	width: 66%;
+	float: right;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	margin-bottom: 10px;
 }

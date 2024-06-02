@@ -10,13 +10,17 @@ const route = useRoute();
 const id=route.params.id;
 const warningMessage = ref('');
 const HOST_UTENTI="/utenti/";
+const fetchDone=ref(false);
 
 onMounted( async () => {
 	await fetchPropostaId(id);
+	
 	if(proposte.value.proposta.usernameCreatore==loggedUser.username)
 	{
 		await fetchRichieste(id);
 	}
+	
+	fetchDone.value=true;
 });
 
 watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
@@ -83,13 +87,13 @@ var isIscritto = computed(() => {
 </script>
 
 <template>
-	<div class="container" v-if="proposte" v-for="proposta in proposte">	
+	<div class="container" v-if="fetchDone" v-for="proposta in proposte">	
 		<h1>Titolo: {{ proposta.titolo }}</h1>
 		<br>
 		<label>Username creatore: </label><RouterLink :to="HOST_UTENTI+proposta.usernameCreatore"> {{ proposta.usernameCreatore }} </RouterLink>
 		<br>
 		<div v-if="proposta.usernameCreatore==loggedUser.username">
-			<div v-if="richieste" v-for="richiesta in richieste">
+			<div v-for="richiesta in richieste">
 				<label>Accettare la richiesta di: </label><RouterLink :to="HOST_UTENTI+richiesta.usernameRichiedente"> {{ richiesta.usernameRichiedente }} </RouterLink>?
 				<button type="button" @click="gestisciRichiestaButton(richiesta._id, true)">Accetta</button>
 				<button type="button" @click="gestisciRichiestaButton(richiesta._id, false)">Rifiuta</button>
@@ -104,8 +108,5 @@ var isIscritto = computed(() => {
 			<button type="button" @click="inviaRichiestaButton()" v-else>Richiedi di partecipare!</button>
 		</div>
 	</div>
+	<div v-else>Loading...</div>
 </template>
-
-<style>
-@import '@/assets/stileProposta.css';
-</style>

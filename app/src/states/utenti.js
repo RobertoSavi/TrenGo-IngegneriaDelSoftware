@@ -32,7 +32,12 @@ async function getInteressi() {
 }
 
 async function signup(dati){
-	
+	await axios.post(UTENTI_URL + "signup", dati, { headers: { 'Content-Type': 'application/json' } });
+}
+
+async function login(dati){
+	const response = await axios.post(UTENTI_URL + "login", dati, { headers: { 'Content-Type': 'application/json' } });
+	return response;
 }
 
 export {
@@ -42,5 +47,7 @@ export {
 	modificaUtente,
 	changePasswordRequest,
 	changePassword,
-	getInteressi
+	getInteressi,
+	signup,
+	login
 } 

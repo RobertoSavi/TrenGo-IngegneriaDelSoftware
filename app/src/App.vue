@@ -18,5 +18,5 @@ import { loggedUser } from './states/loggedUser.js'
 </template>
 
 <style>
-@import '@/assets/general.css';
+	@import '@/assets/stile.css';
 </style>

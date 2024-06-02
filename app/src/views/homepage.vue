@@ -7,18 +7,19 @@ import { RouterLink } from 'vue-router'
 const HOST_PROPOSTA="/proposte/"
 const HOST_UTENTI="/utenti/"
 const warningMessage = ref('');
+const fetchDone=ref(false);
 
-onMounted( () => {
-	if(loggedUser.token){
-		fetchProposte()
+onMounted( async () => {
+	if(loggedUser.token)
+	{
+		await fetchProposte();
 	}
-	else{
-		fetchProposteNA()
+	else
+	{
+		await fetchProposteNA();
 	}
-});
-
-watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
-	warningMessage.value = ''
+	
+	fetchDone.value=true;
 });
 </script>
 
@@ -26,7 +27,7 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
     <div class="bacheca">
        	<h2 style="height: 5%">Bacheca</h2>
        	<input type="text" class="barraRicerca" placeholder="Cerca proposte...">
-       	<div v-if="proposte" class="contenitoreProposte">
+       	<div v-if="fetchDone" class="contenitoreProposte">
        		<div class="proposta" v-for="proposta in proposte">
      	 		<h3><RouterLink :to="HOST_PROPOSTA+proposta._id">{{ proposta.titolo }}</RouterLink></h3>
         		<br>
@@ -42,10 +43,6 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
         		<p v-for="categoria in proposta.categorie">{{ categoria }}</p>
         	</div>
         </div>
-    <div v-else><strong>Loading...</strong></div>
+    	<div v-else>Loading...</div>
     </div>
 </template>
-
-<style>
-@import '@/assets/stileHomepage.css';
-</style>

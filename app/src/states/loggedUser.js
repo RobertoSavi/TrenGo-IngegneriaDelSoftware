@@ -26,14 +26,8 @@ function clearLoggedUser() {
 	loggedUser.self = undefined;
 }
 
-async function signup(dati) {
-	const response = await axios.post(PROPOSTE_URL+'mie',  {headers: {'Token': loggedUser.token}});
-	proposte.value = response.data.proposte;
-}
-
 export {
 	loggedUser,
 	setLoggedUser,
-	clearLoggedUser,
-	signup
+	clearLoggedUser
 } 

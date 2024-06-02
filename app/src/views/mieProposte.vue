@@ -56,7 +56,3 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
 	        </div>
 	    </div>
 </template>
-
-<style>
-@import '@/assets/stileHomepage.css';
-</style>

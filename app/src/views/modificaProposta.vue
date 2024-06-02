@@ -18,20 +18,22 @@ const dati = ref({
 	data: "",
 	categorie: ["Altro"]
 });
+const fetchDone=ref(false);
 
-onMounted( () => {
-	fetchPropostaId(id)
+onMounted( async () => {
+	await fetchPropostaId(id)
 	dati.value.titolo=proposte.value.proposta.titolo;
 	dati.value.nomeLuogo=proposte.value.proposta.nomeLuogo;
 	dati.value.numeroPartecipantiDesiderato=proposte.value.proposta.numeroPartecipantiDesiderato;
 	dati.value.descrizione=proposte.value.proposta.descrizione;
 	dati.value.data=proposte.value.proposta.data.split('.')[0];
 	dati.value.categorie=proposte.value.proposta.categorie;
+	
+	fetchDone.value=true;
 });
 
 function modificaProposteButton() {
-	warningMessage.value = ''
-  	modificaProposta(dati.value, id).catch( err => console.error(err) );
+  	modificaProposta(dati.value, id)
 	router.back();
 };
 
@@ -41,23 +43,21 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
 </script>
 
 <template>
-	<form class="container" v-if="proposte">
-		<label for="titolo">Titolo:</label> <input type="text" id="titolo" v-model="dati.titolo" required/>
+	<h2>Modifica Proposta:</h2>
+	<form class="container-flex" v-if="fetchDone" @submit.prevent="submitForm" @submit="modificaProposteButton()">
+		<label for="titolo">Titolo:</label> <input type="text" id="titolo" v-model="dati.titolo" required />
 		<br>
-		<label for="luogo">Luogo:</label> <input type="text" id="luogo" v-model="dati.nomeLuogo" required/>
+		<label for="luogo">Luogo:</label> <input type="text" id="luogo" v-model="dati.nomeLuogo" required />
 		<br>
-		<label for="descrizione">Descrizione:</label> <input type="text" id="descrizione" v-model="dati.descrizione" required/>
+		<label for="descrizione">Descrizione:</label> <input type="text" id="descrizione" v-model="dati.descrizione" required />
 		<br>
-		<label for="nParecipanti">Numero partecipanti desiderato:</label> <input type="number" id="nPartecipanti" v-model="dati.numeroPartecipantiDesiderato" required/>
+		<label for="nParecipanti">Numero partecipanti desiderato:</label> <input type="number" id="nPartecipanti" v-model="dati.numeroPartecipantiDesiderato" required />
 		<br>
-		<label for="data">Data dell'evento:</label> <input type="datetime-local" id="data" v-model="dati.data" required="true"/>
+		<label for="data">Data dell'evento:</label> <input type="datetime-local" id="data" v-model="dati.data" required />
 		<br>
-		<button type="button" @click="modificaProposteButton()">Fine</button>
+		<button type="submit">Fine</button>
 		<br>
 		<span style="color: red">{{ warningMessage }}</span>
 	</form>
+	<div v-else>Loading...</div>
 </template>
-
-<style>
-	@import '@/assets/stileProposta.css';
-</style>

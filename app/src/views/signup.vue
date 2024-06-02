@@ -1,13 +1,16 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { interessi, getInteressi } from '../states/utenti.js'
+import { interessi, getInteressi, signup, login } from '../states/utenti.js'
+import { setLoggedUser } from '../states/loggedUser.js'
+import router from '../router/index.js'
 
 const dati = ref({
-	nome: "",
-	cognome: "",
+	//nome: "",
+	//cognome: "",
+	username: "",
 	email: "",
-	password: "",
-	interessi: []
+	password: ""
+	//interessi: []
 });
 
 
@@ -15,8 +18,11 @@ onMounted(() => {
 	getInteressi();
 });
 
-function signupButton() {
-	console.log(dati.value.interessi);
+async function signupButton() {
+	await signup(dati.value);
+	const response=await login(JSON.stringify({ username: "dati.username", password: "dati.password"}));
+	setLoggedUser(response.data);
+	router.push('/');
 }
 
 function addInteresse(interesse)
@@ -37,13 +43,17 @@ function addInteresse(interesse)
 	<h1>Signup Form</h1>
 	<form @submit.prevent="submitForm" @submit="signupButton()">
 		<div class="container-flex">
-			<div>
-				<label for="firstName">First Name:</label>
-				<input type="text" v-model="dati.firstName" id="firstName" required />
+			<!--<div>
+				<label for="nome">Nome:</label>
+				<input type="text" v-model="dati.nome" id="nome" required />
 			</div>
 			<div>
-				<label for="lastName">Last Name:</label>
-				<input type="text" v-model="dati.lastName" id="lastName" required />
+				<label for="cognome">Cognome:</label>
+				<input type="text" v-model="dati.cognome" id="cognome" required />
+			</div>-->
+			<div>
+				<label for="username">Username:</label>
+				<input type="text" v-model="dati.username" id="username" required />
 			</div>
 			<div>
 				<label for="email">Email:</label>
@@ -51,22 +61,19 @@ function addInteresse(interesse)
 			</div>
 			<div>
 				<label for="password">Password:</label>
-				<input type="password" v-model="dati.password" id="password" required />
+				<input type="password"  v-model="dati.password" id="password" required />
 			</div>
+		</div>
+		<!--
+		<div class="container-flex">
 			<div>
 				<label>Interessi:</label>
 			</div>
-		</div>
-		<div class="container-flex">
 			<span v-for="interesse in interessi" class="checkbox-item">
 				<label>{{ interesse }}:</label>
 				<input type="checkbox" @click="addInteresse(interesse)"/>
 			</span>
-		</div>
+		</div>		-->
 		<button type="submit">Sign Up</button>
 	</form>
 </template>
-
-<style>
-	@import '@/assets/stileSignup.css';
-</style>
