@@ -7,10 +7,10 @@ const router = Router();
 // Uso il middleware per verificare che l'utente sia utenticato
 router.use("", tokenChecker);
 
-// Permette di creare una nuova notifica
+// Permette di seguire un utente tramite username
 router.put("/follow/:username", handlers.follow);
 
-// Permette di aggiornare una notifica specifica per ID
+// Permette smettere di seguire un utente tramite username
 router.put("/unfollow/:username", handlers.unfollow);
 
 export default router;

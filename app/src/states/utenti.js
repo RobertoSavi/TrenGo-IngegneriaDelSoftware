@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import axios from 'axios'
 import { loggedUser } from './loggedUser.js'
 
-const API_URL = import.meta.env.VITE_API_HOST || `http://localhost:5050`
+const API_URL = import.meta.env.VITE_API_HOST || `http://localhost:5050/api`
 const UTENTI_URL = API_URL+'/utenti/'
 
 const utenti = ref({})

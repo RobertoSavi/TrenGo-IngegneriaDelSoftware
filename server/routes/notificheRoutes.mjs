@@ -5,7 +5,7 @@ import tokenChecker from "../middlewares/tokenChecker.mjs";
 const router = Router();
 
 // Uso il middleware per verificare che l'utente sia utenticato
-//router.use("", tokenChecker);
+router.use("", tokenChecker);
 
 // Permette di creare una nuova notifica
 router.post("/", handlers.postNotifica);

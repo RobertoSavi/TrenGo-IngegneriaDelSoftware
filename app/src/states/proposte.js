@@ -5,7 +5,7 @@ import axios from 'axios'
 import { loggedUser } from '../states/loggedUser.js'
 import { richieste, fetchRichieste } from '../states/richieste.js';
 
-const API_URL = import.meta.env.VITE_API_HOST || `http://localhost:5050`
+const API_URL = import.meta.env.VITE_API_HOST || `http://localhost:5050/api`
 const PROPOSTE_URL = API_URL+'/proposte/'
 
 const proposte = ref({})
