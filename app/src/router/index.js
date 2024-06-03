@@ -2,16 +2,15 @@ import { createRouter, createWebHistory } from 'vue-router'
 import homepage from '../views/homepage.vue'
 import proposta from '../views/proposte.vue'
 import utenti from '../views/utenti.vue'
-import np from '../views/nuovaProposta.vue'
+import newp from '../views/nuovaProposta.vue'
 import login from '../views/login.vue'
-import mp from '../views/modificaProposta.vue'
+import modp from '../views/modificaProposta.vue'
+import modu from '../views/modificaUtente.vue'
 import miep from '../views/mieProposte.vue'
 import richiedicambiop from '../views/richiediCambioPassword.vue'
 import cambiop from '../views/cambioPassword.vue'
 import notifiche from '../views/notifiche.vue'
 import signup from '../views/signup.vue'
-
-
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,12 +28,12 @@ const router = createRouter({
     {
       	path: '/proposte/crea',
       	name: 'nuova proposta',
-      	component: np
+      	component: newp
     },
     {
       	path: '/proposte/modifica/:id',
       	name: 'modifica proposta',
-      	component: mp
+      	component: modp
     },
     {
       	path: '/proposte/mie',
@@ -45,6 +44,11 @@ const router = createRouter({
       	path: '/utenti/:username',
       	name: 'utenti',
       	component: utenti
+    },
+    {
+      	path: '/utenti/modifica',
+      	name: 'modifica utente',
+      	component: modu
     },
     {
       	path: '/login',

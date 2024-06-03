@@ -1,61 +1,65 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue';
-import { loggedUser } from '../states/loggedUser.js';
-import { proposte, modificaProposta, fetchPropostaId } from '../states/proposte.js';
+import { ref, onMounted } from 'vue';
+import { utenti, interessi, fetchUtenteUsername, getInteressi, modificaUtente } from '../states/utenti.js'
 import { useRoute } from 'vue-router';
+import { loggedUser } from '../states/loggedUser.js'
+import router from '../router/index.js'
 
-const route = useRoute();
-const id=route.params.id;
-const warningMessage = ref('');
+const id=loggedUser.id;
 const dati = ref({
-	usernameCreatore: loggedUser.username,
-	creatore: loggedUser.id,
-	titolo: "",
-	nomeLuogo: "",
-	numeroPartecipantiDesiderato: "",
-	descrizione: "",
-	data: "",
-	categorie: ["Altro"]
+	username: "",
+	interessi: []
+});
+const fetchDone=ref(false);
+
+onMounted( async () => {
+	await fetchUtenteUsername(loggedUser.username);
+	dati.value.username=utenti.value.utente.username;
+	dati.value.interessi=utenti.value.utente.interessi;
+	
+	await getInteressi();
+	
+	fetchDone.value="true";
 });
 
-onMounted( () => {
-	fetchPropostaId(id)
-	dati.value.titolo=proposte.value.proposta.titolo;
-	dati.value.nomeLuogo=proposte.value.proposta.nomeLuogo;
-	dati.value.numeroPartecipantiDesiderato=proposte.value.proposta.numeroPartecipantiDesiderato;
-	dati.value.descrizione=proposte.value.proposta.descrizione;
-	dati.value.data=proposte.value.proposta.data.split('T')[0];
-	dati.value.categorie=proposte.value.proposta.categorie;
-});
+async function modificaButton() {
+	await modificaUtente(dati.value, id);
+	loggedUser.username=dati.value.username;
+	router.back();
+}
 
-function modificaProposteButton() {
-	if (dati.value.titolo==""||dati.value.nomeLuogo==""||dati.value.descrizione==""||dati.value.numeroPartecipantiDesiderato<=1) {
-    	warningMessage.value = 'Compilare i campi'
-    	return;
+function addInteresse(interesse)
+{
+	if(dati.value.interessi.includes(interesse))
+	{
+		dati.value.interessi.pop(interesse);
 	}
-	warningMessage.value = ''
-  	modificaProposta(dati.value, id).catch( err => console.error(err) );
-};
-
-watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
-	warningMessage.value = ''
-});
+	else
+	{
+		dati.value.interessi.push(interesse);
+	}
+}
 </script>
 
 <template>
-	<form class="container" v-if="proposte">
-		<label for="titolo">Titolo:</label> <input type="text" id="titolo" v-model="dati.titolo" required/>
-		<br>
-		<label for="luogo">Luogo:</label> <input type="text" id="luogo" v-model="dati.nomeLuogo" required/>
-		<br>
-		<label for="descrizione">Descrizione:</label> <input type="text" id="descrizione" v-model="dati.descrizione" required/>
-		<br>
-		<label for="nParecipanti">Numero partecipanti desiderato:</label> <input type="number" id="nPartecipanti" v-model="dati.numeroPartecipantiDesiderato" required/>
-		<br>
-		<label for="data">Data dell'evento:</label> <input type="date" id="data" v-model="dati.data" required/>
-		<br>
-		<button type="button" @click="modificaProposteButton()">Fine</button>
-		<br>
-		<span style="color: red">{{ warningMessage }}</span>
+	<form v-if="fetchDone" @submit.prevent="submitForm" @submit="modificaButton()">
+		<h2>Modifica account</h2>
+		<div>
+			<label>Username:</label>
+			<input type="text" v-model="dati.username" required />
+		</div>
+		<div>
+			<label>Interessi:</label>
+		</div>
+		<span class="contenitoreInteressi">
+			<span class="interesse" v-for="interesse in interessi">
+				<input type="checkbox" @click="addInteresse(interesse)" :checked="dati.interessi.includes(interesse)"/>
+				{{ interesse }}
+			</span>
+		</span>
+		<div>
+			<button type="submit">Modifica</button>
+		</div>
 	</form>
+	<div v-else>Loading...</div>v
 </template>

@@ -6,7 +6,6 @@ import { RouterLink } from 'vue-router'
  
 const HOST_PROPOSTA="/proposte/"
 const HOST_UTENTI="/utenti/"
-const warningMessage = ref('');
 const fetchDone=ref(false);
 
 onMounted( async () => {
@@ -19,6 +18,8 @@ onMounted( async () => {
 		await fetchProposteNA();
 	}
 	
+	console.log(proposte.value);
+	
 	fetchDone.value=true;
 });
 </script>
@@ -29,18 +30,35 @@ onMounted( async () => {
        	<input type="text" class="barraRicerca" placeholder="Cerca proposte...">
        	<div v-if="fetchDone" class="contenitoreProposte">
        		<div class="proposta" v-for="proposta in proposte">
-     	 		<h3><RouterLink :to="HOST_PROPOSTA+proposta._id">{{ proposta.titolo }}</RouterLink></h3>
-        		<br>
-        		<p><label>Creatore: </label> <RouterLink :to="HOST_UTENTI+proposta.usernameCreatore">{{ proposta.usernameCreatore }}</RouterLink> 
-        		<br> 
-        		<label>Luogo: </label> {{ proposta.nomeLuogo }} 
-        		<br>  
-        		<label>Data: </label> {{ proposta.data }} 
-        		<br>
-				<label>Partecipanti: </label> {{ proposta.numeroPartecipanti }} / {{ proposta.numeroPartecipantiDesiderato }} </p>
-        		<p><label>Descrizione:</label> {{ proposta.descrizione }}</p>
-        		<br>
-        		<p v-for="categoria in proposta.categorie">{{ categoria }}</p>
+     	 		<h3>
+					<RouterLink :to="HOST_PROPOSTA+proposta._id">{{ proposta.titolo }}</RouterLink>
+				</h3>
+        		<div>
+        			<label>Creatore: </label> 
+					<RouterLink :to="HOST_UTENTI+proposta.usernameCreatore">{{ proposta.usernameCreatore }}</RouterLink> 
+        		</div>
+				<div> 
+        			<label>Luogo: </label> 
+					{{ proposta.nomeLuogo }} 
+        		</div>  
+				<div>
+        			<label>Data e ora: </label> 
+					{{ proposta.data.split('.')[0].split('T')[0] }} 
+					{{ proposta.data.split('.')[0].split('T')[1] }}
+        		</div>
+				<div>
+					<label>Partecipanti: </label> 
+					{{ proposta.numeroPartecipanti }}/{{ proposta.numeroPartecipantiDesiderato }}
+        		</div>
+				<div>
+					<label>Descrizione: </label> {{ proposta.descrizione }}
+        		</div>
+				<div>
+					<label>Categorie: </label>
+					<label v-for="categoria in proposta.categorie">
+						<span>{{ categoria }}&nbsp;</span>
+					</label>
+				</div>
         	</div>
         </div>
     	<div v-else>Loading...</div>

@@ -1,9 +1,9 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import { loggedUser } from '../states/loggedUser.js';
 import { creaProposta } from '../states/proposte.js';
+import { interessi, getInteressi } from '../states/utenti.js'
 
-const warningMessage = ref('');
 const dati = ref({
 	usernameCreatore: loggedUser.username,
 	creatore: loggedUser.id,
@@ -12,7 +12,11 @@ const dati = ref({
 	numeroPartecipantiDesiderato: "",
 	descrizione: "",
 	data: "",
-	categorie: ["Altro"]
+	categorie: []
+});
+
+onMounted(() => {
+	getInteressi();
 });
 
 function creaProposteButton() {
@@ -25,37 +29,53 @@ function creaProposteButton() {
   	creaProposta(datiJson).catch( err => console.error(err) );
 };
 
-watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
-	warningMessage.value = ''
-});
+function addCategoria(categoria)
+{
+	if(dati.value.interessi.includes(categoria))
+	{
+		dati.value.interessi.pop(categoria);
+	}
+	else
+	{
+		dati.value.interessi.push(categoria);
+	}
+}
 </script>
 
 <template>
-	<form class="container-flex" @submit.prevent="submitForm" @submit="creaProposteButton()">
+	<form @submit.prevent="submitForm" @submit="creaProposteButton()">
 		<h2>Nuova Proposta:</h2>
 		<div>
 			<label for="titolo">Titolo:</label> 
-			<input type="text" id="titolo" v-model="dati.titolo" required />
+			<input type="text" v-model="dati.titolo" required />
 		</div>
 		<div>
 			<label for="luogo">Luogo:</label> 
-			<input type="text" id="luogo" v-model="dati.nomeLuogo" required />
+			<input type="text" v-model="dati.nomeLuogo" required />
 		</div>
 		<div>
 			<label for="descrizione">Descrizione:</label> 
-			<input type="text" id="descrizione" v-model="dati.descrizione" required />
+			<input type="text" v-model="dati.descrizione" required />
 		</div>
 		<div>
 			<label for="nParecipanti">Numero partecipanti desiderato:</label> 
-			<input type="number" id="nPartecipanti" v-model="dati.numeroPartecipantiDesiderato" required />
+			<input type="number" v-model="dati.numeroPartecipantiDesiderato" required />
 		</div>
 		<div>
 			<label for="data">Data dell'evento:</label> 
-			<input type="datetime-local" id="data" v-model="dati.data" required />
+			<input type="datetime-local" v-model="dati.data" required />
 		</div>
+		<div>
+			<label>Categorie:</label>
+		</div>	
+		<span class="contenitoreInteressi">
+			<span class="interesse" v-for="interesse in interessi">
+				<input type="checkbox" @click="addCategoria(interesse)"/>
+				{{ interesse }}
+			</span>
+		</span>
 		<div>
 			<button type="submit">Fine</button>
 		</div>
-		<span style="color: red">{{ warningMessage }}</span>
 	</form>
 </template>

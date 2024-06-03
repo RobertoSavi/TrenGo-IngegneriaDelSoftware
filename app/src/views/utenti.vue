@@ -1,8 +1,9 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import { loggedUser } from '../states/loggedUser.js';
-import { utenti, interessi, fetchUtenteUsername, getInteressi } from '../states/utenti.js';
+import { utenti, fetchUtenteUsername } from '../states/utenti.js';
 import { useRoute } from 'vue-router';
+import router from '../router/index.js'
 
 const route = useRoute();
 const username=route.params.username;
@@ -11,9 +12,13 @@ const fetchDone=ref(false);
 
 onMounted( async () => {
 	await fetchUtenteUsername(username);
-	await getInteressi();
 	fetchDone.value=true;
 });
+
+function modifica()
+{
+	router.push('modifica');
+}
 
 watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
 	warningMessage.value = ''
@@ -21,25 +26,25 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
 </script>
 
 <template>
-	<div class="page" v-if="fetchDone">
-		<div class="container" v-for="utente in utenti">
-			<h1> {{ utente.username }} ({{ utente.karma }})</h1>
-			<h2 v-if="utente.tipoUtente=='grandeOrganizzatore'"> Grande organizzatore </h2>
-			<br>
+	<div class="container" v-if="fetchDone" v-for="utente in utenti">
+		<h1> {{ utente.username }} ({{ utente.karma }})</h1>
+		<h2 v-if="utente.tipoUtente=='grandeOrganizzatore'"> Grande organizzatore </h2>
+		<div>
 			<label>Nome: </label>{{ loggedUser.nome }}
-			<br>
+		</div>
 			<label>Cognome: </label>{{ utente.cognome }}
-			<br>
+		<div v-if="utente.username==loggedUser.username">
+			<label>Email: </label>{{ utente.email }}
+		</div>
+		<div>
 			<label>Interessi: </label>
 			<span v-for="interesse in utente.interessi">{{ interesse+", " }}</span>
-			<div v-if="utente.username==loggedUser.username">
-				<label>Email: </label>{{ utente.email }}
-				<br>
-				<button>Modifica</button>
-			</div>
-			<div v-else>
-				<button>Segui</button>
-			</div>
+		</div>
+		<div v-if="utente.username==loggedUser.username">
+			<button @click="modifica(loggedUser.id)">Modifica</button>
+		</div>
+		<div v-else>
+			<button>Segui</button>
 		</div>
 	</div>
 	<div v-else>Loading...</div>

@@ -5,12 +5,9 @@ import { login } from '../states/utenti.js'
 import { RouterLink } from 'vue-router'
 import router from '../router/index.js'
 
-const API_URL = import.meta.env.VITE_API_HOST || `http://localhost:5050/api`
-const UTENTI_URL = API_URL+`/utenti`
-
 const dati=ref({
-	username: "",
-	password: ""
+	username: "example_username",
+	password: "example_passworD1"
 })
 
 async function loginButton() {
