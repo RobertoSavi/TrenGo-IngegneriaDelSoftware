@@ -89,15 +89,15 @@ var isIscritto = computed(() => {
 <template>
 	<div class="container" v-if="fetchDone" v-for="proposta in proposte">	
 		<h1>Titolo: {{ proposta.titolo }}</h1>
-		<br>
-		<label>Username creatore: </label><RouterLink :to="HOST_UTENTI+proposta.usernameCreatore"> {{ proposta.usernameCreatore }} </RouterLink>
-		<br>
+		<div>
+			<label>Username creatore: </label>
+			<RouterLink :to="HOST_UTENTI+proposta.usernameCreatore"> {{ proposta.usernameCreatore }} </RouterLink>
+		</div>
 		<div v-if="proposta.usernameCreatore==loggedUser.username">
 			<div v-for="richiesta in richieste">
 				<label>Accettare la richiesta di: </label><RouterLink :to="HOST_UTENTI+richiesta.usernameRichiedente"> {{ richiesta.usernameRichiedente }} </RouterLink>?
 				<button type="button" @click="gestisciRichiestaButton(richiesta._id, true)">Accetta</button>
 				<button type="button" @click="gestisciRichiestaButton(richiesta._id, false)">Rifiuta</button>
-				<br>
 			</div>
 			<button @click="modifica(proposta._id)">Modifica</button>
 			<button @click="eliminaPropostaButton()">Elimina</button>

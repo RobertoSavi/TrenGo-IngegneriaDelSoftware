@@ -1,16 +1,18 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import { loggedUser } from '../states/loggedUser.js';
-import { utenti, fetchUtenteUsername } from '../states/utenti.js';
+import { utenti, interessi, fetchUtenteUsername, getInteressi } from '../states/utenti.js';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
 const username=route.params.username;
 const warningMessage = ref('');
+const fetchDone=ref(false);
 
-onMounted( () => {
-	fetchUtenteUsername(username);
-	console.log(utenti?.value?.utente);
+onMounted( async () => {
+	await fetchUtenteUsername(username);
+	await getInteressi();
+	fetchDone.value=true;
 });
 
 watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
@@ -19,8 +21,8 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
 </script>
 
 <template>
-	<div class="container" v-if="utenti">
-		<div v-for="utente in utenti">
+	<div class="page" v-if="fetchDone">
+		<div class="container" v-for="utente in utenti">
 			<h1> {{ utente.username }} ({{ utente.karma }})</h1>
 			<h2 v-if="utente.tipoUtente=='grandeOrganizzatore'"> Grande organizzatore </h2>
 			<br>
@@ -40,4 +42,5 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
 			</div>
 		</div>
 	</div>
+	<div v-else>Loading...</div>
 </template>
