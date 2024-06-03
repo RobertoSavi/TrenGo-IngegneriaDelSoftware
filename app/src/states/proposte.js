@@ -1,5 +1,3 @@
-// https://vuejs.org/guide/scaling-up/state-management.html#simple-state-management-with-reactivity-api
-
 import { ref } from 'vue'
 import axios from 'axios'
 import { loggedUser } from '../states/loggedUser.js'

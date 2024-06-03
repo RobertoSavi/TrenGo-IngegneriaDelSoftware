@@ -43,13 +43,8 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
                     </span>
                     <span v-else>System</span>
                 </div>
-                <label></label> {{ notifica.messaggio }}
+                <label>{{ notifica.messaggio }}</label> 
             </div>
         </div>
     </div>
 </template>
-
-<style>
-@import '@/assets/stileHomepage.css';
-@import '@/assets/stileNotifiche.css';
-</style>

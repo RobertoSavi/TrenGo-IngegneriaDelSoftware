@@ -30,16 +30,14 @@ function logout() {
 
 <template>
 	<form @submit="loginButton()" @submit.prevent="submitForm" 	v-if="!loggedUser.token">
+		<h2>Login</h2>
 		<div>
-			<h2>Login</h2>
+			<label>Username:</label>
+			<input type="text" v-model="dati.username" required />
 		</div>
 		<div>
-			<label>Username: </label>
-			<input name="username" v-model="dati.username" required />
-		</div>
-		<div>
-			<label>Password: </label>
-			<input name="password" v-model="dati.password" required />
+			<label>Password:</label>
+			<input type="password" v-model="dati.password" required />
 		</div>
 		<div>
 			<button type="submit">Accedi</button>

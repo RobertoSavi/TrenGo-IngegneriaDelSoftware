@@ -13,7 +13,7 @@ import { loggedUser } from './states/loggedUser.js'
 		<RouterLink to="/">Home</RouterLink>
 	</div> 
 	<div class="menubar" v-else>
-			<RouterLink to="/login">Login/Signup</RouterLink>
+		<RouterLink to="/login">Login/Signup</RouterLink>
 	</div> 
 	<RouterView/>
 </template>
