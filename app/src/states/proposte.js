@@ -10,6 +10,7 @@ const PROPOSTE_URL = API_URL+'/proposte/'
 
 const proposte = ref({})
 const proposteIscritto = ref({})
+const proposteTerminate = ref({})
 
 async function fetchProposte() {
 	const response = await axios.get(PROPOSTE_URL,  {headers: {'Token': loggedUser.token}});
