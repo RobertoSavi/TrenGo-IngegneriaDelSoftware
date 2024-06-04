@@ -18,8 +18,6 @@ onMounted( async () => {
 		await fetchProposteNA();
 	}
 	
-	console.log(proposte.value);
-	
 	fetchDone.value=true;
 });
 </script>

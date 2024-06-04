@@ -116,14 +116,6 @@ button:hover {
 	color: #333;
 }
 
-/*#read:hover {
-	background-color: green;
-}
-
-#delt:hover {
-	background-color: red;
-}*/
-
 a {
 	color: inherit;
 	text-align: center;
@@ -221,17 +213,3 @@ label.campo{
 	flex-direction: column;
 }
 
-.icona {
-    background-color: transparent; /* Set the button background to transparent */
-    border: none; /* Remove any border */
-    padding: 10px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.icona img.icon {
-    width: 24px; /* Ensure the icon has the right size */
-    height: 24px;
-}

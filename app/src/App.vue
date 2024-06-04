@@ -20,4 +20,5 @@ import { loggedUser } from './states/loggedUser.js'
 
 <style>
 	@import '@/assets/stile.css';
+	@import '@/assets/stileNotifiche.css';
 </style>

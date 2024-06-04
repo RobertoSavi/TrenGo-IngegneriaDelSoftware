@@ -13,8 +13,6 @@ const dati=ref({
 async function loginButton() {
 	const response = await login(dati.value)	
 	setLoggedUser(response.data);
-	
-	console.log(loggedUser.username);
 	router.push('/');
 };
 
