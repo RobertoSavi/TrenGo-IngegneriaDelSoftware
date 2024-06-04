@@ -87,15 +87,20 @@ var isIscritto = computed(() => {
 </script>
 
 <template>
-	<div class="container" v-if="fetchDone" v-for="proposta in proposte">	
+	<div class="proposta" v-if="fetchDone" v-for="proposta in proposte">	
 		<h1>Titolo: {{ proposta.titolo }}</h1>
-		<div>
-			<label>Username creatore: </label>
-			<RouterLink :to="HOST_UTENTI+proposta.usernameCreatore"> {{ proposta.usernameCreatore }} </RouterLink>
-		</div>
-		<div>
-			<label>Luogo: {{ proposta.luogo }}</label>
-		</div>
+		<br>
+		<label>Username creatoe: </label><RouterLink :to="HOST_UTENTI+proposta.usernameCreatore"> {{ proposta.usernameCreatore }} </RouterLink>
+		<br>
+		<label for="luogo">Luogo:</label> <input type="text" id="luogo" v-model="proposta.nomeLuogo" required />
+		<br>
+		<label for="descrizione">Descrizione:</label> <input type="text" id="descrizione" v-model="proposta.descrizione" required />
+		<br>
+		<label for="nParecipanti">Numero partecipanti desiderato:</label> <input type="number" id="nPartecipanti" v-model="proposta.numeroPartecipantiDesiderato" required />
+		<br>
+		<label for="data">Data dell'evento:</label> <input type="datetime-local" id="data" v-model="proposta.data" required />
+		<br>
+		<span style="color: red">{{ warningMessage }}</span>
 		<div v-if="proposta.usernameCreatore==loggedUser.username">
 			<div v-for="richiesta in richieste">
 				<label>Accettare la richiesta di: </label><RouterLink :to="HOST_UTENTI+richiesta.usernameRichiedente"> {{ richiesta.usernameRichiedente }} </RouterLink>?

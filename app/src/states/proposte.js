@@ -20,14 +20,24 @@ async function fetchPropostaId(id) {
 	proposte.value = response.data;
 }
 
+async function fetchPropostaIdValutazioni(id) {
+    const response = await axios.get(PROPOSTE_URL+id+'?valutazioni=true', {headers: {'Token': loggedUser.token}});
+	proposte.value = response.data;
+}
+
 async function fetchProposteMie() {
-	const response = await axios.get(PROPOSTE_URL+'mie',  {headers: {'Token': loggedUser.token}});
+	const response = await axios.get(PROPOSTE_URL+'?mie=true',  {headers: {'Token': loggedUser.token}});
 	proposte.value = response.data.proposte;
 }
 
 async function fetchProposteIscritto() {
-	const response = await axios.get(PROPOSTE_URL+'iscritto',  {headers: {'Token': loggedUser.token}});
+	const response = await axios.get(PROPOSTE_URL+'?iscritto=true',  {headers: {'Token': loggedUser.token}});
 	proposteIscritto.value = response.data.proposte;
+}
+
+async function fetchProposteTerminate() {
+	const response = await axios.get(PROPOSTE_URL+'?terminate=true',  {headers: {'Token': loggedUser.token}});
+	proposteTerminate.value = response.data.proposte;
 }
 
 async function fetchProposteNA(){
@@ -48,12 +58,15 @@ async function eliminaProposta(id) {
 };
 
 export { 
-	proposte, 
-	proposteIscritto, 
+	proposte,
+	proposteIscritto,
+	proposteTerminate,
 	fetchProposte, 
 	fetchPropostaId, 
+	fetchPropostaIdValutazioni,
 	fetchProposteMie, 
-	fetchProposteIscritto, 
+	fetchProposteIscritto,
+	fetchProposteTerminate,
 	fetchProposteNA, 
 	creaProposta, 
 	modificaProposta, 

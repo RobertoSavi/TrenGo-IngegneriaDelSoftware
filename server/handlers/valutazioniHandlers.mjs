@@ -1,8 +1,9 @@
 import Utente from "../models/utenteModel.mjs";
 import Proposta from "../models/propostaModel.mjs";
+import Valutazione from "../models/valutazioneModel.mjs";
 
 /**
- * Permette all'utente loggato di valutare tutti i partecipanti ad una proposta.
+ * Permette all'utente loggato di valutare tutti i partecipanti ad una proposta tramite idProposta.
  * @param {object} req - L'oggetto della richiesta.
  * @param {object} res - L'oggetto della risposta.
  */
@@ -11,24 +12,49 @@ async function valutaPartecipantiByIdProposta(req,res){
         const idProposta = req.params.idProposta;
         const proposta = await Proposta.findById(idProposta);
         const loggedUsername = req.utenteLoggato.loggedUsername; // Username dell'utente loggato
+        const valutazione = req.body.valutazione;
 
         if(!proposta){
             return res.status(404).json({message: "Proposta non trovata"});
         }
-
-        if(loggedUsername!=proposta.usernameCreatore.toString()){
-            return res.status(403).json({message: "Non sei autorizzato a valutare i partecipanti di questa proposta"});
+        let partecipanti=[];
+        if(loggedUsername==proposta.usernameCreatore){
+            for (const partecipante of proposta.partecipanti) {
+                const valutazioneEsistente = await Valutazione.findOne({idProposta: idProposta, usernameValutato: partecipante, usernameValutatore: loggedUsername});
+                if(valutazioneEsistente){
+                    continue;
+                }
+                partecipanti.push(partecipante);
+            };
         }
+        else{
+            for (const partecipante of proposta.partecipanti.filter(partecipante => partecipante != loggedUsername)) {
+                const valutazioneEsistente = await Valutazione.findOne({idProposta: idProposta, usernameValutato: partecipante, usernameValutatore: loggedUsername});
+                if(valutazioneEsistente){
+                    continue;
+                }
+                partecipanti.push(partecipante);
+            };
+            const valutazioneEsistente = await Valutazione.findOne({idProposta: idProposta, usernameValutato: proposta.usernameCreatore, usernameValutatore: loggedUsername});
+            if(!valutazioneEsistente){
+                partecipanti.push(proposta.usernameCreatore);
+            }
+        }
+        console.log(partecipanti);
 
-        const partecipanti = proposta.partecipanti;
-
+        if(partecipanti.length==0){
+            return res.status(400).json({message: "Tutti i partecipanti sono già stati valutati"});
+        }
         for(let i=0; i<partecipanti.length; i++){
-            const utente = await Utente.findOne({username: partecipanti[i].username});
-            utente.valutazioni.push({
+            const utenteValutato = await Utente.findOne({username: partecipanti[i]});
+            await Valutazione.create({
                 idProposta: idProposta,
-                voto: partecipanti[i].voto
+                usernameValutato: utenteValutato.username,
+                usernameValutatore: loggedUsername,
+                valutazione : valutazione
             });
-            await utente.save();
+            utenteValutato.karma += valutazione;
+            await utenteValutato.save();
         }
 
         return res.status(200).json({message: "Valutazioni effettuate con successo"});
@@ -38,38 +64,49 @@ async function valutaPartecipantiByIdProposta(req,res){
 }
 
 /**
- * Permette all'utente loggato di valutare tutti un partecipante ad una proposta tramite username.
+ * Permette all'utente loggato di valutare un partecipante ad una proposta tramite idProposta e username.
  * @param {object} req - L'oggetto della richiesta.
  * @param {object} res - L'oggetto della risposta.
  */
 async function valutaPartecipanteByUsername(req,res){
     try{
         const idProposta = req.params.idProposta;
+        const username = req.params.username;
         const proposta = await Proposta.findById(idProposta);
+        const utenteValutato = await Utente.findOne({username});
         const loggedUsername = req.utenteLoggato.loggedUsername; // Username dell'utente loggato
+        const valutazione = req.body.valutazione;
 
         if(!proposta){
             return res.status(404).json({message: "Proposta non trovata"});
         }
 
-        if(loggedUsername!=proposta.usernameCreatore.toString()){
-            return res.status(403).json({message: "Non sei autorizzato a valutare i partecipanti di questa proposta"});
+        if(!utenteValutato){
+            return res.status(404).json({message: "Utente non trovato"});
         }
 
-        const partecipanti = proposta.partecipanti;
+        if(loggedUsername==utenteValutato.username){
+            return res.status(400).json({message: "Impossibile valutare se stessi"});
+        }
 
-        for(let i=0; i<partecipanti.length; i++){
-            const utente = await Utente.findOne({username: partecipanti[i].username});
-            utente.valutazioni.push({
+        const valutazioneEsistente = await Valutazione.findOne({idProposta: idProposta, usernameValutato: username, usernameValutatore: loggedUsername});
+        if(valutazioneEsistente){
+            return res.status(400).json({message: "Valutazione già effettuata"});
+        }
+        else{
+            await Valutazione.create({
                 idProposta: idProposta,
-                voto: partecipanti[i].voto
+                usernameValutato: username,
+                usernameValutatore: loggedUsername,
+                valutazione : valutazione
             });
-            await utente.save();
+            utenteValutato.karma += valutazione;
+            await utenteValutato.save();
         }
 
-        return res.status(200).json({message: "Valutazioni effettuate con successo"});
+        return res.status(200).json({message: "Valutazione effettuata con successo"});
     } catch(error){
-        return res.status(500).json({message: "Errore durante la valutazione dei partecipanti", error: error.message});
+        return res.status(500).json({message: "Errore durante la valutazione del partecipante", error: error.message});
     }
 }
 

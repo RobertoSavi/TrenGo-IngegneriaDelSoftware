@@ -8,9 +8,9 @@ const router = Router();
 router.use("", tokenChecker);
 
 // Permette di valutare tutti i partecipanti ad una proposta tramite idProposta
-router.put("/:idProposta/valutazioni", handlers.valutaPartecipantiByIdProposta);
+router.post("/:idProposta", handlers.valutaPartecipantiByIdProposta);
 
 // Permette di valutare un partecipante ad una proposta tramite username
-router.put("/:idProposta/valutazioni/:username", handlers.valutaPartecipanteByUsername);
+router.post("/:idProposta/:username", handlers.valutaPartecipanteByUsername);
 
 export default router;

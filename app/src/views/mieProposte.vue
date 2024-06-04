@@ -1,16 +1,18 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import { loggedUser } from '../states/loggedUser.js';
-import { proposte, proposteIscritto, fetchProposteMie, fetchProposteIscritto } from '../states/proposte.js';
+import { proposte, proposteIscritto, proposteTerminate, fetchProposteMie, fetchProposteIscritto ,fetchProposteTerminate} from '../states/proposte.js';
 import { RouterLink } from 'vue-router'
 
 const HOST_PROPOSTA = "/proposte/"
 const HOST_UTENTI = "/utenti/"
+const HOST_VALUTAZIONI = "/valutazioni/"
 const warningMessage = ref('');
 
 onMounted(() => {
 	fetchProposteMie()
 	fetchProposteIscritto()
+	fetchProposteTerminate()
 });
 
 watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
@@ -64,11 +66,11 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
 		</div>
 	</div>
 	<div class="bacheca">
-		<h2 style="height: 5%">Proposte alle quali partecipo</h2>
+		<h2 style="height: 5%">Proposte terminate</h2>
 		<div class="contenitoreProposte">
-			<div class="proposta" v-for="proposta in proposteIscritto">
+			<div class="proposta" v-for="proposta in proposteTerminate">
 				<h3>
-					<RouterLink :to="HOST_PROPOSTA + proposta._id">{{ proposta.titolo }}</RouterLink>
+					<RouterLink :to="HOST_VALUTAZIONI + proposta._id">{{ proposta.titolo }}</RouterLink>
 				</h3>
 				<br>
 				<p><label>Creatore: </label>

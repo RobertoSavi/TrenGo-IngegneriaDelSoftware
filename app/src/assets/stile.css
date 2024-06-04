@@ -96,8 +96,7 @@ body {
 	text-align: left;
 }
 
-.proposta div
-{
+.proposta div {
 	margin-bottom: 10px;
 }
 
@@ -117,13 +116,13 @@ button:hover {
 	color: #333;
 }
 
-#read:hover {
+/*#read:hover {
 	background-color: green;
 }
 
 #delt:hover {
 	background-color: red;
-}
+}*/
 
 a {
 	color: inherit;
@@ -165,7 +164,11 @@ form label {
 	align-content: center;
 }
 
-form input[type=text], form input[type=password], form input[type=datetime-local], form input[type=number], form input[type=email] {
+form input[type=text],
+form input[type=password],
+form input[type=datetime-local],
+form input[type=number],
+form input[type=email] {
 	height: 50px;
 	width: 66%;
 	float: left;
@@ -198,4 +201,37 @@ form a {
 .interesse input[type=checkbox] {
 	flex: none;
 	height: 15px;
+}
+
+.feature {
+	display: flex;
+	text-align: center;
+}
+
+.campo{
+	display: flex;
+}
+
+label.campo{
+	margin-right: 10px;
+}
+
+.partecipanti{
+	display: flex;
+	flex-direction: column;
+}
+
+.icona {
+    background-color: transparent; /* Set the button background to transparent */
+    border: none; /* Remove any border */
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icona img.icon {
+    width: 24px; /* Ensure the icon has the right size */
+    height: 24px;
 }

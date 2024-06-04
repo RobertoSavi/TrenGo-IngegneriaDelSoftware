@@ -11,6 +11,7 @@ import richiedicambiop from '../views/richiediCambioPassword.vue'
 import cambiop from '../views/cambioPassword.vue'
 import notifiche from '../views/notifiche.vue'
 import signup from '../views/signup.vue'
+import valutap from '../views/valutaProposte.vue'
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -74,6 +75,11 @@ const router = createRouter({
 		path: '/signup',
 		name: 'signup',
 		component: signup
+	},
+	{
+		path: '/valutazioni/:idProposta',
+		name: 'valutazioni',
+		component: valutap
 	}
 	]
 })

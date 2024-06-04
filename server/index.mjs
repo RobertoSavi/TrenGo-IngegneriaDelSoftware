@@ -4,6 +4,7 @@ import proposteRouter from "./routes/proposteRoutes.mjs";
 import richiesteRouter from "./routes/richiesteRoutes.mjs";
 import notificheRouter from "./routes/notificheRoutes.mjs";
 import followRouter from "./routes/followRoutes.mjs";
+import valutazioniRouter from "./routes/valutazioniRoutes.mjs";
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -38,6 +39,7 @@ connectToMongoDB()
     app.use("/api/proposte", richiesteRouter); // Route per le richieste
     app.use("/api/notifiche", notificheRouter); // Route per le notifiche
     app.use("/api/segui", followRouter); // Route per i follow
+    app.use("/api/valutazioni", valutazioniRouter); // Route per le valutazioni
 
     // Gestione status 404
     app.use((req, res) => {
