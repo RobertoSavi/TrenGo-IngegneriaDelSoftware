@@ -1,16 +1,18 @@
-import connectToMongoDB  from "./db/connection.mjs"; 
+import connectToMongoDB from "./db/connection.mjs";
 import utentiRouter from "./routes/utentiRoutes.mjs";
 import proposteRouter from "./routes/proposteRoutes.mjs";
 import richiesteRouter from "./routes/richiesteRoutes.mjs";
 import notificheRouter from "./routes/notificheRoutes.mjs";
 import followRouter from "./routes/followRoutes.mjs";
 import valutazioniRouter from "./routes/valutazioniRoutes.mjs";
+import { notificaProposteTerminate } from "./utils/cronSchedules.mjs";
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import mongoose from "mongoose";
 import swaggerui from "swagger-ui-express";
 import YAML from "yamljs";
+import cron from "node-cron";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -20,13 +22,13 @@ const swaggerFile = YAML.load('./swagger.yml');
 const app = express();
 
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({
   origin: "*", // Permette l'accesso da qualsiasi indirizzo
 }));
 app.use(
-  "/api-docs", 
-  swaggerui.serve, 
+  "/api-docs",
+  swaggerui.serve,
   swaggerui.setup(swaggerFile)
 );
 
@@ -44,20 +46,24 @@ connectToMongoDB()
     // Gestione status 404
     app.use((req, res) => {
       res.status(404);
-      res.json({error: "Not found"});
+      res.json({ error: "Not found" });
     });
-    
+
     // Gestione status 500
     app.use((req, res) => {
       res.status(500);
-      res.json({error: "Internal Server Error"});
+      res.json({ error: "Internal Server Error" });
     });
-    
+
 
     // Avvia il server
     const server = app.listen(process.env.PORT, () => {
       console.log(`Il server è in esecuzione sulla porta: ${process.env.PORT}`);
     });
+
+    // Pianifica i cron job
+    //cron.schedule('0 * * * *', notificaProposteTerminate); // Ogni ora
+    cron.schedule('* * * * *', notificaProposteTerminate); // Ogni minuto
 
     // Chiudi la connessione a MongoDB quando il processo viene arrestato
     process.on('SIGINT', async () => {

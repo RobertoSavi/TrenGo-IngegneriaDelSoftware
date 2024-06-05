@@ -1,6 +1,8 @@
 import Proposta from "../models/propostaModel.mjs"
 import Utente from "../models/utenteModel.mjs"
+import Richiesta from "../models/richiestaModel.mjs"
 import Valutazione from "../models/valutazioneModel.mjs"
+import Notifica from "../models/notificaModel.mjs"
 import * as validators from "../validators/proposteValidators.mjs";
 import mongoose from "mongoose";
 //import {ObjectId} from "mongodb";
@@ -16,7 +18,7 @@ async function getProposte(req, res) {
         const query = {};
 
         // Controlla i parametri di query
-        const { mie, iscritto, terminate } = req.query;
+        const { mie, iscritto, valutabili } = req.query;
 
         if (loggedUsername) {
             if (mie === 'true') {
@@ -27,14 +29,11 @@ async function getProposte(req, res) {
                 // Aggiungi la condizione per le proposte alle quali l'utente loggato partecipa
                 query.partecipanti = loggedUsername;
             }
-            if (terminate === 'true') {
-                const now = new Date();
-                const yesterday = new Date(now.setDate(now.getDate() - 1));
-
-                // Aggiungi condizione per le proposte completate alle quali l'utente loggato ha partecipato o è il creatore
+            if (valutabili === 'true') {
+                // Aggiungi condizione per le proposte valutabili alle quali l'utente loggato ha partecipato o è il creatore
                 query.$or = [
-                    { data: { $lte: yesterday }, partecipanti: loggedUsername },
-                    { data: { $lte: yesterday }, usernameCreatore: loggedUsername }
+                    { valutabile: true, partecipanti: loggedUsername },
+                    { valutabile: true, usernameCreatore: loggedUsername }
                 ];
             }
         }
@@ -163,7 +162,7 @@ async function getPropostaById(req, res) {
         if (valutazioni === 'true') {
             const loggedUsername = req.utenteLoggato.loggedUsername;
             const propostaCopy = JSON.parse(JSON.stringify(proposta)); // Crea una copia dell'oggetto proposta
-        
+
             if (loggedUsername === propostaCopy.usernameCreatore) {
                 for (let i = 0; i < propostaCopy.partecipanti.length; i++) {
                     const valutazioneEsistente = await Valutazione.findOne({ idProposta: id, usernameValutato: propostaCopy.partecipanti[i], usernameValutatore: loggedUsername });
@@ -178,10 +177,10 @@ async function getPropostaById(req, res) {
                 const valutazioneEsistente = await Valutazione.findOne({ idProposta: id, usernameValutato: propostaCopy.usernameCreatore, usernameValutatore: loggedUsername });
                 propostaCopy.partecipanti.push([propostaCopy.usernameCreatore, !!valutazioneEsistente]);
             }
-        
+
             return res.status(200).json({ proposta: propostaCopy });
         }
-        else{
+        else {
             return res.status(200).json({ proposta });
         }
     } catch (error) {
@@ -194,8 +193,7 @@ async function getPropostaById(req, res) {
  * @param {object} req - L'oggetto della richiesta.
  * @param {object} res - L'oggetto della risposta.
  */
-/*
-async function postProposta(req, res) {
+/*async function postProposta(req, res) {
     const { usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data } = req.body;
     const errors = [];
 
@@ -227,9 +225,15 @@ async function postProposta(req, res) {
 }*/
 
 async function postProposta(req, res) {
-    const { usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data } = req.body;
+    const { titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data } = req.body;
+    const usernameCreatore = req.utenteLoggato.loggedUsername;
     const errors = [];
-    const utenteCreatore = await Utente.findOne({ username: usernameCreatore});
+    const utenteCreatore = await Utente.findOne({ username: usernameCreatore });
+
+    // Controlla se l'utente esiste
+    if (!utenteCreatore) {
+        return res.status(404).json({ message: "Utente non trovato" });
+    }
 
     // Validazione delle categorie
     if (!validators.categorieInEnum(categorie))
@@ -251,6 +255,16 @@ async function postProposta(req, res) {
         // Creazione della proposta
         const proposta = await Proposta.create({ usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data });
 
+        // Creo una notifica per ogni utente che segue l'utente creatore della proposta
+        utenteCreatore.followers.forEach(async follower => {
+            // Creo una notifica per il follower
+            await Notifica.create({
+                sorgente: 'System',
+                username: follower,
+                messaggio: `L'utente ${proposta.usernameCreatore} ha pubblicato una nuova proposta: ${proposta.titolo}`
+            });
+        });
+
         return res.status(201).json({ self: "proposte/" + proposta._id });
 
     } catch (error) {
@@ -264,6 +278,35 @@ async function postProposta(req, res) {
  * @param {object} req - L'oggetto della richiesta.
  * @param {object} res - L'oggetto della risposta.
  */
+/*async function modifyPropostaById(req, res) {
+    try {
+        const { id } = req.params;
+        const updates = req.body;
+        const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
+
+        // Trovo la proposta da modificare
+        var proposta = await Proposta.findById(id);
+
+        if (!proposta) {
+            return res.status(404).json({ message: "Proposta non trovata" });
+        }
+
+        // Permetto la modifica dei dati utente solo se il chiamante dell'API è il creatore della proposta
+        if (proposta.usernameCreatore == loggedUsername) {
+            // Aggiorna il documento proposta con tutti i campi forniti nel corpo della richiesta
+            proposta = await Proposta.findByIdAndUpdate(id, updates, { new: true });
+
+        }
+        else {
+            return res.status(403).json({ message: "Impossibile modificare proposte altrui" });
+        }
+
+        return res.status(200).json({ proposta });
+    } catch (error) {
+        return res.status(500).json({ message: "Errore durante la modifica della proposta", error: error.message });
+    }
+}*/
+
 async function modifyPropostaById(req, res) {
     try {
         const { id } = req.params;
@@ -281,6 +324,15 @@ async function modifyPropostaById(req, res) {
         if (proposta.usernameCreatore == loggedUsername) {
             // Aggiorna il documento proposta con tutti i campi forniti nel corpo della richiesta
             proposta = await Proposta.findByIdAndUpdate(id, updates, { new: true });
+            // Creo una notifica per ogni utente partecipante alla proposta
+            proposta.partecipanti.forEach(async partecipante => {
+                // Crea una notifica per il partecipante
+                await Notifica.create({
+                    sorgente: 'System',
+                    username: partecipante,
+                    messaggio: `L'utente ${proposta.usernameCreatore} ha modificato la proposta: ${proposta.titolo}`
+                });
+            });
         }
         else {
             return res.status(403).json({ message: "Impossibile modificare proposte altrui" });
@@ -297,7 +349,7 @@ async function modifyPropostaById(req, res) {
  * @param {object} req - L'oggetto della richiesta.
  * @param {object} res - L'oggetto della risposta.
  */
-async function deletePropostaById(req, res) {
+/*async function deletePropostaById(req, res) {
     try {
         const { id } = req.params;
         const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
@@ -313,6 +365,45 @@ async function deletePropostaById(req, res) {
         if (proposta.usernameCreatore == loggedUsername) {
             // Trova e elimina la proposta dal database
             await Proposta.findByIdAndDelete(id);
+        }
+        else {
+            return res.status(403).json({ message: "Impossibile eliminare proposte altrui" });
+        }
+        return res.status(204).json({ message: "Proposta eliminata con successo" });
+
+    } catch (error) {
+        return res.status(500).json({ message: "Errore durante l'eliminazione della proposta", error: error.message });
+    }
+}*/
+
+async function deletePropostaById(req, res) {
+    try {
+        const { id } = req.params;
+        const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
+
+        // Trovo la proposta da modificare
+        var proposta = await Proposta.findById(id);
+
+        if (!proposta) {
+            return res.status(404).json({ message: "Proposta non trovata" });
+        }
+
+        // Permetto la modifica dei dati utente solo se il chiamante dell'API è il creatore della proposta
+        if (proposta.usernameCreatore == loggedUsername) {
+            // Trova e elimina la proposta dal database
+            // Creo una notifica per ogni utente partecipante alla proposta
+            proposta.partecipanti.forEach(async partecipante => {
+                // Creo una notifica per il partecipante
+                await Notifica.create({
+                    sorgente: 'System',
+                    username: partecipante,
+                    messaggio: `L'utente ${proposta.usernameCreatore} ha eliminato la proposta: ${proposta.titolo}`
+                });
+            });
+            // Elimino la proposta
+            await Proposta.findByIdAndDelete(id);
+            // Elimino tutte le richieste relative alla proposta
+            await Richiesta.deleteMany({ idProposta: id });
         }
         else {
             return res.status(403).json({ message: "Impossibile eliminare proposte altrui" });
