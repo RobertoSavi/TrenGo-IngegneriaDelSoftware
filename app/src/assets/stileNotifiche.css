@@ -13,6 +13,7 @@
 .contenitoreIcone {
     display: flex;
     gap: 10px; /* Add some space between icons */
+    float: right; /* Align icons to the right */
 }
 
 .icona {
@@ -58,6 +59,6 @@
     align-items: center;
 }
 
-.sorgente .labelSorgente {
+.sorgente .spanSorgente {
     margin-right: 5px; /* Adjust as needed */
 }

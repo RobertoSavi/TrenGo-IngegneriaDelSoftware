@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { loggedUser } from '../states/loggedUser.js';
 import { proposte, fetchPropostaId, eliminaProposta } from '../states/proposte.js';
 import { RouterLink, useRoute } from 'vue-router';
@@ -8,7 +8,6 @@ import router from '../router/index.js'
 
 const route = useRoute();
 const id=route.params.id;
-const warningMessage = ref('');
 const HOST_UTENTI="/utenti/";
 const fetchDone=ref(false);
 
@@ -21,10 +20,6 @@ onMounted( async () => {
 	}
 	
 	fetchDone.value=true;
-});
-
-watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
-	warningMessage.value = ''
 });
 
 function modifica(propostaId)
@@ -89,11 +84,14 @@ var isIscritto = computed(() => {
 <template>
 	<div class="proposta" v-if="fetchDone" v-for="proposta in proposte">	
 		<h1>Titolo: {{ proposta.titolo }}</h1>
-		<br>
-		<label>Username creatoe: </label><RouterLink :to="HOST_UTENTI+proposta.usernameCreatore"> {{ proposta.usernameCreatore }} </RouterLink>
-		<br>
-		<label for="luogo">Luogo:</label> <input type="text" id="luogo" v-model="proposta.nomeLuogo" required />
-		<br>
+		<div>
+			<label>Username creatoe: </label>
+			{{ proposta.usernameCreatore }}
+		</div>
+		<div>
+			<label for="luogo">Luogo:</label>		
+			{{ proposta.nomeLuogo }}
+		</div>
 		<label for="descrizione">Descrizione:</label> <input type="text" id="descrizione" v-model="proposta.descrizione" required />
 		<br>
 		<label for="nParecipanti">Numero partecipanti desiderato:</label> <input type="number" id="nPartecipanti" v-model="proposta.numeroPartecipantiDesiderato" required />

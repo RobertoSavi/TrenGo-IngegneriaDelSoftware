@@ -25,10 +25,21 @@ async function deleteAll() {
     await fetchNotifiche();
 }
 
+async function readNotifica(id) {
+    await axios.put(NOTIFICHE_URL+id, {headers: {'Token': loggedUser.token}});
+    await fetchNotifiche();
+}
+
+async function deleteNotifica(id) {
+    await axios.delete(NOTIFICHE_URL+id, {headers: {'Token': loggedUser.token}});
+    await fetchNotifiche();
+}
 
 export { 
     notifiche,
 	fetchNotifiche,
     setAllAsRead,
-    deleteAll
+    deleteAll,
+    readNotifica,
+    deleteNotifica
 } 

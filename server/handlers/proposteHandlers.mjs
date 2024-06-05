@@ -181,7 +181,9 @@ async function getPropostaById(req, res) {
         
             return res.status(200).json({ proposta: propostaCopy });
         }
-
+        else{
+            return res.status(200).json({ proposta });
+        }
     } catch (error) {
         return res.status(500).json({ message: "Errore durante il recupero della proposta", error: error.message });
     }
@@ -192,6 +194,7 @@ async function getPropostaById(req, res) {
  * @param {object} req - L'oggetto della richiesta.
  * @param {object} res - L'oggetto della risposta.
  */
+/*
 async function postProposta(req, res) {
     const { usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data } = req.body;
     const errors = [];
@@ -215,6 +218,39 @@ async function postProposta(req, res) {
     try {
         // Creazione della proposta
         const proposta = await Proposta.create({ usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data });
+        return res.status(201).json({ self: "proposte/" + proposta._id });
+
+    } catch (error) {
+        // Gestione dell'errore durante la creazione della proposta
+        return res.status(500).json({ message: "Errore durante la creazione della proposta", error: error.message });
+    }
+}*/
+
+async function postProposta(req, res) {
+    const { usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data } = req.body;
+    const errors = [];
+    const utenteCreatore = await Utente.findOne({ username: usernameCreatore});
+
+    // Validazione delle categorie
+    if (!validators.categorieInEnum(categorie))
+        errors.push({ field: "categorie", message: "Categorie non valide" });
+
+    // Validazione del titolo
+    if (!validators.validateTitolo(titolo))
+        errors.push({ field: "titolo", message: "Titolo troppo lungo o troppo corto" });
+
+    // Validazione della descrizione
+    if (!validators.validateDescrizione(descrizione))
+        errors.push({ field: "descrizione", message: "Descrizione troppo lunga" });
+
+    // Gestione degli errori
+    if (errors.length > 0)
+        return res.status(400).json({ message: "error", errors });
+
+    try {
+        // Creazione della proposta
+        const proposta = await Proposta.create({ usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data });
+
         return res.status(201).json({ self: "proposte/" + proposta._id });
 
     } catch (error) {

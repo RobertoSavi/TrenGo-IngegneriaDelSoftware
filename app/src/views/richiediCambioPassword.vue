@@ -7,7 +7,7 @@ import {changePasswordRequest} from '../states/utenti.js';
 async function richiediCambioPassword() {
     const dati = { email: email.value };
     await changePasswordRequest(dati);
-    router.push('');
+    router.push('/');
 }
 
 </script>
