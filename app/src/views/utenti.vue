@@ -1,13 +1,12 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { loggedUser } from '../states/loggedUser.js';
+import { ref, onMounted } from 'vue';
+import { loggedUser, clearLoggedUser } from '../states/loggedUser.js';
 import { utenti, fetchUtenteUsername } from '../states/utenti.js';
 import { useRoute } from 'vue-router';
 import router from '../router/index.js'
 
 const route = useRoute();
 const username=route.params.username;
-const warningMessage = ref('');
 const fetchDone=ref(false);
 
 onMounted( async () => {
@@ -20,9 +19,11 @@ function modifica()
 	router.push('modifica');
 }
 
-watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
-	warningMessage.value = ''
-});
+function logout()
+{
+	clearLoggedUser();
+	router.push('/');
+}
 </script>
 
 <template>
@@ -42,6 +43,7 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
 		</div>
 		<div v-if="utente.username==loggedUser.username">
 			<button @click="modifica(loggedUser.id)">Modifica</button>
+			<button style="margin-left: 20px;" @click="logout()">Logout</button>
 		</div>
 		<div v-else>
 			<button>Segui</button>

@@ -50,6 +50,16 @@ body {
 	flex-direction: column;
 }
 
+.container-mappa
+{
+	border: 1px solid #f2f2f2f2;
+	border-radius: 5px;
+	float: right;
+	width: 66%;
+	height: 82vh;
+	margin-bottom: 10px;
+}
+
 .barraRicerca {
 	align-self: center;
 	width: 80%;

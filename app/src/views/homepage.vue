@@ -1,12 +1,15 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import { loggedUser } from '../states/loggedUser.js';
 import { proposte, fetchProposte, fetchProposteNA } from '../states/proposte.js';
 import { RouterLink } from 'vue-router'
- 
+import L from 'leaflet'
+
+const leafletMap=ref(); 
 const HOST_PROPOSTA="/proposte/"
 const HOST_UTENTI="/utenti/"
 const fetchDone=ref(false);
+
 
 onMounted( async () => {
 	if(loggedUser.token)
@@ -18,10 +21,28 @@ onMounted( async () => {
 		await fetchProposteNA();
 	}
 	
-	console.log(proposte.value);
-	
 	fetchDone.value=true;
+	
+	nextTick(() => {
+		initLeafletMap()
+	})
 });
+
+function initLeafletMap()
+{
+	leafletMap.value = L.map('mappa', {center: new L.LatLng(46.0677, 11.1215), zoom: 12});
+	
+	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19}).addTo(leafletMap.value);
+	
+	proposte.value.forEach(loc =>
+	{
+		if(loc.coordinate.length==2)
+		{	
+			const marker = L.marker([loc.coordinate[0], loc.coordinate[1]]).addTo(leafletMap.value)
+		}
+	});
+}
+
 </script>
 
 <template>
@@ -63,4 +84,5 @@ onMounted( async () => {
         </div>
     	<div v-else>Loading...</div>
     </div>
+	<div id="mappa" class="container-mappa"></div>
 </template>
