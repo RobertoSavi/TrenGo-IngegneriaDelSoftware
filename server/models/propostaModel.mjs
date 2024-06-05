@@ -77,8 +77,16 @@ const schemaProposta = new mongoose.Schema({
     stato: {
         type: Boolean,
         default: true
+    },
+    // Stato della proposta, se è terminata e sono state inviate notifiche ai partecipanti
+    // invitandoli a valutare gli altri partecipanti
+    valutabile: {
+        type: Boolean,
+        default: false
     }
 });
+
+
 
 // Creazione del modello Proposta
 const Proposta = mongoose.model("Proposta", schemaProposta, "Proposte");
