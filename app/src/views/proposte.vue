@@ -7,60 +7,54 @@ import { richieste, fetchRichieste, creaRichiesta, gestisciRichiesta } from '../
 import router from '../router/index.js'
 
 const route = useRoute();
-const id=route.params.id;
-const HOST_UTENTI="/utenti/";
-const fetchDone=ref(false);
+const id = route.params.id;
+const HOST_UTENTI = "/utenti/";
+const fetchDone = ref(false);
 
-onMounted( async () => {
+onMounted(async () => {
 	await fetchPropostaId(id);
-	
-	if(proposte.value.proposta.usernameCreatore==loggedUser.username)
-	{
+
+	if (proposte.value.proposta.usernameCreatore == loggedUser.username) {
 		await fetchRichieste(id);
 	}
-	
-	fetchDone.value=true;
+
+	fetchDone.value = true;
 });
 
-function modifica(propostaId)
-{
-	router.push('modifica/'+propostaId);
+function modifica(propostaId) {
+	router.push('modifica/' + propostaId);
 }
 
-async function eliminaPropostaButton()
-{
+async function eliminaPropostaButton() {
 	await eliminaProposta(id);
 }
 
-async function annullaRichiestaButton(idRichiesta)
-{
+async function annullaRichiestaButton(idRichiesta) {
 	//await annullaRichiesta(idRichiesta); for the future
 }
 
-async function inviaRichiestaButton()
-{
-	const dati = ref({'usernameRichiedente': loggedUser.username});
+async function inviaRichiestaButton() {
+	const dati = ref({ 'usernameRichiedente': loggedUser.username });
 	await creaRichiesta(dati.value, id);
-	
+
 	location.reload;
 }
 
-async function gestisciRichiestaButton(idRichiesta, acc)
-{
-	if(acc){
-		const dati = ref({'stato': "accettata"});
+async function gestisciRichiestaButton(idRichiesta, acc) {
+	if (acc) {
+		const dati = ref({ 'stato': "accettata" });
 		await gestisciRichiesta(dati.value, id, idRichiesta);
 	}
-	else{
-		const dati = ref({'stato': "accettata"});
+	else {
+		const dati = ref({ 'stato': "accettata" });
 		await gestisciRichiesta(dati.value, id, idRichiesta);
 	}
-	
+
 	location.reload;
 }
 
 var isRichiedente = computed(() => {
-	
+
 	/*for(var richiesta in richieste)
 	{
 		console.log(richiesta.value);
@@ -70,44 +64,58 @@ var isRichiedente = computed(() => {
 			return true;
 		}
 	}*/
-	
+
 	return false;
-	
+
 });
 
 var isIscritto = computed(() => {
-	try{return proposte.value.proposta.partecipanti.includes(loggedUser.username);}
-	catch{}
+	try { return proposte.value.proposta.partecipanti.includes(loggedUser.username); }
+	catch { }
 });
 </script>
 
 <template>
-	<div class="proposta" v-if="fetchDone" v-for="proposta in proposte">	
+	<div class="container" v-if="fetchDone" v-for="proposta in proposte">
 		<h1>Titolo: {{ proposta.titolo }}</h1>
 		<div>
-			<label>Username creatoe: </label>
-			{{ proposta.usernameCreatore }}
+			<label>Creatore: </label>
+			<RouterLink :to="HOST_UTENTI + proposta.usernameCreatore">{{ proposta.usernameCreatore }}</RouterLink>
 		</div>
 		<div>
-			<label for="luogo">Luogo:</label>		
+			<label>Luogo: </label>
 			{{ proposta.nomeLuogo }}
 		</div>
-		<label for="descrizione">Descrizione:</label> <input type="text" id="descrizione" v-model="proposta.descrizione" required />
-		<br>
-		<label for="nParecipanti">Numero partecipanti desiderato:</label> <input type="number" id="nPartecipanti" v-model="proposta.numeroPartecipantiDesiderato" required />
-		<br>
-		<label for="data">Data dell'evento:</label> <input type="datetime-local" id="data" v-model="proposta.data" required />
-		<br>
-		<span style="color: red">{{ warningMessage }}</span>
-		<div v-if="proposta.usernameCreatore==loggedUser.username">
+		<div>
+			<label>Data e ora: </label>
+			{{ proposta.data.split('.')[0].split('T')[0] }}
+			{{ proposta.data.split('.')[0].split('T')[1] }}
+		</div>
+		<div>
+			<label>Partecipanti: </label>
+			{{ proposta.numeroPartecipanti }}/{{ proposta.numeroPartecipantiDesiderato }}
+		</div>
+		<div>
+			<label>Descrizione: </label>
+			{{ proposta.descrizione }}
+		</div>
+		<div>
+			<label>Categorie: </label>
+			<label v-for="categoria in proposta.categorie">
+				<span>{{ categoria }}&nbsp;</span>
+			</label>
+		</div>
+		<div v-if="proposta.usernameCreatore == loggedUser.username">
 			<div v-for="richiesta in richieste">
-				<label>Accettare la richiesta di: </label><RouterLink :to="HOST_UTENTI+richiesta.usernameRichiedente"> {{ richiesta.usernameRichiedente }} </RouterLink>?
+				<label>Accettare la richiesta di: </label>
+				<RouterLink :to="HOST_UTENTI + richiesta.usernameRichiedente"> {{ richiesta.usernameRichiedente }}
+				</RouterLink>?
 				<button type="button" @click="gestisciRichiestaButton(richiesta._id, true)">Accetta</button>
 				<button type="button" @click="gestisciRichiestaButton(richiesta._id, false)">Rifiuta</button>
 			</div>
 			<div>
 				<button @click="modifica(proposta._id)">Modifica</button>
-				<button @click="eliminaPropostaButton()">Elimina</button>
+				<button style="margin-left: 20px;" @click="eliminaPropostaButton()">Elimina</button>
 			</div>
 		</div>
 		<div v-else>

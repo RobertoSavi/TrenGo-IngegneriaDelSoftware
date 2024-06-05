@@ -39,7 +39,7 @@ function logout()
 		</div>
 		<div>
 			<label>Interessi: </label>
-			<span v-for="interesse in utente.interessi">{{ interesse+", " }}</span>
+			<span v-for="interesse in utente.interessi">{{ interesse+" " }}</span>
 		</div>
 		<div v-if="utente.username==loggedUser.username">
 			<button @click="modifica(loggedUser.id)">Modifica</button>

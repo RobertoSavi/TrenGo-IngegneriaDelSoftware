@@ -72,12 +72,13 @@ function initLeafletMap()
 					{{ proposta.numeroPartecipanti }}/{{ proposta.numeroPartecipantiDesiderato }}
         		</div>
 				<div>
-					<label>Descrizione: </label> {{ proposta.descrizione }}
+					<label>Descrizione: </label> 
+					{{ proposta.descrizione }}
         		</div>
 				<div>
 					<label>Categorie: </label>
 					<label v-for="categoria in proposta.categorie">
-						<span>{{ categoria }}&nbsp;</span>
+						<span>{{ categoria + "" }}</span>
 					</label>
 				</div>
         	</div>
