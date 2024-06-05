@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { utenti, interessi, fetchUtenteUsername, getInteressi, modificaUtente } from '../states/utenti.js'
-import { useRoute } from 'vue-router';
+
 import { loggedUser } from '../states/loggedUser.js'
 import router from '../router/index.js'
 
@@ -10,6 +10,9 @@ const dati = ref({
 	username: "",
 	interessi: []
 });
+
+var interessiIniziali=[];
+
 const fetchDone=ref(false);
 
 onMounted( async () => {
@@ -17,6 +20,8 @@ onMounted( async () => {
 	dati.value.username=utenti.value.utente.username;
 	dati.value.interessi=utenti.value.utente.interessi;
 	
+	interessiIniziali=dati.value.interessi;
+		
 	await getInteressi();
 	
 	fetchDone.value="true";
@@ -30,9 +35,11 @@ async function modificaButton() {
 
 function addInteresse(interesse)
 {
-	if(dati.value.interessi.includes(interesse))
+	var index = dati.value.interessi.indexOf(interesse);
+	
+	if(index>-1)
 	{
-		dati.value.interessi.pop(interesse);
+		dati.value.interessi.splice(index, 1);
 	}
 	else
 	{
@@ -53,13 +60,13 @@ function addInteresse(interesse)
 		</div>
 		<span class="contenitoreInteressi">
 			<span class="interesse" v-for="interesse in interessi">
-				<input type="checkbox" @click="addInteresse(interesse)" :checked="dati.interessi.includes(interesse)"/>
+				<input type="checkbox" id="interesse" @click="addInteresse(interesse)" :checked="dati.interessi.includes(interesse)"/>
 				{{ interesse }}
 			</span>
 		</span>
 		<div>
-			<button type="submit">Modifica</button>
+			<button type="submit">Fine</button>
 		</div>
 	</form>
-	<div v-else>Loading...</div>v
+	<div v-else>Loading...</div>
 </template>

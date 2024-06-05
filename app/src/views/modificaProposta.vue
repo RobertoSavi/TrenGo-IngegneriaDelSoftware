@@ -5,10 +5,11 @@ import { proposte, modificaProposta, fetchPropostaId } from '../states/proposte.
 import { useRoute } from 'vue-router';
 import router from '../router/index.js'
 import { interessi, getInteressi } from '../states/utenti.js'
+import L from 'leaflet'
 
+const leafletMap=ref(); 
 const route = useRoute();
 const id=route.params.id;
-const warningMessage = ref('');
 const dati = ref({
 	usernameCreatore: loggedUser.username,
 	creatore: loggedUser.id,
@@ -17,7 +18,7 @@ const dati = ref({
 	numeroPartecipantiDesiderato: "",
 	descrizione: "",
 	data: "",
-	categorie: ["Altro"]
+	categorie: []
 });
 const fetchDone=ref(false);
 
@@ -40,9 +41,19 @@ function modificaProposteButton() {
 	router.back();
 };
 
-watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
-	warningMessage.value = ''
-});
+function addCategoria(categoria)
+{
+	var index = dati.value.interessi.indexOf(categoria);
+	
+	if(index>-1)
+	{
+		dati.value.categoria.splice(index, 1);
+	}
+	else
+	{
+		dati.value.categoria.push(categoria);
+	}
+}
 </script>
 
 <template>
