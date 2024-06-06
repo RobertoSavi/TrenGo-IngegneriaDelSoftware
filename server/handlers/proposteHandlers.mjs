@@ -7,6 +7,8 @@ import * as validators from "../validators/proposteValidators.mjs";
 import mongoose from "mongoose";
 //import {ObjectId} from "mongodb";
 
+const HOST_PROPOSTE = 'proposte/';
+
 /**
  * Ottiene le proposte dal database, con comportamento variabile basato sui parametri di query.
  * @param {object} req - L'oggetto della richiesta.
@@ -136,11 +138,11 @@ async function getProposteIscritto(req, res) {
  * @param {object} req - L'oggetto della richiesta.
  * @param {object} res - L'oggetto della risposta.
  */
-/*
-async function getPropostaById(req, res) {
-	try {
-		const { id } = req.params;
-		const proposta = await Proposta.findById(id);
+
+/*async function getPropostaById(req, res) {
+    try {
+        const { id } = req.params;
+        const proposta = await Proposta.findById(id);
 
 		if (!proposta) {
 			return res.status(400).json({ message: "Proposta non trovata" });
@@ -259,19 +261,21 @@ async function postProposta(req, res) {
 	if (errors.length > 0)
 		return res.status(400).json({ message: "error", errors });
 
-	try {
-		// Creazione della proposta
-		const proposta = await Proposta.create({ usernameCreatore, titolo, categorie, nomeLuogo, descrizione, coordinate, numeroPartecipantiDesiderato, data });
-
-		// Creo una notifica per ogni utente che segue l'utente creatore della proposta
-		utenteCreatore.followers.forEach(async follower => {
-			// Creo una notifica per il follower
-			await Notifica.create({
-				sorgente: 'System',
-				username: follower,
-				messaggio: `L'utente ${proposta.usernameCreatore} ha pubblicato una nuova proposta: ${proposta.titolo}`
-			});
-		});
+    try {
+        // Creazione della proposta
+        const proposta = await Proposta.create({ usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data });
+        const propostaUrl = `${HOST_PROPOSTE}${proposta._id}`;
+        // Creo una notifica per ogni utente che segue l'utente creatore della proposta
+        utenteCreatore.followers.forEach(async follower => {
+            // Creo una notifica per il follower
+            await Notifica.create({
+                sorgente: 'System',
+                username: follower,
+                messaggio: `L'utente ${proposta.usernameCreatore} ha pubblicato una nuova proposta: ${proposta.titolo}`,
+                link: propostaUrl,
+                tipo: tipoNotificaEnum.PROPOSTA
+            });
+        });
 
 		return res.status(201).json({ self: "proposte/" + proposta._id });
 
@@ -329,23 +333,26 @@ async function modifyPropostaById(req, res) {
 			return res.status(404).json({ message: "Proposta non trovata" });
 		}
 
-		// Permetto la modifica dei dati utente solo se il chiamante dell'API è il creatore della proposta
-		if (proposta.usernameCreatore == loggedUsername) {
-			// Aggiorna il documento proposta con tutti i campi forniti nel corpo della richiesta
-			proposta = await Proposta.findByIdAndUpdate(id, updates, { new: true });
-			// Creo una notifica per ogni utente partecipante alla proposta
-			proposta.partecipanti.forEach(async partecipante => {
-				// Crea una notifica per il partecipante
-				await Notifica.create({
-					sorgente: 'System',
-					username: partecipante,
-					messaggio: `L'utente ${proposta.usernameCreatore} ha modificato la proposta: ${proposta.titolo}`
-				});
-			});
-		}
-		else {
-			return res.status(403).json({ message: "Impossibile modificare proposte altrui" });
-		}
+        // Permetto la modifica dei dati utente solo se il chiamante dell'API è il creatore della proposta
+        if (proposta.usernameCreatore == loggedUsername) {
+            // Aggiorna il documento proposta con tutti i campi forniti nel corpo della richiesta
+            proposta = await Proposta.findByIdAndUpdate(id, updates, { new: true });
+            const propostaUrl = `${HOST_PROPOSTE}${proposta._id}`;
+            // Creo una notifica per ogni utente partecipante alla proposta
+            proposta.partecipanti.forEach(async partecipante => {
+                // Crea una notifica per il partecipante
+                await Notifica.create({
+                    sorgente: 'System',
+                    username: partecipante,
+                    messaggio: `L'utente ${proposta.usernameCreatore} ha modificato la proposta: ${proposta.titolo}`,
+                    link: propostaUrl,
+                    tipo: tipoNotificaEnum.PROPOSTA
+                });
+            });
+        }
+        else {
+            return res.status(403).json({ message: "Impossibile modificare proposte altrui" });
+        }
 
 		return res.status(200).json({ proposta });
 	} catch (error) {
@@ -370,27 +377,30 @@ async function deletePropostaById(req, res) {
 			return res.status(404).json({ message: "Proposta non trovata" });
 		}
 
-		// Permetto la modifica dei dati utente solo se il chiamante dell'API è il creatore della proposta
-		if (proposta.usernameCreatore == loggedUsername) {
-			// Trova e elimina la proposta dal database
-			// Creo una notifica per ogni utente partecipante alla proposta
-			proposta.partecipanti.forEach(async partecipante => {
-				// Creo una notifica per il partecipante
-				await Notifica.create({
-					sorgente: 'System',
-					username: partecipante,
-					messaggio: `L'utente ${proposta.usernameCreatore} ha eliminato la proposta: ${proposta.titolo}`
-				});
-			});
-			// Elimino la proposta
-			await Proposta.findByIdAndDelete(id);
-			// Elimino tutte le richieste relative alla proposta
-			await Richiesta.deleteMany({ idProposta: id });
-		}
-		else {
-			return res.status(403).json({ message: "Impossibile eliminare proposte altrui" });
-		}
-		return res.status(204).json({ message: "Proposta eliminata con successo" });
+        // Permetto la modifica dei dati utente solo se il chiamante dell'API è il creatore della proposta
+        if (proposta.usernameCreatore == loggedUsername) {
+            // Creo una notifica per ogni utente partecipante alla proposta
+            const propostaUrl = `${HOST_PROPOSTE}${proposta._id}`;
+            proposta.partecipanti.forEach(async partecipante => {
+                // Creo una notifica per il partecipante
+                await Notifica.create({
+                    sorgente: 'System',
+                    username: partecipante,
+                    messaggio: `L'utente ${proposta.usernameCreatore} ha eliminato la proposta: ${proposta.titolo}`,
+                    link: propostaUrl,
+                    tipo: tipoNotificaEnum.PROPOSTA
+                });
+            });
+            // Trova e elimina la proposta dal database
+            // Elimino la proposta
+            await Proposta.findByIdAndDelete(id);
+            // Elimino tutte le richieste relative alla proposta
+            await Richiesta.deleteMany({ idProposta: id });
+        }
+        else {
+            return res.status(403).json({ message: "Impossibile eliminare proposte altrui" });
+        }
+        return res.status(204).json({ message: "Proposta eliminata con successo" });
 
 	} catch (error) {
 		return res.status(500).json({ message: "Errore durante l'eliminazione della proposta", error: error.message });

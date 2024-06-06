@@ -63,7 +63,7 @@ connectToMongoDB()
 
     // Pianifica i cron job
     //cron.schedule('0 * * * *', notificaProposteTerminate); // Ogni ora
-    cron.schedule('* * * * *', notificaProposteTerminate); // Ogni minuto
+    cron.schedule('*/10 * * * * *', notificaProposteTerminate); // Ogni minuto
 
     // Chiudi la connessione a MongoDB quando il processo viene arrestato
     process.on('SIGINT', async () => {
