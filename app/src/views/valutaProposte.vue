@@ -19,18 +19,18 @@ const hoverPartecipante = reactive([]);
 const HOST_UTENTI = "/utenti/"
 
 onMounted(async () => {
-      try {
-        await fetchPropostaIdValutazioni(id);
-        if (proposte.value.proposta) {
-          for (let i = 0; i < proposte.value.proposta.partecipanti.length; i++) {
-            hoverPartecipante[i] = { upvote: false, downvote: false };
-          }
-        }
-        fetchDone.value = true;
-      } catch (error) {
-        console.error('Error fetching proposta id valutazioni:', error);
-      }
-    });
+	try {
+		await fetchPropostaIdValutazioni(id);
+		if (proposte.value.proposta) {
+			for (let i = 0; i < proposte.value.proposta.partecipanti.length; i++) {
+				hoverPartecipante[i] = { upvote: false, downvote: false };
+			}
+		}
+		fetchDone.value = true;
+	} catch (error) {
+		console.error('Error fetching proposta id valutazioni:', error);
+	}
+});
 
 async function valutaPartecipanteByIdPropostaButton(idProposta, valutazione) {
 	await valutaPartecipantiByIdProposta(idProposta, valutazione);
@@ -81,32 +81,40 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
 		<span style="color: red">{{ warningMessage }}</span>
 
 		<div class="partecipanti">
-			<h2>Partecipanti:</h2>
-			<button type="button" class="vote" @click="valutaPartecipanteByIdPropostaButton(proposta._id, +1)"
-				@mouseover="hover.upvote = true" @mouseleave="hover.upvote = false">
-				<img :src="hover.upvote ? upvoteBlack : upvote" alt="Valuta positivamente" class="icon">
-			</button>
-			<button type="button" class="vote" @click="valutaPartecipanteByIdPropostaButton(proposta._id, -1)"
-				@mouseover="hover.downvote = true" @mouseleave="hover.downvote = false">
-				<img :src="hover.downvote ? downvoteBlack : downvote" alt="Valuta negativamente" class="icon">
-			</button>
+			<div class="contenitoreHeader valutazioni">
+				<h2>Partecipanti:</h2>
+				<div class="contenitoreIcone" v-if="proposta.utentiValutabili>0">
+					<button type="button" class="vote" @click="valutaPartecipanteByIdPropostaButton(proposta._id, +1)"
+						@mouseover="hover.upvote = true" @mouseleave="hover.upvote = false">
+						<img :src="hover.upvote ? upvoteBlack : upvote" alt="Valuta positivamente" class="icon">
+					</button>
+					<button type="button" class="vote" @click="valutaPartecipanteByIdPropostaButton(proposta._id, -1)"
+						@mouseover="hover.downvote = true" @mouseleave="hover.downvote = false">
+						<img :src="hover.downvote ? downvoteBlack : downvote" alt="Valuta negativamente" class="icon">
+					</button>
+				</div>
+			</div>
 			<ul>
 				<li v-for="(partecipante, index) in proposta.partecipanti">
-					{{ partecipante[0] }}
-					<button type="button" class="vote"
-						@click="valutaPartecipanteByUsernameButton(proposta._id, partecipante[0], +1)"
-						v-if="!partecipante[1]" @mouseover="hoverPartecipante[index].upvote = true"
-						@mouseleave="hoverPartecipante[index].upvote = false">
-						<img :src="hoverPartecipante[index].upvote ? upvoteBlack : upvote" alt="Valuta positivamente"
-							class="icon" :key="hoverPartecipante[index].upvote">
-					</button>
-					<button type="button" class="vote"
-						@click="valutaPartecipanteByUsernameButton(proposta._id, partecipante[0], -1)"
-						v-if="!partecipante[1]" @mouseover="hoverPartecipante[index].downvote = true"
-						@mouseleave="hoverPartecipante[index].downvote = false">
-						<img :src="hoverPartecipante[index].downvote ? downvoteBlack : downvote"
-							alt="Valuta negativamente" class="icon" :key="hoverPartecipante[index].downvote">
-					</button>
+					<div class="contenitorePartecipante">
+						<div>{{ partecipante[0] }}</div>
+						<div class="contenitoreIcone" v-if="!partecipante[1]">
+							<button type="button" class="vote"
+								@click="valutaPartecipanteByUsernameButton(proposta._id, partecipante[0], +1)"
+								@mouseover="hoverPartecipante[index].upvote = true"
+								@mouseleave="hoverPartecipante[index].upvote = false">
+								<img :src="hoverPartecipante[index].upvote ? upvoteBlack : upvote"
+									alt="Valuta positivamente" class="icon" :key="hoverPartecipante[index].upvote">
+							</button>
+							<button type="button" class="vote"
+								@click="valutaPartecipanteByUsernameButton(proposta._id, partecipante[0], -1)"
+								@mouseover="hoverPartecipante[index].downvote = true"
+								@mouseleave="hoverPartecipante[index].downvote = false">
+								<img :src="hoverPartecipante[index].downvote ? downvoteBlack : downvote"
+									alt="Valuta negativamente" class="icon" :key="hoverPartecipante[index].downvote">
+							</button>
+						</div>
+					</div>
 				</li>
 			</ul>
 		</div>

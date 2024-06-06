@@ -167,22 +167,32 @@ async function getPropostaById(req, res) {
 		if (valutazioni === 'true') {
 			const loggedUsername = req.utenteLoggato.loggedUsername;
 			const propostaCopy = JSON.parse(JSON.stringify(proposta)); // Crea una copia dell'oggetto proposta
+			let utentiValutabili=0;
 
 			if (loggedUsername === propostaCopy.usernameCreatore) {
 				for (let i = 0; i < propostaCopy.partecipanti.length; i++) {
 					const valutazioneEsistente = await Valutazione.findOne({ idProposta: id, usernameValutato: propostaCopy.partecipanti[i], usernameValutatore: loggedUsername });
+					if(!valutazioneEsistente){
+						utentiValutabili++;
+					}
 					propostaCopy.partecipanti[i] = [propostaCopy.partecipanti[i], !!valutazioneEsistente];
 				}
 			} else {
 				propostaCopy.partecipanti = propostaCopy.partecipanti.filter(partecipante => partecipante !== loggedUsername);
 				for (let i = 0; i < propostaCopy.partecipanti.length; i++) {
 					const valutazioneEsistente = await Valutazione.findOne({ idProposta: id, usernameValutato: propostaCopy.partecipanti[i], usernameValutatore: loggedUsername });
+					if(!valutazioneEsistente){
+						utentiValutabili++;
+					}
 					propostaCopy.partecipanti[i] = [propostaCopy.partecipanti[i], !!valutazioneEsistente];
 				}
 				const valutazioneEsistente = await Valutazione.findOne({ idProposta: id, usernameValutato: propostaCopy.usernameCreatore, usernameValutatore: loggedUsername });
+				if(!valutazioneEsistente){
+					utentiValutabili++;
+				}
 				propostaCopy.partecipanti.push([propostaCopy.usernameCreatore, !!valutazioneEsistente]);
 			}
-
+			propostaCopy.utentiValutabili=utentiValutabili;
 			return res.status(200).json({ proposta: propostaCopy });
 		}
 		else {

@@ -1,19 +1,44 @@
 .contenitoreHeader {
     display: flex;
     align-items: center; /* Center items vertically */
-    justify-content: space-between; /* Space items horizontally */
     width: 100%;
-    margin-bottom: 10px; /* Add some space at the bottom */
+}
+
+.contenitoreHeader.notifiche{
+    text-align: center;
+    justify-content: space-between; /* Space items horizontally */
+}
+
+.contenitoreHeader.valutazioni{
+    align-items: center;
 }
 
 .contenitoreTitolo {
     flex-grow: 1; /* Allow the title container to grow to fill available space */
 }
 
-.contenitoreIcone {
+div .contenitoreIcone {
     display: flex;
+    align-items: center; /* Center items vertically */
     gap: 10px; /* Add some space between icons */
+    margin-bottom: 0; /* Remove bottom margin */
+    margin-left: 10px; /* Add left margin */
+}
+
+.contenitoreIcone .notifiche{
     float: right; /* Align icons to the right */
+}
+
+.contenitoreIcone .valutazioni{
+    float: left;
+}
+
+li .contenitorePartecipante{
+    display: flex;
+    flex-direction: row;
+    vertical-align: text-top;
+    align-items: center;
+    gap: 10px; /* Add some space between icons */
 }
 
 .icona {

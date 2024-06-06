@@ -14,7 +14,7 @@ onMounted(() => {
 
 <template>
 	<div class="bacheca">
-		<div class="contenitoreHeader">
+		<div class="contenitoreHeader notifiche">
 			<div class="contenitoreTitolo">
 				<h2 style="height: 5%">Notifiche</h2>
 			</div>
@@ -30,7 +30,7 @@ onMounted(() => {
 		<div class="contenitoreProposte">
 			<div class="notifica" v-for="notifica in notifiche"
 				:class="{ 'nonVista': notifica.stato === statoNotificaEnum.NOT_SEEN, 'vista': notifica.stato === statoNotificaEnum.SEEN }">
-				<div class="contenitoreHeader">
+				<div class="contenitoreHeader notifiche">
 					<div class="sorgente">
 						<span class="spanSorgente">Da:</span>
 						<span v-if="notifica.sorgente !== 'System'">
