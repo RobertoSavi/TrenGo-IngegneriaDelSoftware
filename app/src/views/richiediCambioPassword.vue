@@ -1,8 +1,8 @@
 <script setup>
 import {ref} from 'vue';
 import {useRoute} from 'vue-router'
-import router from '../router/index.js';
-import {changePasswordRequest} from '../states/utenti.js';
+import router from '../router/index.mjs';
+import {changePasswordRequest} from '../states/utenti.mjs';
 
 async function richiediCambioPassword() {
     const dati = { email: email.value };

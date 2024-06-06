@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { loggedUser } from '../states/loggedUser.js';
-import { notifiche, fetchNotifiche, setAllAsRead, deleteAll, readNotifica, deleteNotifica} from '../states/notifiche.js';
+import { loggedUser } from '../states/loggedUser.mjs';
+import { notifiche, fetchNotifiche, setAllAsRead, deleteAll, readNotifica, deleteNotifica} from '../states/notifiche.mjs';
 import { RouterLink } from 'vue-router'
 
 const HOST_UTENTI = "/utenti/"

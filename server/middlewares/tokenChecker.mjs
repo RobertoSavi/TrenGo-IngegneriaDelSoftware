@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 function tokenChecker (req, res, next) {
 	// Controlla l'header per trovare il token
 	const token = req.get('Token');
-
 	// Se non è presente alcun token
 	if (!token) {
 		// Risponde con uno status code 401 e un messaggio di errore

@@ -1,5 +1,3 @@
-// https://vuejs.org/guide/scaling-up/state-management.html#simple-state-management-with-reactivity-api
-
 import { reactive } from 'vue'
 
 const API_URL = import.meta.env.VITE_API_HOST || `http://localhost:5050`

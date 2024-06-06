@@ -1,10 +1,10 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { loggedUser } from '../states/loggedUser.js';
-import { proposte, fetchPropostaId, eliminaProposta } from '../states/proposte.js';
+import { loggedUser } from '../states/loggedUser.mjs';
+import { proposte, fetchPropostaId, eliminaProposta } from '../states/proposte.mjs';
 import { RouterLink, useRoute } from 'vue-router';
-import { richieste, fetchRichieste, creaRichiesta, gestisciRichiesta } from '../states/richieste.js';
-import router from '../router/index.js'
+import { richieste, fetchRichieste, creaRichiesta, gestisciRichiesta } from '../states/richieste.mjs';
+import router from '../router/index.mjs'
 
 const route = useRoute();
 const id = route.params.id;

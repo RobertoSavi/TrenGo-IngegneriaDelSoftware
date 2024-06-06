@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
-import { loggedUser } from '../states/loggedUser.js';
-import { proposte, fetchProposte, fetchProposteNA } from '../states/proposte.js';
+import { loggedUser } from '../states/loggedUser.mjs';
+import { proposte, fetchProposte, fetchProposteNA, ricercaProposte } from '../states/proposte.mjs';
 import { RouterLink } from 'vue-router'
 import L from 'leaflet'
 
@@ -9,6 +9,10 @@ const leafletMap=ref();
 const HOST_PROPOSTA="/proposte/"
 const HOST_UTENTI="/utenti/"
 const fetchDone=ref(false);
+const markersGroup=ref();
+
+const query=ref({});
+const stringQuery=ref("");
 
 
 onMounted( async () => {
@@ -34,13 +38,70 @@ function initLeafletMap()
 	
 	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19}).addTo(leafletMap.value);
 	
+	markersGroup.value = L.layerGroup().addTo(leafletMap.value);
+	
 	proposte.value.forEach(loc =>
 	{
 		if(loc.coordinate.length==2)
 		{	
-			const marker = L.marker([loc.coordinate[0], loc.coordinate[1]]).addTo(leafletMap.value)
+			const marker = L.marker([loc.coordinate[0], loc.coordinate[1]]).addTo(markersGroup.value);
+			marker.on('click', ()=>(clickMarker(loc.nomeLuogo)));
 		}
 	});
+}
+
+async function clickMarker(nomeLuogo)
+{
+	query.value={};
+	stringQuery.value="";
+	query.value.nomeLuogo=nomeLuogo;
+	stringQuery.value+="nomeLuogo="+nomeLuogo;
+	
+	fetchDone.value=false;
+	
+	await ricercaProposte(query.value);
+	
+	markersGroup.value.clearLayers();
+	proposte.value.forEach(loc =>
+	{
+		if(loc.coordinate.length==2)
+		{	
+			const marker = L.marker([loc.coordinate[0], loc.coordinate[1]]).addTo(markersGroup.value);
+			marker.on('click', ()=>(clickMarker(loc.nomeLuogo)));
+		}
+	});
+	
+	fetchDone.value=true;
+}
+
+async function cerca()
+{
+	query.value={};
+	
+	var array=stringQuery.value.split("//");
+	
+	for (var entry in array)
+	{	
+		query.value[array[entry].split("=")[0]]=array[entry].split("=")[1];
+		
+		console.log(query.value);
+	}
+	
+	fetchDone.value=false;
+		
+	await ricercaProposte(query.value);
+		
+	markersGroup.value.clearLayers();
+	proposte.value.forEach(loc =>
+	{
+		if(loc.coordinate.length==2)
+		{	
+			const marker = L.marker([loc.coordinate[0], loc.coordinate[1]]).addTo(markersGroup.value);
+			marker.on('click', ()=>(clickMarker(loc.nomeLuogo)));
+		}
+	});
+		
+	fetchDone.value=true;
 }
 
 </script>
@@ -48,7 +109,7 @@ function initLeafletMap()
 <template>
     <div class="bacheca">
        	<h2 style="height: 5%">Bacheca</h2>
-       	<input type="text" class="barraRicerca" placeholder="Cerca proposte...">
+       	<input type="text" @keyup.enter="cerca()" class="barraRicerca" v-model="stringQuery" placeholder="Cerca proposte...">
        	<div v-if="fetchDone" class="contenitoreProposte">
        		<div class="proposta" v-for="proposta in proposte">
      	 		<h3>

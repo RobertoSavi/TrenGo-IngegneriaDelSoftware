@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { loggedUser, clearLoggedUser } from '../states/loggedUser.js';
-import { utenti, fetchUtenteUsername } from '../states/utenti.js';
+import { loggedUser, clearLoggedUser } from '../states/loggedUser.mjs';
+import { utenti, fetchUtenteUsername } from '../states/utenti.mjs';
 import { useRoute } from 'vue-router';
-import router from '../router/index.js'
+import router from '../router/index.mjs'
 
 const route = useRoute();
 const username=route.params.username;

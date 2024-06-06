@@ -1,10 +1,10 @@
 <script setup>
 import { onMounted, ref, watch, reactive } from 'vue';
-import { loggedUser } from '../states/loggedUser.js';
-import { proposte, fetchPropostaIdValutazioni } from '../states/proposte.js';
-import { valutaPartecipantiByIdProposta, valutaPartecipanteByUsername } from '../states/valutazioni.js';
+import { loggedUser } from '../states/loggedUser.mjs';
+import { proposte, fetchPropostaIdValutazioni } from '../states/proposte.mjs';
+import { valutaPartecipantiByIdProposta, valutaPartecipanteByUsername } from '../states/valutazioni.mjs';
 import { useRoute } from 'vue-router';
-import router from '../router/index.js'
+import router from '../router/index.mjs'
 import upvoteBlack from '../public/icons/valutazioni_upvote_black.svg';
 import upvote from '../public/icons/valutazioni_upvote.svg';
 import downvoteBlack from '../public/icons/valutazioni_downvote_black.svg';

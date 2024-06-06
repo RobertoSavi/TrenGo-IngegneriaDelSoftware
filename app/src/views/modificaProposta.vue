@@ -1,10 +1,10 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
-import { loggedUser } from '../states/loggedUser.js';
-import { proposte, modificaProposta, fetchPropostaId } from '../states/proposte.js';
+import { loggedUser } from '../states/loggedUser.mjs';
+import { proposte, modificaProposta, fetchPropostaId } from '../states/proposte.mjs';
 import { useRoute } from 'vue-router';
-import router from '../router/index.js'
-import { interessi, getInteressi } from '../states/utenti.js'
+import router from '../router/index.mjs'
+import { interessi, getInteressi } from '../states/utenti.mjs'
 import L from 'leaflet'
 
 const leafletMap=ref(); 
@@ -67,6 +67,7 @@ function addCategoria(categoria)
 			<label for="luogo">Luogo:</label> 
 			<input type="text" id="luogo" v-model="dati.nomeLuogo" required />
 		</div>
+		<div id="mappa" class="input-mappa"></div>
 		<div>
 			<label for="descrizione">Descrizione:</label> 
 			<input type="text" id="descrizione" v-model="dati.descrizione" required />

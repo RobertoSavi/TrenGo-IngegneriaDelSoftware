@@ -1,7 +1,6 @@
 import { ref } from 'vue'
 import axios from 'axios'
-import { loggedUser } from '../states/loggedUser.js'
-import { richieste, fetchRichieste } from '../states/richieste.js';
+import { loggedUser } from '../states/loggedUser.mjs'
 
 const API_URL = import.meta.env.VITE_API_HOST || `http://localhost:5050/api`
 const PROPOSTE_URL = API_URL+'/proposte/'
@@ -45,17 +44,36 @@ async function fetchProposteNA(){
 	proposte.value = response.data.proposte;
 }
 
+async function ricercaProposte(dati){
+	
+	var query="?";
+	
+	for (var key in dati)
+	{
+		console.log(key+", "+dati[key]);
+		
+		query+=key+"="+dati[key]+"&";
+	}
+	
+	console.log(query);
+	
+	const response = await axios.get(PROPOSTE_URL+'ricerca'+query, {headers: {'Token': loggedUser.token}});
+	
+	console.log(response.data.proposte);
+	proposte.value = response.data.proposte;
+}
+
 async function creaProposta(dati) {
-	await axios.post(PROPOSTE_URL, dati, {headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token}});;
-};
+	await axios.post(PROPOSTE_URL, dati, {headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token}});
+}
 
 async function modificaProposta(dati, id) {
-	await axios.put(PROPOSTE_URL+id, dati, {headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token}});;
-};
+	await axios.put(PROPOSTE_URL+id, dati, {headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token}});
+}
 
 async function eliminaProposta(id) {
-	await axios.delete(PROPOSTE_URL+id, {headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token}});;
-};
+	await axios.delete(PROPOSTE_URL+id, {headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token}});
+}
 
 export { 
 	proposte,
@@ -68,6 +86,7 @@ export {
 	fetchProposteIscritto,
 	fetchProposteTerminate,
 	fetchProposteNA, 
+	ricercaProposte,
 	creaProposta, 
 	modificaProposta, 
 	eliminaProposta 

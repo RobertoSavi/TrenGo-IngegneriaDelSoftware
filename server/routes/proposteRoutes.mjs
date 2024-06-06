@@ -19,6 +19,9 @@ router.get("/mie", handlers.getMieProposte);
 // Permette di ottenere le proposte alle quali sono iscritto
 router.get("/iscritto", handlers.getProposteIscritto);
 
+// Permette di ottenere le proposte che coincidono con la query passata
+router.get("/ricerca", handlers.ricercaProposte);
+
 // Permette di ottenere una proposta tramite l'id
 router.get("/:id", handlers.getPropostaById);
 

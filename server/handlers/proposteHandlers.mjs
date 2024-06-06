@@ -226,6 +226,54 @@ async function postProposta(req, res) {
 	}
 }*/
 
+/**
+ * Ottiene le proposte dal database in base a query specifiche.
+ * @param {object} req - L'oggetto della richiesta.
+ * @param {object} res - L'oggetto della risposta.
+ */
+async function ricercaProposte(req, res) {
+	try {
+		const loggedUsername = req.utenteLoggato.loggedUsername; // Username dell'utente loggato
+		const query = {};
+
+		// Controlla i parametri del body
+		const { usernameCreatore, nomeLuogo, maxPartecipanti, minPartecipanti } = req.query;
+
+		if(usernameCreatore)
+		{
+			query.usernameCreatore={$regex: new RegExp(usernameCreatore, 'i')};
+		}
+		
+		if(nomeLuogo)
+		{
+			query.nomeLuogo={$regex: new RegExp(nomeLuogo, 'i')};
+		}
+		
+		if(maxPartecipanti&&minPartecipanti)
+		{
+			query.numeroPartecipantiDesiderato={$lte: maxPartecipanti, $gte: minPartecipanti};
+		}
+		else if(maxPartecipanti)
+		{
+			query.numeroPartecipantiDesiderato={$lte: maxPartecipanti};
+		}
+		else if(minPartecipanti)
+		{
+			query.numeroPartecipantiDesiderato={$lte: minPartecipanti};
+		}
+
+		const proposte = await Proposta.find(query);
+
+		if (!proposte) {
+			return res.status(404).json({ message: "Nessuna proposta disponibile." });
+		}
+
+		return res.status(200).json({ proposte });
+	} catch (error) {
+		return res.status(500).json({ message: "Errore durante il recupero delle proposte", error: error.message });
+	}
+}
+
 async function postProposta(req, res) {
 	const { usernameCreatore, titolo, categorie, nomeLuogo, coordinate, descrizione, numeroPartecipantiDesiderato, data } = req.body;
 	const errors = [];
@@ -335,6 +383,7 @@ export {
 	getMieProposte,
 	getProposteIscritto,
 	getPropostaById,
+	ricercaProposte,
 	postProposta,
 	modifyPropostaById,
 	deletePropostaById
