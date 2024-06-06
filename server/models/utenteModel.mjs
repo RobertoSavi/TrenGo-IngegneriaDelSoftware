@@ -83,6 +83,8 @@ const schemaUtente = new mongoose.Schema({
         default: [],
         ref: "Utente" // Riferimento al modello utente
     }
+}, {
+    timestamps: true
 });
 
 // Hook pre-save per hashare la password prima del salvataggio

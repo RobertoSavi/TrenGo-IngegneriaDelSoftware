@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 // const URL_FRONTEND = process.env.URL_FRONTEND;
-const HOST_PROPOSTA = 'proposte/';
+const HOST_PROPOSTE = 'proposte/';
 
 async function notificaProposteTerminate(){
     try {

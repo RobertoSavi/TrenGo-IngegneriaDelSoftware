@@ -25,7 +25,9 @@ const schemaValutazione = new mongoose.Schema({
         type: Number,
         required: true,
         enum: [1, -1] // +1 for upvote, -1 for downvote
-    },
+    }
+}, {
+    timestamps: true
 });
 
 // Creare un indice unico combinato per garantire che ogni utente possa valutare un altro utente solo una volta per attività

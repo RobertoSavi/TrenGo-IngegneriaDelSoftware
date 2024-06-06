@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import  {ObjectId}  from "mongodb";
-import  {interessiEnum}  from './enums.mjs';
+import { ObjectId } from "mongodb";
+import { interessiEnum } from './enums.mjs';
 
 // Definizione dello schema per le proposte di attività
 const schemaProposta = new mongoose.Schema({
@@ -84,6 +84,8 @@ const schemaProposta = new mongoose.Schema({
         type: Boolean,
         default: false
     }
+}, {
+    timestamps: true
 });
 
 

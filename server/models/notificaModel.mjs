@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import  {ObjectId}  from "mongodb";
-import  {statoNotificaEnum, tipoNotificaEnum}  from './enums.mjs';
+import { ObjectId } from "mongodb";
+import { statoNotificaEnum, tipoNotificaEnum } from './enums.mjs';
 import Utente from "./utenteModel.mjs";
 
 const schemaNotifica = new mongoose.Schema({
@@ -9,7 +9,7 @@ const schemaNotifica = new mongoose.Schema({
         type: String,
         required: true,
         validate: {
-            validator: async function(v) {
+            validator: async function (v) {
                 if (v === 'System') return true;
                 const user = await Utente.findOne({ username: v });
                 return user != null;
@@ -21,7 +21,7 @@ const schemaNotifica = new mongoose.Schema({
         type: String,
         required: true,
         validate: {
-            validator: async function(v) {
+            validator: async function (v) {
                 const user = await Utente.findOne({ username: v });
                 return user != null;
             },
@@ -49,10 +49,10 @@ const schemaNotifica = new mongoose.Schema({
         enum: Object.values(tipoNotificaEnum),
         required: true
     }
-},{
+}, {
     timestamps: true
 });
-      
+
 // Creazione del modello Notifica
 const Notifica = mongoose.model("Notifica", schemaNotifica, "Notifiche");
 export default Notifica;

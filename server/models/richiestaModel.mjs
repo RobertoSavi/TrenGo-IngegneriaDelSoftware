@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import  {ObjectId}  from "mongodb";
+import { ObjectId } from "mongodb";
 
 // Definizione dello schema per le richieste di partecipazione alle proposte di attività
 const schemaRichiesta = new mongoose.Schema({
@@ -25,6 +25,8 @@ const schemaRichiesta = new mongoose.Schema({
         enum: ["pending", "accettata", "rifiutata"], // Possibili stati per la richiesta
         default: "pending"
     }
+}, {
+    timestamps: true
 });
 
 // Creazione del modello Proposta
