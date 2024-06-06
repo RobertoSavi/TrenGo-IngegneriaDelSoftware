@@ -3,6 +3,8 @@ import Proposta from "../models/propostaModel.mjs"
 import validateStato from "../validators/richiesteValidators.mjs";
 import mongoose from "mongoose";
 
+const HOST_PROPOSTE = 'proposte/';
+
 /**
  * Ottiene le richieste di partecipazione dal database.
  * @param {object} req - L'oggetto della richiesta.
@@ -123,11 +125,14 @@ async function postRichiesta(req, res) {
         if (loggedUsername != proposta.usernameCreatore.toString()) {
             // Creazione della richiesta
             richiesta = await Richiesta.create({ usernameRichiedente, idProposta, titoloProposta });
+            const propostaUrl = `${HOST_PROPOSTE}${proposta._id}`;
             // Creo una notifica per il creatore della proposta
             await Notifica.create({
                 sorgente: 'System',
                 username: utente.username,
-                messaggio: `L'utente ${loggedUsername} ha richiesto di partecipare alla proposta: ${proposta.titolo}`
+                messaggio: `L'utente ${loggedUsername} ha richiesto di partecipare alla proposta: ${proposta.titolo}`,
+                link: propostaUrl,
+                tipo: tipoNotificaEnum.PROPOSTA
             });
         }
         else {
@@ -227,11 +232,14 @@ async function handleRichiestaById(req, res) {
                 proposta.numeroPartecipanti = proposta.numeroPartecipanti + 1;
                 proposta.save();
             }
+            const propostaUrl = `${HOST_PROPOSTE}${proposta._id}`;
             // Creo una notifica per avvisare il richiedente dell'avvenuta processazione della richiesta
             await Notifica.create({
                 sorgente: 'System',
                 username: richiesta.usernameRichiedente,
-                messaggio: `La tua richiesta per partecipare alla proposta ${proposta.titolo} è stata ${stato.stato}`
+                messaggio: `La tua richiesta per partecipare alla proposta ${proposta.titolo} è stata ${stato.stato}`,
+                link: propostaUrl,
+                tipo: tipoNotificaEnum.PROPOSTA
             });
 
             return res.status(200).json({ self: "richeste/" + richiesta._id });

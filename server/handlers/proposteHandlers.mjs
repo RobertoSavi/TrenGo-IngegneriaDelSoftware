@@ -7,6 +7,8 @@ import * as validators from "../validators/proposteValidators.mjs";
 import mongoose from "mongoose";
 //import {ObjectId} from "mongodb";
 
+const HOST_PROPOSTE = 'proposte/';
+
 /**
  * Ottiene le proposte dal database, con comportamento variabile basato sui parametri di query.
  * @param {object} req - L'oggetto della richiesta.
@@ -133,8 +135,8 @@ async function getProposteIscritto(req, res) {
  * @param {object} req - L'oggetto della richiesta.
  * @param {object} res - L'oggetto della risposta.
  */
-/*
-async function getPropostaById(req, res) {
+
+/*async function getPropostaById(req, res) {
     try {
         const { id } = req.params;
         const proposta = await Proposta.findById(id);
@@ -254,14 +256,16 @@ async function postProposta(req, res) {
     try {
         // Creazione della proposta
         const proposta = await Proposta.create({ usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data });
-
+        const propostaUrl = `${HOST_PROPOSTE}${proposta._id}`;
         // Creo una notifica per ogni utente che segue l'utente creatore della proposta
         utenteCreatore.followers.forEach(async follower => {
             // Creo una notifica per il follower
             await Notifica.create({
                 sorgente: 'System',
                 username: follower,
-                messaggio: `L'utente ${proposta.usernameCreatore} ha pubblicato una nuova proposta: ${proposta.titolo}`
+                messaggio: `L'utente ${proposta.usernameCreatore} ha pubblicato una nuova proposta: ${proposta.titolo}`,
+                link: propostaUrl,
+                tipo: tipoNotificaEnum.PROPOSTA
             });
         });
 
@@ -324,13 +328,16 @@ async function modifyPropostaById(req, res) {
         if (proposta.usernameCreatore == loggedUsername) {
             // Aggiorna il documento proposta con tutti i campi forniti nel corpo della richiesta
             proposta = await Proposta.findByIdAndUpdate(id, updates, { new: true });
+            const propostaUrl = `${HOST_PROPOSTE}${proposta._id}`;
             // Creo una notifica per ogni utente partecipante alla proposta
             proposta.partecipanti.forEach(async partecipante => {
                 // Crea una notifica per il partecipante
                 await Notifica.create({
                     sorgente: 'System',
                     username: partecipante,
-                    messaggio: `L'utente ${proposta.usernameCreatore} ha modificato la proposta: ${proposta.titolo}`
+                    messaggio: `L'utente ${proposta.usernameCreatore} ha modificato la proposta: ${proposta.titolo}`,
+                    link: propostaUrl,
+                    tipo: tipoNotificaEnum.PROPOSTA
                 });
             });
         }
@@ -390,16 +397,19 @@ async function deletePropostaById(req, res) {
 
         // Permetto la modifica dei dati utente solo se il chiamante dell'API è il creatore della proposta
         if (proposta.usernameCreatore == loggedUsername) {
-            // Trova e elimina la proposta dal database
             // Creo una notifica per ogni utente partecipante alla proposta
+            const propostaUrl = `${HOST_PROPOSTE}${proposta._id}`;
             proposta.partecipanti.forEach(async partecipante => {
                 // Creo una notifica per il partecipante
                 await Notifica.create({
                     sorgente: 'System',
                     username: partecipante,
-                    messaggio: `L'utente ${proposta.usernameCreatore} ha eliminato la proposta: ${proposta.titolo}`
+                    messaggio: `L'utente ${proposta.usernameCreatore} ha eliminato la proposta: ${proposta.titolo}`,
+                    link: propostaUrl,
+                    tipo: tipoNotificaEnum.PROPOSTA
                 });
             });
+            // Trova e elimina la proposta dal database
             // Elimino la proposta
             await Proposta.findByIdAndDelete(id);
             // Elimino tutte le richieste relative alla proposta

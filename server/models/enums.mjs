@@ -15,14 +15,14 @@ const statoNotificaEnum = {
     SEEN: 'Vista'
 };
 
-/*const tipoNotificaEnum = {
-    RICHIESTA: 'Richiesta',
-    INVITO: 'Invito',
-    CONFERMA: 'Conferma',
-    RIFIUTO: 'Rifiuto'
-};*/
+const tipoNotificaEnum = {
+    PROPOSTA: 'Proposta',
+    CHAT: 'Chat',
+    UTENTE: 'Utente'
+};
 
 export{
     interessiEnum,
-    statoNotificaEnum
+    statoNotificaEnum,
+    tipoNotificaEnum
 }

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import  {ObjectId}  from "mongodb";
-import  {statoNotificaEnum}  from './enums.mjs';
+import  {statoNotificaEnum, tipoNotificaEnum}  from './enums.mjs';
 import Utente from "./utenteModel.mjs";
 
 const schemaNotifica = new mongoose.Schema({
@@ -34,10 +34,20 @@ const schemaNotifica = new mongoose.Schema({
         minlength: 1,
         maxlength: 500
     },
+    // Link associato alla notifica, per accedere alla proposta o alla chat
+    link: {
+        type: String,
+        required: false
+    },
     stato: {
         type: String,
         enum: Object.values(statoNotificaEnum),
         default: statoNotificaEnum.NOT_SEEN
+    },
+    tipo: {
+        type: String,
+        enum: Object.values(tipoNotificaEnum),
+        required: true
     }
 },{
     timestamps: true

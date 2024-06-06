@@ -8,15 +8,14 @@ const PROPOSTE_URL = API_URL+'/proposte/'
 const NOTIFICHE_URL = API_URL+'/notifiche/'
 
 const notifiche = ref({})
-//const proposteIscritto = ref({})
 
 async function fetchNotifiche() {
-	const response = await axios.get(NOTIFICHE_URL+"utenti/"+loggedUser.username,  {headers: {'Token': loggedUser.token}});
+	const response = await axios.get(NOTIFICHE_URL+"utenti/"+loggedUser.username, {headers: {'Token': loggedUser.token}});
 	notifiche.value = response.data;
 }
 
 async function setAllAsRead() {
-    await axios.put(NOTIFICHE_URL+"utenti/"+loggedUser.username, {headers: {'Token': loggedUser.token}});
+    await axios.put(NOTIFICHE_URL+"utenti/"+loggedUser.username, {} ,{headers: {'Token': loggedUser.token}});
     await fetchNotifiche();
 }
 
@@ -26,7 +25,7 @@ async function deleteAll() {
 }
 
 async function readNotifica(id) {
-    await axios.put(NOTIFICHE_URL+id, {headers: {'Token': loggedUser.token}});
+    await axios.put(NOTIFICHE_URL+id, {}, {headers: {'Token': loggedUser.token}});
     await fetchNotifiche();
 }
 

@@ -1,5 +1,7 @@
 import Notifica from "../models/notificaModel.mjs"
 import Utente from "../models/utenteModel.mjs";
+import {tipoInEnum} from "../validators/notificheValidators.mjs";
+import { statoNotificaEnum, tipoNotificaEnum } from "../models/enums.mjs";
 
 /**
  * Crea una nuova notifica.
@@ -8,7 +10,9 @@ import Utente from "../models/utenteModel.mjs";
  */
 async function postNotifica(req, res) {
   try {
-    const { sorgente, username, messaggio } = req.body;
+    const { sorgente, username, messaggio, link, tipo } = req.body;
+    const loggedUsername = req.utenteLoggato.loggedUsername;
+    const errors = [];
 
     // Validazione sorgente
     if (sorgente !== 'System') {
@@ -18,15 +22,40 @@ async function postNotifica(req, res) {
       }
     }
 
+    // Controllo se l'utente loggato è diverso dalla sorgente della notifica
+    if (loggedUsername !== sorgente) {
+      return res.status(403).json({ message: "Impossibile creare notifiche con l'username di altri" });
+    }
+
+    // Controllo se l'utente loggato è uguale al destinatario della notifica
+    if (loggedUsername === username) {
+      return res.status(403).json({ message: "Impossibile creare notifiche per se stessi" });
+    }
+
+    // Validazione tipo
+    if(!tipoInEnum(tipo))
+        errors.push({ field: "tipo", message: "Tipo non valido, i valori accettati sono ['Proposta', 'Chat', 'Utente']" });
+
+    // Gestione degli errori
+    if (errors.length > 0)
+      return res.status(400).json({ message: "error", errors });
+
     // Validazione username
     const usernameValido = await Utente.findOne({ username });
     if (!usernameValido) {
       return res.status(400).json({ message: `${username} non è un username valido`, error: "Errore di validazione" });
     }
 
-    // Crea una nuova notifica
-    const notifica = Notifica.create({ sorgente, username, messaggio });
+    // Prepara l'oggetto della nuova notifica
+    const datiNotifica = { sorgente, username, messaggio, tipo };
 
+    // Include 'link' se è stato specificato
+    if (link) {
+      datiNotifica.link = link;
+    }
+
+    // Crea una nuova notifica
+    const notifica = await Notifica.create(datiNotifica);
     // Restituisce la risposta con lo stato 201 e l'ID della nuova notifica
     return res.status(201).json({ self: "notifiche/" + notifica._id });
   } catch (error) {
@@ -43,9 +72,19 @@ async function postNotifica(req, res) {
 async function setAsReadById(req, res) {
   try {
     const { id } = req.params;
+    const loggedUsername = req.utenteLoggato.loggedUsername;
+
+    // Recupera la notifica specificata
+    let notifica = await Notifica.findById(id);
+
+    // Se l'utente loggato è diverso dal destinatario della notifica, restituisce un errore
+    if (loggedUsername !== notifica.username) {
+      return res.status(403).json({ message: "Non hai i permessi per leggere questa notifica" });
+    }
 
     // Aggiorna lo stato della notifica con il nuovo valore
-    const notifica = await Notifica.findByIdAndUpdate(id, { stato: 'Vista' }, { new: true });
+    notifica = await Notifica.findByIdAndUpdate(id, { stato: statoNotificaEnum.SEEN }, { new: true });
+    console.log(notifica);
 
     if (!notifica) return res.status(404).json({ message: 'Notifica non trovata' });
 
@@ -65,9 +104,18 @@ async function setAsReadById(req, res) {
 async function deleteNotificaById(req, res) {
   try {
     const { id } = req.params;
+    const loggedUsername = req.utenteLoggato.loggedUsername;
+
+    // Recupera la notifica specificata
+    let notifica = await Notifica.findById(id);
+
+    // Se l'utente loggato è diverso dal destinatario della notifica, restituisce un errore
+    if (loggedUsername !== notifica.username) {
+      return res.status(403).json({ message: "Non hai i permessi per eliminare questa notifica" });
+    }
 
     // Elimina la notifica specificata
-    const notifica = await Notifica.findByIdAndDelete(id);
+    notifica = await Notifica.findByIdAndDelete(id);
 
     if (!notifica) {
       return res.status(404).json({ message: "Notifica non trovata" });
@@ -90,11 +138,17 @@ async function getNotificheByUsername(req, res) {
   try {
     const { username } = req.params;
     const { from } = req.query;
+    const loggedUsername = req.utenteLoggato.loggedUsername;
 
     // Controlla se l'utente esiste
     const utente = await Utente.findOne({ username });
     if (!utente) {
       return res.status(404).json({ message: "Utente non trovato" });
+    }
+
+    // Controllo se l'utente loggato è diverso dall'utente richiesto
+    if (loggedUsername !== username) {
+      return res.status(403).json({ message: "Non hai i permessi per visualizzare queste notifiche" });
     }
 
     // Filtra le notifiche per sorgente se specificato
@@ -104,7 +158,7 @@ async function getNotificheByUsername(req, res) {
     }
 
     // Recupera tutte le notifiche per l'utente specificato
-    const notifiche = await Notifica.find(filter);
+    const notifiche = await Notifica.find(filter).sort({ stato: 'asc' });
 
     // Restituisce la risposta con lo stato 200 e le notifiche trovate
     res.status(200).json(notifiche);
@@ -123,6 +177,7 @@ async function setAllASReadByUsername(req, res) {
   try {
     const { username } = req.params;
     const { from } = req.query;
+    const loggedUsername = req.utenteLoggato.loggedUsername;
 
     // Controlla se l'utente esiste
     const utente = await Utente.findOne({ username });
@@ -130,14 +185,19 @@ async function setAllASReadByUsername(req, res) {
       return res.status(404).json({ message: "Utente non trovato" });
     }
 
+    // Controllo se l'utente loggato è diverso dall'utente richiesto
+    if (loggedUsername !== username) {
+      return res.status(403).json({ message: "Non hai i permessi per leggere queste notifiche" });
+    }
+
     // Filtra le notifiche per sorgente se specificato
-    const filter = { username, stato: 'Non vista' };
+    const filter = { username, stato: statoNotificaEnum.NOT_SEEN };
     if (from) {
       filter.sorgente = from;
     }
 
     // Imposta lo stato 'Vista' a tutte le notifiche non lette per l'utente specificato
-    await Notifica.updateMany(filter, { stato: 'Vista' }, { new: true });
+    await Notifica.updateMany(filter, { stato: statoNotificaEnum.SEEN }, { new: true });
 
     // Restituisce la risposta con lo stato 200
     res.status(200).json({ message: 'Tutte le notifiche sono state impostate come lette' });
@@ -156,11 +216,17 @@ async function deleteNotificheByUsername(req, res) {
   try {
     const { username } = req.params;
     const { from } = req.query;
+    const loggedUsername = req.utenteLoggato.loggedUsername;
 
     // Controlla se l'utente esiste
     const utente = await Utente.findOne({ username });
     if (!utente) {
       return res.status(404).json({ message: "Utente non trovato" });
+    }
+
+    // Controllo se l'utente loggato è diverso dall'utente richiesto
+    if (loggedUsername !== username) {
+      return res.status(403).json({ message: "Non hai i permessi per eliminare queste notifiche" });
     }
 
     // Filtra le notifiche per sorgente se specificato
