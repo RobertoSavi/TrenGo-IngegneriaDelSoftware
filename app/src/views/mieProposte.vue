@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { loggedUser } from '../states/loggedUser.js';
-import { proposte, proposteIscritto, proposteTerminate, fetchProposteMie, fetchProposteIscritto ,fetchProposteTerminate} from '../states/proposte.js';
+import { loggedUser } from '../states/loggedUser.mjs';
+import { proposte, proposteIscritto, proposteTerminate, fetchProposteMie, fetchProposteIscritto ,fetchProposteTerminate} from '../states/proposte.mjs';
 import { RouterLink } from 'vue-router'
 
 const HOST_PROPOSTA = "/proposte/"

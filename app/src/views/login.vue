@@ -1,9 +1,9 @@
 <script setup>
 import { ref } from 'vue'
-import { loggedUser, setLoggedUser, clearLoggedUser } from '../states/loggedUser.js'
-import { login } from '../states/utenti.js'
+import { loggedUser, setLoggedUser, clearLoggedUser } from '../states/loggedUser.mjs'
+import { login } from '../states/utenti.mjs'
 import { RouterLink } from 'vue-router'
-import router from '../router/index.js'
+import router from '../router/index.mjs'
 
 const dati=ref({
 	username: "example_username",

@@ -1,8 +1,8 @@
 <script setup>
 import {ref} from 'vue';
 import {useRoute} from 'vue-router'
-import router from '../router/index.js';
-import {changePassword} from '../states/utenti.js';
+import router from '../router/index.mjs';
+import {changePassword} from '../states/utenti.mjs';
 
 const route = useRoute();
 const token=route.params.token;

@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { interessi, getInteressi, signup, login } from '../states/utenti.js'
-import { setLoggedUser } from '../states/loggedUser.js'
-import router from '../router/index.js'
+import { interessi, getInteressi, signup, login } from '../states/utenti.mjs'
+import { setLoggedUser } from '../states/loggedUser.mjs'
+import router from '../router/index.mjs'
 
 const dati = ref({
 	//nome: "",

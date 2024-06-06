@@ -1,10 +1,10 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
-import { loggedUser } from '../states/loggedUser.js';
-import { creaProposta } from '../states/proposte.js';
-import { interessi, getInteressi } from '../states/utenti.js'
+import { loggedUser } from '../states/loggedUser.mjs';
+import { creaProposta } from '../states/proposte.mjs';
+import { interessi, getInteressi } from '../states/utenti.mjs'
 import L from 'leaflet'
-import router from '../router';
+import router from '../router/index.mjs'
 
 const luogoValido = ref(false);
 const leafletMap = ref();
@@ -13,7 +13,7 @@ const dati = ref({
 	usernameCreatore: loggedUser.username,
 	creatore: loggedUser.id,
 	titolo: "",
-	nomeLuogo: "",
+	nomeLuogo: "Selezionare dalla mappa",
 	coordinate: [],
 	numeroPartecipantiDesiderato: "",
 	descrizione: "",
@@ -33,7 +33,11 @@ function initLeafletMap() {
 	leafletMap.value = L.map('mappa', { center: new L.LatLng(46.0677, 11.1215), zoom: 12, zoomControl: false });
 	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(leafletMap.value);
 
-	leafletMap.value.on('click', async function (e) {
+	leafletMap.value.on('click', clickMappa);
+}
+
+async function clickMappa(e) 
+{
 		const { lat, lng } = e.latlng;
 
 		await getNomeLuogo(lat, lng);
@@ -50,8 +54,6 @@ function initLeafletMap() {
 
 		dati.value.coordinate[0] = lat;
 		dati.value.coordinate[1] = lng;
-	});
-
 }
 
 function creaProposteButton() {
@@ -60,9 +62,9 @@ function creaProposteButton() {
 		return;
 	}*/
 
-	if (luogoValido) {
+	if (luogoValido.value) {
 		creaProposta(dati.value);
-		router.back;
+		router.push('/');
 	}
 };
 
@@ -82,16 +84,16 @@ async function getNomeLuogo(lat, lng) {
 	const data = await response.json();
 
 	if (data.error != "Unable to geocode") {
-		if (data.address.house_number && data.address.road && (data.address.town || data.address.village || data.address.city || data.address.municipality)) {
-			dati.value.nomeLuogo = data.address.road + " " + data.address.house_number + ", " + (data.address.town || data.address.village || data.address.city || data.address.municipality);
+		if (data.address.house_number && data.address.road && (data.address.city || data.address.town || data.address.village || data.address.municipality)) {
+			dati.value.nomeLuogo = data.address.road + " " + data.address.house_number + ", " + (data.address.city || data.address.town || data.address.village || data.address.municipality);
 			luogoValido.value = true;
 		}
-		else if (!data.address.house_number && data.address.road && (data.address.town || data.address.village || data.address.city || data.address.municipality)) {
-			dati.value.nomeLuogo = data.address.road + ", " + (data.address.town || data.address.village || data.address.city || data.address.municipality);
+		else if (!data.address.house_number && data.address.road && (data.address.city || data.address.town || data.address.village || data.address.municipality)) {
+			dati.value.nomeLuogo = data.address.road + ", " + (data.address.city || data.address.town || data.address.village || data.address.municipality);
 			luogoValido.value = true;
 		}
-		else if (!data.address.road && (data.address.town || data.address.village || data.address.city || data.address.municipality)) {
-			dati.value.nomeLuogo = (data.address.town || data.address.village || data.address.city || data.address.municipality);
+		else if (!data.address.road && (data.address.city || data.address.town || data.address.village || data.address.municipality)) {
+			dati.value.nomeLuogo = (data.address.city || data.address.town || data.address.village || data.address.municipality);
 			luogoValido.value = true;
 		}
 		else {
@@ -103,8 +105,6 @@ async function getNomeLuogo(lat, lng) {
 		dati.value.nomeLuogo = "Luogo non accettabile"
 		luogoValido.value = false;
 	}
-
-	console.log(data);
 }
 </script>
 
@@ -117,8 +117,7 @@ async function getNomeLuogo(lat, lng) {
 		</div>
 		<div>
 			<label for="luogo">Luogo:</label>
-			<span @click="" class="input-mappa" id="mappa"></span>
-			{{ dati.nomeLuogo }}
+			<input type="text" :value="dati.nomeLuogo" readonly />
 		</div>
 		<div>
 			<label for="descrizione">Descrizione:</label>
@@ -145,4 +144,5 @@ async function getNomeLuogo(lat, lng) {
 			<button type="submit">Fine</button>
 		</div>
 	</form>
+	<div class="input-mappa" id="mappa"></div>
 </template>

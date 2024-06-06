@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { utenti, interessi, fetchUtenteUsername, getInteressi, modificaUtente } from '../states/utenti.js'
+import { utenti, interessi, fetchUtenteUsername, getInteressi, modificaUtente } from '../states/utenti.mjs'
 
-import { loggedUser } from '../states/loggedUser.js'
-import router from '../router/index.js'
+import { loggedUser } from '../states/loggedUser.mjs'
+import router from '../router/index.mjs'
 
 const id=loggedUser.id;
 const dati = ref({
