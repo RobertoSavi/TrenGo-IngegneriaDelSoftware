@@ -12,7 +12,6 @@ async function fetchRichieste(id) {
 	if(response.data.richiesta)
 	{
 		richieste.value = response.data.richiesta;
-
 	}
 	else
 	{

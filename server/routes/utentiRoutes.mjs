@@ -32,5 +32,7 @@ router.put("/:id", tokenChecker, handlers.updateUtenteById);
 // Permette di ottenere i dati di un utente tramite l'username
 router.get("/username/:username", tokenChecker, handlers.getUtenteByUsername);
 
+
+
 // Esporta router
 export default router;

@@ -20,7 +20,7 @@ onMounted(() => {
 
 async function signupButton() {
 	await signup(dati.value);
-	const response=await login(JSON.stringify({ username: "dati.username", password: "dati.password"}));
+	const response=await login({ "username": dati.value.username, "password": dati.value.password});
 	setLoggedUser(response.data);
 	router.push('/');
 }

@@ -37,7 +37,6 @@ const dati = ref({
 
 async function loginButton() {
 	const response = await login(dati.value)
-	console.log(response.data);
 	setLoggedUser(response.data);
 	router.push('/');
 };

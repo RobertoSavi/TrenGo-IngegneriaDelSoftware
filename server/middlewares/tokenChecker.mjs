@@ -7,11 +7,13 @@ function tokenChecker (req, res, next) {
 	const token = req.get('Token');
 	// Se non è presente alcun token
 	if (!token) {
-		// Risponde con uno status code 401 e un messaggio di errore
-		return res.status(401).send({ 
+		// Setta l'utente loggato a null e prosegue con la prossima funzione di middleware o route
+		req.utenteLoggato = null;
+		return next();
+		/*return res.status(401).send({ 
 			success: false,
 			message: 'Nessun token fornito.'
-		});
+		});*/
 	}
 
 	// Decodifica il token, verifica il segreto e controlla se è scaduto

@@ -11,8 +11,7 @@ const id = route.params.id;
 const HOST_UTENTI = "/utenti/";
 const fetchDone = ref(false);
 
-onMounted(async () => 
-{
+onMounted(async () => {
 	await fetchPropostaId(id);
 
 	await fetchRichieste(id);
@@ -26,7 +25,7 @@ function modifica(propostaId) {
 
 async function eliminaPropostaButton() {
 	await eliminaProposta(id);
-	
+
 	router.push('/');
 }
 
@@ -34,25 +33,25 @@ async function inviaRichiestaButton() {
 	const dati = ref({ 'usernameRichiedente': loggedUser.username });
 	await creaRichiesta(dati.value, id);
 
-	fetchDone.value=false;
+	fetchDone.value = false;
 	await fetchRichieste(id);
-	fetchDone.value=true;
+	fetchDone.value = true;
 }
 
 async function annullaRichiestaButton(idRichiesta) {
 	await annullaRichiesta(id, idRichiesta);
-	
-	fetchDone.value=false;
+
+	fetchDone.value = false;
 	await fetchRichieste(id);
-	fetchDone.value=true;
+	fetchDone.value = true;
 }
 
 async function annullaPartecipazioneButton() {
 	await annullaPartecipazione(id);
-	
-	fetchDone.value=false;
+
+	fetchDone.value = false;
 	await fetchPropostaId(id);
-	fetchDone.value=true;
+	fetchDone.value = true;
 }
 
 async function gestisciRichiestaButton(idRichiesta, acc) {
@@ -65,27 +64,25 @@ async function gestisciRichiestaButton(idRichiesta, acc) {
 		await gestisciRichiesta(dati.value, id, idRichiesta);
 	}
 
-	fetchDone.value=false;
+	fetchDone.value = false;
 	await fetchRichieste(id);
 	await fetchPropostaId(id);
-	fetchDone.value=true;
+	fetchDone.value = true;
 }
 
-var isRichiedente = computed(() => {	
-	for (var index in richieste.value)
-	{
-		if(richieste.value[index].usernameRichiedente==loggedUser.username)
-		{
+var isRichiedente = computed(() => {
+	for (var index in richieste.value) {
+		if (richieste.value[index].usernameRichiedente == loggedUser.username) {
 			return true;
 		}
 	}
-	
+
 	return false;
 
 });
 
 var isIscritto = computed(() => {
-	return proposte.value.proposta.partecipanti.includes(loggedUser.username); 
+	return proposte.value.proposta.partecipanti.includes(loggedUser.username);
 });
 </script>
 
@@ -119,7 +116,7 @@ var isIscritto = computed(() => {
 				<span>{{ categoria }}&nbsp;</span>
 			</label>
 		</div>
-		<div v-if="proposta.usernameCreatore == loggedUser.username">
+		<div v-if="proposta.usernameCreatore == loggedUser.username && loggedUser.username">
 			<div v-for="richiesta in richieste">
 				<label>Accettare la richiesta di: </label>
 				<RouterLink :to="HOST_UTENTI + richiesta.usernameRichiedente"> {{ richiesta.usernameRichiedente }}
@@ -132,9 +129,11 @@ var isIscritto = computed(() => {
 				<button style="margin-left: 20px;" @click="eliminaPropostaButton()">Elimina</button>
 			</div>
 		</div>
-		<div v-else>
-			<button type="button" @click="annullaPartecipazioneButton()" v-if="isIscritto">Annulla partecipazione</button>
-			<button v-for="richiesta in richieste" type="button" @click="annullaRichiestaButton(richiesta._id)" v-else-if="isRichiedente">Annulla richiesta</button>
+		<div v-else-if="proposta.usernameCreatore != loggedUser.username && loggedUser.username">
+			<button type="button" @click="annullaPartecipazioneButton()" v-if="isIscritto">Annulla
+				partecipazione</button>
+			<button v-for="richiesta in richieste" type="button" @click="annullaRichiestaButton(richiesta._id)"
+				v-else-if="isRichiedente">Annulla richiesta</button>
 			<button type="button" @click="inviaRichiestaButton()" v-else>Richiedi di partecipare!</button>
 		</div>
 	</div>

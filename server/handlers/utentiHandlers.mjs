@@ -4,7 +4,7 @@ import { interessiEnum } from "../models/enums.mjs";
 import { sendResetPasswordMail } from "../services/emailService.mjs";
 import { generateRandomPassword } from "../utils/passwordGenerator.mjs";
 import Token from "../models/tokenModel.mjs";
-import jwt  from "jsonwebtoken"
+import jwt from "jsonwebtoken"
 import crypto from 'crypto';
 
 /**
@@ -14,30 +14,39 @@ import crypto from 'crypto';
  */
 async function getUtenteById(req, res) {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
         const utente = await Utente.findById(id);
-        const loggedId = req.utenteLoggato.loggedId; // ID dell'utente loggato
-        
-        if (!utente) {
-            return res.status(404).json({message: "Utente non trovato"});
-        }
+        const loggedId = req.utenteLoggato ? req.utenteLoggato.loggedId : null; // ID dell'utente loggato (se presente)
 
-        // Se l'utente cercato è uguale all'utente loggato resituisco tutte le informazioni dell'utente
-        if(utente.id==loggedId){
-            return res.status(200).json({utente});
-        }
-
-        // Altrimenti ritorna solo le informazioni pubbliche
-        return res.status(200).json({
-            username: utente.username, 
-            tipoUtente: utente.tipoUtente,
-            nome: utente.nome,
-            cognome: utente.cognome,
-            karma: utente.karma,
-            interessi: utente.interessi
+        // Se l'utente non è loggato
+        if (!loggedId) {
+            return res.status(401).send({
+                success: false,
+                message: 'Nessun token fornito.'
             });
+        }
+        else {
+            if (!utente) {
+                return res.status(404).json({ message: "Utente non trovato" });
+            }
+
+            // Se l'utente cercato è uguale all'utente loggato resituisco tutte le informazioni dell'utente
+            if (utente.id == loggedId) {
+                return res.status(200).json({ utente });
+            }
+
+            // Altrimenti ritorna solo le informazioni pubbliche
+            return res.status(200).json({
+                username: utente.username,
+                tipoUtente: utente.tipoUtente,
+                nome: utente.nome,
+                cognome: utente.cognome,
+                karma: utente.karma,
+                interessi: utente.interessi
+            });
+        }
     } catch (error) {
-        return res.status(500).json({message: "Errore durante il recupero dell'utente", error: error.message});
+        return res.status(500).json({ message: "Errore durante il recupero dell'utente", error: error.message });
     }
 }
 
@@ -48,28 +57,36 @@ async function getUtenteById(req, res) {
  */
 async function updateUtenteById(req, res) {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
         const updates = req.body;
-        const loggedId = req.utenteLoggato.loggedId; // ID dell'utente loggato
-        
-        // Aggiorna il documento utente con tutti i campi forniti nel corpo della richiesta
-        const utente = await Utente.findByIdAndUpdate(id, updates, {new: true});
-        if (!utente) {
-            return res.status(404).json({message: "Utente non trovato"});
-        }
-        
-        // Permetto la modifica dei dati utente solo se il chiamante dell'API è l'utente da modificare
-        if(utente.id==loggedId){
-            // Aggiorna il documento utente con tutti i campi forniti nel corpo della richiesta
-            const utente = await Utente.findByIdAndUpdate(id, updates, {new: true});
-            return res.status(200).json({self: "utenti/" + utente._id});
-        }
-        else{
-            return res.status(403).json({message: "Impossibile modificare account altrui"});
-        }
+        const loggedId = req.utenteLoggato ? req.utenteLoggato.loggedId : null; // ID dell'utente loggato (se presente)
 
+        // Se l'utente non è loggato
+        if (!loggedId) {
+            return res.status(401).send({
+                success: false,
+                message: 'Nessun token fornito.'
+            });
+        }
+        else {
+            // Aggiorna il documento utente con tutti i campi forniti nel corpo della richiesta
+            const utente = await Utente.findByIdAndUpdate(id, updates, { new: true });
+            if (!utente) {
+                return res.status(404).json({ message: "Utente non trovato" });
+            }
+
+            // Permetto la modifica dei dati utente solo se il chiamante dell'API è l'utente da modificare
+            if (utente.id == loggedId) {
+                // Aggiorna il documento utente con tutti i campi forniti nel corpo della richiesta
+                const utente = await Utente.findByIdAndUpdate(id, updates, { new: true });
+                return res.status(200).json({ self: "utenti/" + utente._id });
+            }
+            else {
+                return res.status(403).json({ message: "Impossibile modificare account altrui" });
+            }
+        }
     } catch (error) {
-        return res.status(500).json({message: "Errore durante l'aggiornamento dell'utente", error: error.message});
+        return res.status(500).json({ message: "Errore durante l'aggiornamento dell'utente", error: error.message });
     }
 }
 
@@ -80,34 +97,64 @@ async function updateUtenteById(req, res) {
  */
 async function getUtenteByUsername(req, res) {
     try {
-        const {username} = req.params;
-        const loggedId = req.utenteLoggato.loggedId; // ID dell'utente loggatow
-
-        // Trova l'utente nel database utilizzando lo username
-        const utente = await Utente.findOne({username: username});
-
-        if (!utente) {
-            return res.status(404).json({message: "Utente non trovato"});
-        }
-
-        // Se l'utente cercato è uguale all'utente loggato resituisco tutte le informazioni dell'utente
-        if(utente.id==loggedId){
-            return res.status(200).json({utente});
-        }
-
-        // Altrimenti ritorna solo le informazioni pubbliche
-        return res.status(200).json({
-            "utente": {
-                username: utente.username, 
-                tipoUtente: utente.tipoUtente,
-                nome: utente.nome,
-                cognome: utente.cognome,
-                karma: utente.karma,
-                interessi: utente.interessi
+        const { username } = req.params;
+        const loggedUsername = req.utenteLoggato ? req.utenteLoggato.loggedUsername : null; // ID dell'utente loggato (se presente)
+        const grandiOrganizzatori = await Utente.find({ tipoUtente: "grandeOrganizzatore" });
+        // Mappa i username dei grandi organizzatori
+        const grandiOrganizzatoriUsernames = grandiOrganizzatori.map(u => u.username);
+        // Controlla se proposta.usernameCreatore è presente in grandiOrganizzatoriUsernames
+        const isGrandeOrganizzatore = grandiOrganizzatoriUsernames.includes(username);
+        // Se l'utente non è loggato
+        if (!loggedUsername) {
+            // Può visualizzare solo i grandi organizzatori
+            if (isGrandeOrganizzatore) {
+                const utente = await Utente.findOne({ username: username });
+                return res.status(200).json({
+                    "utente": {
+                        username: utente.username,
+                        tipoUtente: utente.tipoUtente,
+                        nome: utente.nome,
+                        cognome: utente.cognome,
+                        karma: utente.karma,
+                        interessi: utente.interessi
+                    }
+                });
             }
-        });
+            // Se l'utente cercato non è un grande organizzatore, restituisci un errore
+            else {
+                return res.status(401).send({
+                    success: false,
+                    message: 'Nessun token fornito.'
+                });
+            }
+        }
+        else {
+            // Trova l'utente nel database utilizzando lo username
+            const utente = await Utente.findOne({ username: username });
+
+            if (!utente) {
+                return res.status(404).json({ message: "Utente non trovato" });
+            }
+
+            // Se l'utente cercato è uguale all'utente loggato resituisco tutte le informazioni dell'utente
+            if (utente.username == loggedUsername) {
+                return res.status(200).json({ utente });
+            }
+
+            // Altrimenti ritorna solo le informazioni pubbliche
+            return res.status(200).json({
+                "utente": {
+                    username: utente.username,
+                    tipoUtente: utente.tipoUtente,
+                    nome: utente.nome,
+                    cognome: utente.cognome,
+                    karma: utente.karma,
+                    interessi: utente.interessi
+                }
+            });
+        }
     } catch (error) {
-        return res.status(500).json({message: "Errore durante il recupero dell'utente", error: error.message});
+        return res.status(500).json({ message: "Errore durante il recupero dell'utente", error: error.message });
     }
 }
 
@@ -117,43 +164,44 @@ async function getUtenteByUsername(req, res) {
  * @param {object} res - L'oggetto della risposta.
  */
 async function signupUtente(req, res) {
-    // Estrai username, email e password dal body della richiesta
-    const {nome, cognome, username, email, password, interessi} = req.body;
+    // Estrai i campi dal body della richiesta
+    const { nome, cognome, username, email, password, interessi } = req.body;
     // Inizializza un array per gli errori
     const errors = [];
 
     // Validazione dello username
-    if (!validators.isUsernameValid(username)) 
-        errors.push({field: "username", message: "Username non valido"});
+    if (!validators.isUsernameValid(username))
+        errors.push({ field: "username", message: "Username non valido" });
 
     // Validazione dell'email
-    if (!validators.isEmailValid(email)) 
-        errors.push({field: "email", message: "Email non valida"});
+    if (!validators.isEmailValid(email))
+        errors.push({ field: "email", message: "Email non valida" });
 
     // Validazione della password
-    if (!validators.isPasswordValid(password)) 
-        errors.push({field: "password", message: "Password non valida"});
+    if (!validators.isPasswordValid(password))
+        errors.push({ field: "password", message: "Password non valida" });
 
     // Verifica se lo username è già in uso
-    if (await validators.isUsernameTaken(username)) 
-        errors.push({field: "username", message: "Username già in uso"});
+    if (await validators.isUsernameTaken(username))
+        errors.push({ field: "username", message: "Username già in uso" });
 
     // Verifica se l'email è già in uso
-    if (await validators.isEmailTaken(email)) 
-        errors.push({field: "email", message: "Email già registrata"});
+    if (await validators.isEmailTaken(email))
+        errors.push({ field: "email", message: "Email già registrata" });
 
     // Gestione degli errori
-    if (errors.length > 0) 
-        return res.status(400).json({message: "error", errors});
+    if (errors.length > 0)
+        return res.status(400).json({ message: "error", errors });
 
     try {
         // Creazione dell'utente
-        const utente = await Utente.create({nome, cognome, username, email, password, interessi});
-        return res.status(201).json({self: "utenti/" + utente._id});
+        const utente = await Utente.create({ nome, cognome, username, email, password, interessi });
+        console.log(utente);
+        return res.status(201).json({ self: "utenti/" + utente._id });
 
     } catch (error) {
         // Gestione dell'errore durante la creazione dell'utente
-        return res.status(500).json({message: "Errore durante la registrazione dell'utente", error: error.message});
+        return res.status(500).json({ message: "Errore durante la registrazione dell'utente", error: error.message });
     }
 }
 
@@ -162,17 +210,17 @@ async function signupUtente(req, res) {
  * @param {object} req - L'oggetto della richiesta.
  * @param {object} res - L'oggetto della risposta.
  */
-async function loginUtente(req, res){
+async function loginUtente(req, res) {
     try {
         // Estrai username e password dal body della richiesta
-        const {username, password} = req.body;
+        const { username, password } = req.body;
 
         // Find the user by username
         const utente = await validators.getUtente(username);
 
         // Ritorna errore, se l'utente non viene trovato
         if (!utente) {
-            return res.status(401).json({success: false, message: 'Utente non trovato'});
+            return res.status(401).json({ success: false, message: 'Utente non trovato' });
         }
 
         // Verifica la password
@@ -180,9 +228,9 @@ async function loginUtente(req, res){
 
         // Ritorna errore se la password non è corretta
         if (!isPasswordCorrect) {
-            return res.status(401).json({success: false, message: 'Password sbagliata'});
+            return res.status(401).json({ success: false, message: 'Password sbagliata' });
         }
-        
+
         // Se l'utente è stato trovato e la password è corretta, crea un token JWT
         const payload = {
             loggedId: utente._id, // Aggiungi l'ID dell'utente come informazione nel payload del token
@@ -204,10 +252,10 @@ async function loginUtente(req, res){
             loggedUsername: utente.username, // Username dell'utente associato al token
             self: "utenti/" + utente._id // Link alla risorsa dell'utente nel formato API
         });
-        
+
     } catch (error) {
-        return res.status(500).json({message: "Errore durante l'accesso dell'utente", error: error.message});
-    } 
+        return res.status(500).json({ message: "Errore durante l'accesso dell'utente", error: error.message });
+    }
 }
 
 /**
@@ -215,19 +263,19 @@ async function loginUtente(req, res){
  * @param {object} req - L'oggetto della richiesta.
  * @param {object} res - L'oggetto della risposta.
  */
-async function getInteressi(req, res){
+async function getInteressi(req, res) {
     try {
         const interessi = interessiEnum;
-        return res.status(200).json({interessi});
+        return res.status(200).json({ interessi });
     } catch (error) {
-        return res.status(500).json({message: "Errore durante il recupero degli interessi", error: error.message});
+        return res.status(500).json({ message: "Errore durante il recupero degli interessi", error: error.message });
     }
 }
 
-async function changePasswordRequest(req, res){
+async function changePasswordRequest(req, res) {
     try {
-        const {email} = req.body;
-        const utente = await Utente.findOne({email});
+        const { email } = req.body;
+        const utente = await Utente.findOne({ email });
 
         if (!utente) {
             return res.status(400).json({ message: "Utente non trovato" });
@@ -235,7 +283,7 @@ async function changePasswordRequest(req, res){
 
         // Creo un token e lo salvo nel database
         const token = crypto.randomBytes(20).toString('hex');
-        await Token.create({username:utente.username, token})
+        await Token.create({ username: utente.username, token })
 
         // Crea il link per il reset della password
         const urlFrontend = process.env.URL_FRONTEND;
@@ -244,97 +292,93 @@ async function changePasswordRequest(req, res){
         // Send password reset email to the usesr
         await sendResetPasswordMail(utente.email, resetLink);
 
-        return res.status(200).json({message: "Email per il reset della password inviata"});
+        return res.status(200).json({ message: "Email per il reset della password inviata" });
     } catch (error) {
-        return res.status(500).json({message: "Errore nell\'invio dell\'email per il reset della password ", error: error.message});
+        return res.status(500).json({ message: "Errore nell\'invio dell\'email per il reset della password ", error: error.message });
     }
 }
 
 async function changePassword(req, res) {
     try {
-        const {token} = req.params;
-        const {new_password} = req.body;
+        const { token } = req.params;
+        const { new_password } = req.body;
         // Inizializza un array per gli errori
         const errors = [];
 
         // Verifica il token
-        const passedToken = await Token.findOne({token});
+        const passedToken = await Token.findOne({ token });
 
         // Se il token non viene trovato, restituisce un errore
         if (!passedToken) {
-            return res.status(404).json({message: "Token non valido"});
+            return res.status(404).json({ message: "Token non valido" });
         }
 
         // Validazione della password
-        if (!validators.isPasswordValid(new_password)) 
-            errors.push({field: "password", message: "Password non valida"});
+        if (!validators.isPasswordValid(new_password))
+            errors.push({ field: "password", message: "Password non valida" });
 
         // Gestione degli errori
-        if (errors.length > 0) 
-            return res.status(400).json({message: "error", errors});
+        if (errors.length > 0)
+            return res.status(400).json({ message: "error", errors });
 
 
         // Verifica la scadenza del token
         const tokenExpiration = new Date(passedToken.expirationDate).getTime();
         if (tokenExpiration < Date.now()) {
             // Se il token è scaduto, cancellalo dal database e restituisci un errore
-            await Token.deleteOne({passedToken});
-            return res.status(404).json({message: "Token scaduto"});
+            await Token.deleteOne({ passedToken });
+            return res.status(404).json({ message: "Token scaduto" });
         }
 
         // Trova l'utente associato al token
-        const utente = await Utente.findOne({username: passedToken.username});
+        const utente = await Utente.findOne({ username: passedToken.username });
 
         // Aggiorna la password dell'utente
         utente.password = new_password;
         await utente.save();
 
         // Cancella il token dal database
-        await Token.deleteOne({passedToken});
+        await Token.deleteOne({ passedToken });
 
-        return res.status(200).json({ message: "Password aggiornata con successo"});
+        return res.status(200).json({ message: "Password aggiornata con successo" });
     } catch (error) {
-        return res.status(500).json({ message: "Errore nell\'aggiornamento della password:", error: error.message});
+        return res.status(500).json({ message: "Errore nell\'aggiornamento della password:", error: error.message });
     }
 }
 
 async function googleLogin(profile) {
     try {
-        console.log(profile);
-        let utente; // Declare utente outside the if-else scope to use it later for JWT
+        let utente;
 
-        // Check if user is already authenticated with Google
+        // Controlla se l'utente è già autenticato con Google
         const utenteGoogle = await Utente.findOne({ googleId: profile.id });
-        console.log(utenteGoogle);
 
         if (!utenteGoogle) {
-            console.log('email ' + profile.email);
             const utenteEmail = await Utente.findOne({ email: profile.email });
 
             if (utenteEmail) {
-                // Update the googleId of the existing user
+                // Aggiorna il googleId dell'utente esistente
                 utenteEmail.googleId = profile.id;
                 await utenteEmail.save();
-                utente = utenteEmail; // Use this user for JWT
+                utente = utenteEmail; // Usa l'utente autenticato per JWT
             } else {
-                // Create a new user with the Google profile
+                // Crea un nuovo utente con il profilo Google
                 const nuovoUtente = {
                     googleId: profile.id,
                     username: profile.displayName,
                     email: profile.email,
                     nome: profile.given_name,
                     cognome: profile.family_name,
-                    password: generateRandomPassword(), // Ensure you have a method to generate a random password
+                    password: generateRandomPassword(), // Genera una password casuale per l'utente Google
                 };
                 utente = new Utente(nuovoUtente);
-                console.log(utente);
                 await utente.save();
             }
         } else {
-            utente = utenteGoogle; // Use this user for JWT
+            utente = utenteGoogle; // Usa l'utente Google per JWT
         }
 
-        // Generate JWT Token
+        // Genera il token JWT
         const payload = {
             loggedId: utente._id,
             loggedUsername: utente.username
@@ -344,7 +388,7 @@ async function googleLogin(profile) {
         };
         const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, options);
 
-        // Return JWT Token in response
+        // Restituisce il token JWT nella risposta
         return {
             token: token,
             loggedId: utente._id,
