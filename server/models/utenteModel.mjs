@@ -58,6 +58,11 @@ const schemaUtente = new mongoose.Schema({
             message: props => `${props.value}: password non valida`
         }
     },
+    // Id google nel caso effettui l'autenticazione tramite google
+    googleId: {
+        type: String,
+        default: null
+    },
     // Karma dell'utente
     karma: {
         type: Number,

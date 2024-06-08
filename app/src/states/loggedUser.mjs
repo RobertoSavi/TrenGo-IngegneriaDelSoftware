@@ -1,7 +1,7 @@
 import { reactive } from 'vue'
 
-const API_URL = import.meta.env.VITE_API_HOST || `http://localhost:5050`
-const PROPOSTE_URL = API_URL+'/proposte/'
+const URL_API = import.meta.env.VITE_URL_API;
+const PROPOSTE_URL = URL_API+'/proposte/'
 
 const loggedUser = reactive({
 	token: undefined,

@@ -4,7 +4,7 @@ import { loggedUser } from '../states/loggedUser.mjs';
 import { fetchProposte, creaProposta } from '../states/proposte.mjs';
 import { interessi, getInteressi } from '../states/utenti.mjs'
 import L from 'leaflet'
-import router from '../router/index.mjs'
+import router from '../router/index.js';
 
 const luogoValido = ref(false);
 const leafletMap = ref();

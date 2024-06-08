@@ -2,6 +2,7 @@ import Utente from "../models/utenteModel.mjs"
 import * as validators from "../validators/utentiValidators.mjs";
 import { interessiEnum } from "../models/enums.mjs";
 import { sendResetPasswordMail } from "../services/emailService.mjs";
+import { generateRandomPassword } from "../utils/passwordGenerator.mjs";
 import Token from "../models/tokenModel.mjs";
 import jwt  from "jsonwebtoken"
 import crypto from 'crypto';
@@ -297,6 +298,64 @@ async function changePassword(req, res) {
     }
 }
 
+async function googleLogin(profile) {
+    try {
+        console.log(profile);
+        let utente; // Declare utente outside the if-else scope to use it later for JWT
+
+        // Check if user is already authenticated with Google
+        const utenteGoogle = await Utente.findOne({ googleId: profile.id });
+        console.log(utenteGoogle);
+
+        if (!utenteGoogle) {
+            console.log('email ' + profile.email);
+            const utenteEmail = await Utente.findOne({ email: profile.email });
+
+            if (utenteEmail) {
+                // Update the googleId of the existing user
+                utenteEmail.googleId = profile.id;
+                await utenteEmail.save();
+                utente = utenteEmail; // Use this user for JWT
+            } else {
+                // Create a new user with the Google profile
+                const nuovoUtente = {
+                    googleId: profile.id,
+                    username: profile.displayName,
+                    email: profile.email,
+                    nome: profile.given_name,
+                    cognome: profile.family_name,
+                    password: generateRandomPassword(), // Ensure you have a method to generate a random password
+                };
+                utente = new Utente(nuovoUtente);
+                console.log(utente);
+                await utente.save();
+            }
+        } else {
+            utente = utenteGoogle; // Use this user for JWT
+        }
+
+        // Generate JWT Token
+        const payload = {
+            loggedId: utente._id,
+            loggedUsername: utente.username
+        };
+        const options = {
+            expiresIn: process.env.JWT_EXPIRES_IN
+        };
+        const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, options);
+
+        // Return JWT Token in response
+        return {
+            token: token,
+            loggedId: utente._id,
+            loggedUsername: utente.username,
+            self: "utenti/" + utente._id
+        };
+    } catch (err) {
+        throw err;
+    }
+}
+
 // Esporta handlers
 export {
     getUtenteById,
@@ -306,5 +365,6 @@ export {
     loginUtente,
     getInteressi,
     changePasswordRequest,
-    changePassword  
+    changePassword,
+    googleLogin
 };
