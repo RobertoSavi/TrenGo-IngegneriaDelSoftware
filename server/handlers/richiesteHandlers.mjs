@@ -260,10 +260,44 @@ async function handleRichiestaById(req, res) {
     }
 }
 
+/**
+ * Elimina una richiesta pending dal database
+ * @param {object} req - L'oggetto della richiesta.
+ * @param {object} res - L'oggetto della risposta.
+ */
+async function deleteRichiestaById(req, res) {
+	try {
+		const { id } = req.params;
+		const loggedUsername = req.utenteLoggato.loggedUsername; // ID dell'utente loggato
+
+		// Trovo la proposta da modificare
+		var richiesta = await Richiesta.findById(id);
+
+		if (!richiesta) {
+			return res.status(404).json({ message: "Richiesta non trovata" });
+		}
+
+        // Permetto la modifica dei dati utente solo se il chiamante dell'API è il richiedente
+        if (richiesta.usernameRichiedente == loggedUsername) {
+            // Trova e elimina la richiesta dal database
+            // Elimino la richiesta
+            await Richiesta.findByIdAndDelete(id);
+        }
+        else {
+            return res.status(403).json({ message: "Impossibile eliminare richieste altrui" });
+        }
+        return res.status(204).json({ message: "Richiesta eliminata con successo" });
+
+	} catch (error) {
+		return res.status(500).json({ message: "Errore durante l'eliminazione della richiesta", error: error.message });
+	}
+}
+
 // Esporta handlers
 export {
     getRichieste,
     getRichiestaById,
     postRichiesta,
-    handleRichiestaById
+    handleRichiestaById,
+    deleteRichiestaById
 };

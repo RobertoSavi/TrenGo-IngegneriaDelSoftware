@@ -49,22 +49,20 @@ async function ricercaProposte(dati){
 	var query="?";
 	
 	for (var key in dati)
-	{
-		console.log(key+", "+dati[key]);
-		
+	{		
 		query+=key+"="+dati[key]+"&";
 	}
 	
-	console.log(query);
-	
 	const response = await axios.get(PROPOSTE_URL+'ricerca'+query, {headers: {'Token': loggedUser.token}});
-	
-	console.log(response.data.proposte);
 	proposte.value = response.data.proposte;
 }
 
 async function creaProposta(dati) {
 	await axios.post(PROPOSTE_URL, dati, {headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token}});
+}
+
+async function annullaPartecipazione(id) {
+	await axios.put(PROPOSTE_URL+id+'/annullaPartecipazione', {}, {headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token}});
 }
 
 async function modificaProposta(dati, id) {
@@ -88,6 +86,7 @@ export {
 	fetchProposteNA, 
 	ricercaProposte,
 	creaProposta, 
+	annullaPartecipazione,
 	modificaProposta, 
 	eliminaProposta 
 } 

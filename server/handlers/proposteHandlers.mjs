@@ -379,6 +379,37 @@ async function postProposta(req, res) {
 	}
 }*/
 
+/**
+ * Rimuove un partecipante dalla proposta.
+ * @param {object} req - L'oggetto della richiesta.
+ * @param {object} res - L'oggetto della risposta.
+ */
+async function annullaPartecipazioneById(req, res) {
+	const loggedUsername = req.utenteLoggato.loggedUsername; // Username dell'utente loggato
+	const idProposta = req.params.id;
+	const proposta = await Proposta.findById(idProposta);
+
+	let partecipanti = proposta.partecipanti;
+	
+	try {
+		
+		if(!partecipanti.includes(loggedUsername))
+		{
+			return res.status(401).json({ message: "Non sei un partecipante di questa proposta" });
+		}
+		
+		partecipanti=partecipanti.filter(partecipanteUsername => partecipanteUsername !== loggedUsername);
+
+		await Proposta.findByIdAndUpdate(idProposta, {partecipanti: partecipanti, numeroPartecipanti: --proposta.numeroPartecipanti}, { new: true });
+		
+		return res.status(201).json({ self: "proposte/" + idProposta });
+
+	} catch (error) {
+		// Gestione dell'errore durante la modifica della proposta
+		return res.status(500).json({ message: "Errore durante la modifica della proposta", error: error.message });
+	}
+}
+
 async function modifyPropostaById(req, res) {
 	try {
 		const { id } = req.params;
@@ -475,6 +506,7 @@ export {
 	getPropostaById,
 	ricercaProposte,
 	postProposta,
+	annullaPartecipazioneById,
 	modifyPropostaById,
 	deletePropostaById
 };

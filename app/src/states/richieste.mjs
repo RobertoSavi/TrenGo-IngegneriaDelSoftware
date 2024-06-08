@@ -12,12 +12,11 @@ async function fetchRichieste(id) {
 	if(response.data.richiesta)
 	{
 		richieste.value = response.data.richiesta;
-		console.log(response.data.richieste);
+
 	}
 	else
 	{
 		richieste.value = response.data.richieste;
-		console.log(response.data.richieste);
 	}
 }
 
@@ -26,15 +25,17 @@ async function creaRichiesta(dati, id) {
 }
 
 async function gestisciRichiesta(dati, id, idRichiesta) {
-	console.log(dati);
-	console.log(id)
-	console.log(idRichiesta);
 	await axios.put(PROPOSTE_URL+id+'/richieste/'+idRichiesta, dati, {headers: {'Token': loggedUser.token}});
+}
+
+async function annullaRichiesta(id, idRichiesta) {
+	await axios.delete(PROPOSTE_URL+id+'/richieste/'+idRichiesta, {headers: {'Token': loggedUser.token}});
 }
 
 export { 
 	richieste, 
 	fetchRichieste,
 	creaRichiesta,
-	gestisciRichiesta
+	gestisciRichiesta,
+	annullaRichiesta
 } 

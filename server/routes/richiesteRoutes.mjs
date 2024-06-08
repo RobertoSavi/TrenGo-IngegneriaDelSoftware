@@ -20,4 +20,7 @@ router.post("/:idProposta/richieste", handlers.postRichiesta);
 // Usato dal creatore della proposta per accettare o rifiutare una richiesta
 router.put("/:idProposta/richieste/:id", handlers.handleRichiestaById);
 
+// Permette di eliminare una richiesta tramite l'id
+router.delete("/:idProposta/richieste/:id", handlers.deleteRichiestaById);
+
 export default router;

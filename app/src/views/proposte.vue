@@ -1,9 +1,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { loggedUser } from '../states/loggedUser.mjs';
-import { proposte, fetchPropostaId, eliminaProposta } from '../states/proposte.mjs';
+import { proposte, fetchPropostaId, eliminaProposta, annullaPartecipazione } from '../states/proposte.mjs';
 import { RouterLink, useRoute } from 'vue-router';
-import { richieste, fetchRichieste, creaRichiesta, gestisciRichiesta } from '../states/richieste.mjs';
+import { richieste, fetchRichieste, creaRichiesta, gestisciRichiesta, annullaRichiesta } from '../states/richieste.mjs';
 import router from '../router/index.mjs'
 
 const route = useRoute();
@@ -11,9 +11,8 @@ const id = route.params.id;
 const HOST_UTENTI = "/utenti/";
 const fetchDone = ref(false);
 
-onMounted(async () => {
-	
-	console.log(id);
+onMounted(async () => 
+{
 	await fetchPropostaId(id);
 
 	await fetchRichieste(id);
@@ -27,17 +26,33 @@ function modifica(propostaId) {
 
 async function eliminaPropostaButton() {
 	await eliminaProposta(id);
-}
-
-async function annullaRichiestaButton(idRichiesta) {
-	//await annullaRichiesta(idRichiesta); for the future
+	
+	router.push('/');
 }
 
 async function inviaRichiestaButton() {
 	const dati = ref({ 'usernameRichiedente': loggedUser.username });
 	await creaRichiesta(dati.value, id);
 
-	isRichiedente=true;
+	fetchDone.value=false;
+	await fetchRichieste(id);
+	fetchDone.value=true;
+}
+
+async function annullaRichiestaButton(idRichiesta) {
+	await annullaRichiesta(id, idRichiesta);
+	
+	fetchDone.value=false;
+	await fetchRichieste(id);
+	fetchDone.value=true;
+}
+
+async function annullaPartecipazioneButton() {
+	await annullaPartecipazione(id);
+	
+	fetchDone.value=false;
+	await fetchPropostaId(id);
+	fetchDone.value=true;
 }
 
 async function gestisciRichiestaButton(idRichiesta, acc) {
@@ -50,18 +65,21 @@ async function gestisciRichiestaButton(idRichiesta, acc) {
 		await gestisciRichiesta(dati.value, id, idRichiesta);
 	}
 
-	router.go(0);
+	fetchDone.value=false;
+	await fetchRichieste(id);
+	await fetchPropostaId(id);
+	fetchDone.value=true;
 }
 
-var isRichiedente = computed(() => {
-
-	console.log(richieste.value);
-	
-	if(richieste.value)
+var isRichiedente = computed(() => {	
+	for (var index in richieste.value)
 	{
-		return true;
+		if(richieste.value[index].usernameRichiedente==loggedUser.username)
+		{
+			return true;
+		}
 	}
-
+	
 	return false;
 
 });
@@ -115,8 +133,8 @@ var isIscritto = computed(() => {
 			</div>
 		</div>
 		<div v-else>
-			<button type="button" @click="" v-if="isIscritto">Annulla partecipazione</button>
-			<button type="button" @click="" v-else-if="isRichiedente">Annulla richiesta</button>
+			<button type="button" @click="annullaPartecipazioneButton()" v-if="isIscritto">Annulla partecipazione</button>
+			<button v-for="richiesta in richieste" type="button" @click="annullaRichiestaButton(richiesta._id)" v-else-if="isRichiedente">Annulla richiesta</button>
 			<button type="button" @click="inviaRichiestaButton()" v-else>Richiedi di partecipare!</button>
 		</div>
 	</div>

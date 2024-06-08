@@ -28,6 +28,9 @@ router.get("/:id", handlers.getPropostaById);
 // Permette di pubblicare una proposta
 router.post("", handlers.postProposta);
 
+// Permette di annullare la partecipazione ad una proposta tramite l'id
+router.put("/:id/annullaPartecipazione", handlers.annullaPartecipazioneById);
+
 // Permette di modificare una proposta tramite l'id
 router.put("/:id", handlers.modifyPropostaById);
 
