@@ -31,9 +31,11 @@ function logout()
 		<h1> {{ utente.username }} ({{ utente.karma }})</h1>
 		<h2 v-if="utente.tipoUtente=='grandeOrganizzatore'"> Grande organizzatore </h2>
 		<div>
-			<label>Nome: </label>{{ loggedUser.nome }}
+			<label>Nome: </label>{{ utente.nome }}
 		</div>
+		<div>
 			<label>Cognome: </label>{{ utente.cognome }}
+		</div>
 		<div v-if="utente.username==loggedUser.username">
 			<label>Email: </label>{{ utente.email }}
 		</div>

@@ -3,6 +3,7 @@ import Utente from "../models/utenteModel.mjs"
 import Richiesta from "../models/richiestaModel.mjs"
 import Valutazione from "../models/valutazioneModel.mjs"
 import Notifica from "../models/notificaModel.mjs"
+import { tipoNotificaEnum } from "../models/enums.mjs";
 import * as validators from "../validators/proposteValidators.mjs";
 import mongoose from "mongoose";
 //import {ObjectId} from "mongodb";
@@ -309,7 +310,7 @@ async function postProposta(req, res) {
 
 	// Validazione delle coordinate	
 	if (!validators.validateCoordinate(coordinate))
-		errors.push({ field: "titolo", message: "Latitudine o longitudine mancanti" });
+		errors.push({ field: "titolo", message: "Latitudine o longitudine non valide" });
 
 	// Validazione della descrizione
 	if (!validators.validateDescrizione(descrizione))
@@ -321,7 +322,7 @@ async function postProposta(req, res) {
 
     try {
         // Creazione della proposta
-        const proposta = await Proposta.create({ usernameCreatore, titolo, categorie, nomeLuogo, descrizione, numeroPartecipantiDesiderato, data });
+        const proposta = await Proposta.create({ usernameCreatore, titolo, categorie, nomeLuogo, coordinate, descrizione, numeroPartecipantiDesiderato, data });
         const propostaUrl = `${HOST_PROPOSTE}${proposta._id}`;
         // Creo una notifica per ogni utente che segue l'utente creatore della proposta
         utenteCreatore.followers.forEach(async follower => {

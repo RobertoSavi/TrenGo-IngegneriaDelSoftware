@@ -1,13 +1,15 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, nextTick } from 'vue';
 import { loggedUser } from '../states/loggedUser.mjs';
 import { proposte, modificaProposta, fetchPropostaId } from '../states/proposte.mjs';
 import { useRoute } from 'vue-router';
-import router from '../router/index.mjs'
 import { interessi, getInteressi } from '../states/utenti.mjs'
 import L from 'leaflet'
+import router from '../router/index.mjs'
 
-const leafletMap=ref(); 
+const luogoValido = ref(false);
+const leafletMap = ref();
+const marker = ref();
 const route = useRoute();
 const id=route.params.id;
 const dati = ref({
@@ -15,6 +17,7 @@ const dati = ref({
 	creatore: loggedUser.id,
 	titolo: "",
 	nomeLuogo: "",
+	coordinate: [],
 	numeroPartecipantiDesiderato: "",
 	descrizione: "",
 	data: "",
@@ -24,8 +27,10 @@ const fetchDone=ref(false);
 
 onMounted( async () => {
 	await fetchPropostaId(id)
+	
 	dati.value.titolo=proposte.value.proposta.titolo;
 	dati.value.nomeLuogo=proposte.value.proposta.nomeLuogo;
+	dati.value.coordinate=proposte.value.proposta.coordinate;
 	dati.value.numeroPartecipantiDesiderato=proposte.value.proposta.numeroPartecipantiDesiderato;
 	dati.value.descrizione=proposte.value.proposta.descrizione;
 	dati.value.data=proposte.value.proposta.data.split('.')[0];
@@ -33,25 +38,87 @@ onMounted( async () => {
 	
 	await getInteressi();
 	
+	nextTick(() => {
+		initLeafletMap()
+	})
+	
 	fetchDone.value=true;
 });
+
+function initLeafletMap() {
+	leafletMap.value = L.map('mappa', { center: new L.LatLng(dati.value.coordinate[0], dati.value.coordinate[1]), zoom: 12, zoomControl: false });
+	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(leafletMap.value);
+	
+	marker.value = L.marker([dati.value.coordinate[0], dati.value.coordinate[1]]).addTo(leafletMap.value);
+	
+	leafletMap.value.on('click', clickMappa);
+}
+
+async function clickMappa(e) 
+{
+	const { lat, lng } = e.latlng;
+
+	if (marker.value) {
+		leafletMap.value.removeLayer(marker.value);
+	}
+	
+	await getNomeLuogo(lat, lng);
+
+	if (!luogoValido.value) {
+		return 1;
+	}
+	
+	marker.value = L.marker([lat, lng]).addTo(leafletMap.value);
+
+	dati.value.coordinate[0] = lat;
+	dati.value.coordinate[1] = lng;
+}
+
+async function getNomeLuogo(lat, lng) {
+	const response = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng);
+
+	const data = await response.json();
+
+	if (data.error != "Unable to geocode") {
+		if (data.address.house_number && data.address.road && (data.address.city || data.address.town || data.address.village || data.address.municipality)) {
+			dati.value.nomeLuogo = data.address.road + " " + data.address.house_number + ", " + (data.address.city || data.address.town || data.address.village || data.address.municipality);
+			luogoValido.value = true;
+		}
+		else if (!data.address.house_number && data.address.road && (data.address.city || data.address.town || data.address.village || data.address.municipality)) {
+			dati.value.nomeLuogo = data.address.road + ", " + (data.address.city || data.address.town || data.address.village || data.address.municipality);
+			luogoValido.value = true;
+		}
+		else if (!data.address.road && (data.address.city || data.address.town || data.address.village || data.address.municipality)) {
+			dati.value.nomeLuogo = (data.address.city || data.address.town || data.address.village || data.address.municipality);
+			luogoValido.value = true;
+		}
+		else {
+			dati.value.nomeLuogo = "Luogo non accettabile";
+			luogoValido.value = false;
+		}
+	}
+	else {
+		dati.value.nomeLuogo = "Luogo non accettabile"
+		luogoValido.value = false;
+	}
+}
 
 function modificaProposteButton() {
   	modificaProposta(dati.value, id)
 	router.back();
 };
 
-function addCategoria(categoria)
+function addCategoria(interesse)
 {
-	var index = dati.value.interessi.indexOf(categoria);
+	var index = dati.value.categorie.indexOf(interesse);
 	
 	if(index>-1)
 	{
-		dati.value.categoria.splice(index, 1);
+		dati.value.categorie.splice(index, 1);
 	}
 	else
 	{
-		dati.value.categoria.push(categoria);
+		dati.value.categorie.push(interesse);
 	}
 }
 </script>
@@ -65,9 +132,8 @@ function addCategoria(categoria)
 		</div>
 		<div>
 			<label for="luogo">Luogo:</label> 
-			<input type="text" id="luogo" v-model="dati.nomeLuogo" required />
+			<input type="text" id="luogo" :value="dati.nomeLuogo" required />
 		</div>
-		<div id="mappa" class="input-mappa"></div>
 		<div>
 			<label for="descrizione">Descrizione:</label> 
 			<input type="text" id="descrizione" v-model="dati.descrizione" required />
@@ -85,7 +151,7 @@ function addCategoria(categoria)
 		</div>
 		<span class="contenitoreInteressi">
 			<span class="interesse" v-for="interesse in interessi">
-				<input type="checkbox" @click="addCategoria(interesse)"/>
+				<input type="checkbox" @click="addCategoria(interesse)" :checked="dati.categorie.includes(interesse)"/>
 				{{ interesse }}
 			</span>
 		</span>
@@ -94,4 +160,5 @@ function addCategoria(categoria)
 		</div>
 	</form>
 	<div v-else>Loading...</div>
+	<div id="mappa" class="input-mappa"></div>
 </template>

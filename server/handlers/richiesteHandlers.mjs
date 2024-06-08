@@ -1,5 +1,7 @@
 import Richiesta from "../models/richiestaModel.mjs"
 import Proposta from "../models/propostaModel.mjs"
+import Notifica from "../models/notificaModel.mjs"
+import { tipoNotificaEnum } from "../models/enums.mjs";
 import validateStato from "../validators/richiesteValidators.mjs";
 import mongoose from "mongoose";
 
@@ -30,7 +32,13 @@ async function getRichieste(req, res) {
             return res.status(200).json({ richieste });
         }
         else {
-            return res.status(403).json({ message: "Impossibile ottenere le richieste alle proposte altrui" });
+			const richiesta = await Richiesta.find({ idProposta, usernameRichiedente: loggedUsername, stato: "pending" });
+			
+			if(!richiesta){
+            	return res.status(403).json({ message: "Impossibile ottenere le richieste alle proposte altrui se non si ha una richiesta propria" });
+            }
+            
+            return res.status(201).json({ richiesta });
         }
 
     } catch (error) {
@@ -60,7 +68,7 @@ async function getRichiestaById(req, res) {
         }
 
         // Restituisco la richiesta alla proposta solo se sono il creatore della proposta
-        if (loggedUsername == proposta.usernameCreatore.toString()) {
+        if (loggedUsername == proposta.usernameCreatore.toString()||loggedUsername == richiesta.usernameRichiedente.toString()) {
             return res.status(200).json({ richiesta });
         }
         else {
@@ -129,7 +137,7 @@ async function postRichiesta(req, res) {
             // Creo una notifica per il creatore della proposta
             await Notifica.create({
                 sorgente: 'System',
-                username: utente.username,
+                username: proposta.usernameCreatore,
                 messaggio: `L'utente ${loggedUsername} ha richiesto di partecipare alla proposta: ${proposta.titolo}`,
                 link: propostaUrl,
                 tipo: tipoNotificaEnum.PROPOSTA

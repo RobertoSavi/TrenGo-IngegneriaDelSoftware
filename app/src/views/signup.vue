@@ -5,12 +5,12 @@ import { setLoggedUser } from '../states/loggedUser.mjs'
 import router from '../router/index.mjs'
 
 const dati = ref({
-	//nome: "",
-	//cognome: "",
+	nome: "",
+	cognome: "",
 	username: "",
 	email: "",
-	password: ""
-	//interessi: []
+	password: "",
+	interessi: []
 });
 
 

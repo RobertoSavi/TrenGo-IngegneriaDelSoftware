@@ -9,7 +9,16 @@ const richieste = ref({})
 
 async function fetchRichieste(id) {
 	const response = await axios.get(PROPOSTE_URL+id+'/richieste',  {headers: {'Token': loggedUser.token}});
-	richieste.value = response.data.richieste;
+	if(response.data.richiesta)
+	{
+		richieste.value = response.data.richiesta;
+		console.log(response.data.richieste);
+	}
+	else
+	{
+		richieste.value = response.data.richieste;
+		console.log(response.data.richieste);
+	}
 }
 
 async function creaRichiesta(dati, id) {

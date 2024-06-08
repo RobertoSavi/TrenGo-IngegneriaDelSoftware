@@ -117,7 +117,7 @@ async function getUtenteByUsername(req, res) {
  */
 async function signupUtente(req, res) {
     // Estrai username, email e password dal body della richiesta
-    const {username, email, password} = req.body;
+    const {nome, cognome, username, email, password, interessi} = req.body;
     // Inizializza un array per gli errori
     const errors = [];
 
@@ -147,7 +147,7 @@ async function signupUtente(req, res) {
 
     try {
         // Creazione dell'utente
-        const utente = await Utente.create({username, email, password});
+        const utente = await Utente.create({nome, cognome, username, email, password, interessi});
         return res.status(201).json({self: "utenti/" + utente._id});
 
     } catch (error) {

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
 import { loggedUser } from '../states/loggedUser.mjs';
-import { creaProposta } from '../states/proposte.mjs';
+import { fetchProposte, creaProposta } from '../states/proposte.mjs';
 import { interessi, getInteressi } from '../states/utenti.mjs'
 import L from 'leaflet'
 import router from '../router/index.mjs'
@@ -38,42 +38,48 @@ function initLeafletMap() {
 
 async function clickMappa(e) 
 {
-		const { lat, lng } = e.latlng;
+	const { lat, lng } = e.latlng;
 
-		await getNomeLuogo(lat, lng);
+	if (marker.value) {
+		leafletMap.value.removeLayer(marker.value);
+	}
+	
+	await getNomeLuogo(lat, lng);
 
-		if (!luogoValido.value) {
-			return 1;
-		}
+	if (!luogoValido.value) {
+		return 1;
+	}
+	
+	marker.value = L.marker([lat, lng]).addTo(leafletMap.value);
 
-		if (marker.value) {
-			leafletMap.value.removeLayer(marker.value);
-		}
-
-		marker.value = L.marker([lat, lng]).addTo(leafletMap.value);
-
-		dati.value.coordinate[0] = lat;
-		dati.value.coordinate[1] = lng;
+	dati.value.coordinate[0] = lat;
+	dati.value.coordinate[1] = lng;
 }
 
-function creaProposteButton() {
+async function creaProposteButton() {
 	/*if (dati.value.titolo == "" || dati.value.nomeLuogo == "" || dati.value.descrizione == "" || dati.value.numeroPartecipantiDesiderato <= 1) {
 		warningMessage.value = 'Compilare i campi'
 		return;
 	}*/
 
 	if (luogoValido.value) {
-		creaProposta(dati.value);
+		await creaProposta(dati.value);
+		await fetchProposte();
 		router.push('/');
 	}
 };
 
-function addCategoria(categoria) {
-	if (dati.value.categorie.includes(categoria)) {
-		dati.value.categorie.pop(categoria);
+function addCategoria(interesse)
+{
+	var index = dati.value.categorie.indexOf(interesse);
+	
+	if(index>-1)
+	{
+		dati.value.categorie.splice(index, 1);
 	}
-	else {
-		dati.value.categorie.push(categoria);
+	else
+	{
+		dati.value.categorie.push(interesse);
 	}
 }
 

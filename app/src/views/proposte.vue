@@ -12,11 +12,11 @@ const HOST_UTENTI = "/utenti/";
 const fetchDone = ref(false);
 
 onMounted(async () => {
+	
+	console.log(id);
 	await fetchPropostaId(id);
 
-	if (proposte.value.proposta.usernameCreatore == loggedUser.username) {
-		await fetchRichieste(id);
-	}
+	await fetchRichieste(id);
 
 	fetchDone.value = true;
 });
@@ -37,41 +37,37 @@ async function inviaRichiestaButton() {
 	const dati = ref({ 'usernameRichiedente': loggedUser.username });
 	await creaRichiesta(dati.value, id);
 
-	location.reload;
+	isRichiedente=true;
 }
 
 async function gestisciRichiestaButton(idRichiesta, acc) {
 	if (acc) {
-		const dati = ref({ 'stato': "accettata" });
+		const dati = ref({ stato: "accettata" });
 		await gestisciRichiesta(dati.value, id, idRichiesta);
 	}
 	else {
-		const dati = ref({ 'stato': "accettata" });
+		const dati = ref({ stato: "rifiutata" });
 		await gestisciRichiesta(dati.value, id, idRichiesta);
 	}
 
-	location.reload;
+	router.go(0);
 }
 
 var isRichiedente = computed(() => {
 
-	/*for(var richiesta in richieste)
+	console.log(richieste.value);
+	
+	if(richieste.value)
 	{
-		console.log(richiesta.value);
-		
-		if(richiesta.usernameRichiedente==loggedUser.username)
-		{
-			return true;
-		}
-	}*/
+		return true;
+	}
 
 	return false;
 
 });
 
 var isIscritto = computed(() => {
-	try { return proposte.value.proposta.partecipanti.includes(loggedUser.username); }
-	catch { }
+	return proposte.value.proposta.partecipanti.includes(loggedUser.username); 
 });
 </script>
 
