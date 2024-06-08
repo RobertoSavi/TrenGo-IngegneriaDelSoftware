@@ -81,7 +81,7 @@ const router = createRouter({
 		name: 'valutazioni',
 		component: valutap
 	}
-	]
+  ]
 })
 
 export default router

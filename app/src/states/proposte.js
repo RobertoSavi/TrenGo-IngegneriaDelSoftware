@@ -3,8 +3,8 @@ import axios from 'axios'
 import { loggedUser } from '../states/loggedUser.js'
 import { richieste, fetchRichieste } from '../states/richieste.js';
 
-const API_URL = import.meta.env.VITE_API_HOST || `http://localhost:5050/api`
-const PROPOSTE_URL = API_URL+'/proposte/'
+const URL_API = import.meta.env.VITE_URL_API;
+const PROPOSTE_URL = URL_API+'/proposte/'
 
 const proposte = ref({})
 const proposteIscritto = ref({})
