@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onMounted, watch, onUpdated } from 'vue'
-import { loggedUser, setLoggedUser, clearLoggedUser } from '../states/loggedUser.js'
-import { login } from '../states/utenti.js'
+import { loggedUser, setLoggedUser, clearLoggedUser } from '../states/loggedUser.mjs'
+import { login } from '../states/utenti.mjs'
 import { RouterLink, useRoute } from 'vue-router'
-import router from '../router/index.js'
+import router from '../router/index.mjs'
 
 const URL_API = import.meta.env.VITE_URL_API;
 const URL_GOOGLE_LOGIN = URL_API + '/utenti/auth/google';
