@@ -1,17 +1,10 @@
-// Mock the module and its functions
-jest.mock('../middlewares/tokenChecker.mjs', () => ({
-    __esModule: true,
-    tokenChecker: jest.fn().mockResolvedValue((req, res, next) => {
-        req.utenteLoggato = { loggedId: '012345', loggedUsername: 'utenteTest' };
-        next();})
-}))
 import { jest } from '@jest/globals';
 import request from 'supertest';
 import app from '../../app.mjs';
 import validators from "../validators/utentiValidators.mjs";
 import Utente from '../models/utenteModel.mjs';
+import middleware from '../middlewares/tokenChecker.mjs';
 import { sendResetPasswordMail } from '../services/emailService.mjs';
-import tokenChecker from '../middlewares/tokenChecker.mjs';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
@@ -258,6 +251,10 @@ describe('utentiHandlers', () => {
         });
     });
     describe('GET /api/utenti/:id', () => {
+        beforeEach(() => {
+            jest.clearAllMocks();
+        });
+
         jest.spyOn(Utente, 'findById').mockResolvedValue({
             _id: '012345',
             nome: 'utente',
@@ -273,12 +270,8 @@ describe('utentiHandlers', () => {
             interessi: ['Altro'],
         });
 
-        
 
-
-        //jest.spyOn(tokenChecker, 'tokenChecker').mockReturnValue(true);
-
-        jest.spyOn(tokenChecker, 'tokenChecker').mockResolvedValue(() => (req, res, next) => {
+        jest.spyOn(middleware, 'tokenChecker').mockReturnValue(() => (req, res, next) => {
             req.utenteLoggato = { loggedId: '012345', loggedUsername: 'utenteTest' };
             next();
         });

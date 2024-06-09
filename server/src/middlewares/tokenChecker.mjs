@@ -2,7 +2,7 @@
 import jwt from "jsonwebtoken";
 
 // Middleware per verificare e decodificare un token JWT
-function tokenChecker (req, res, next) {
+function tokenChecker(req, res, next) {
 	console.log("tokenChecker");
 	// Controlla l'header per trovare il token
 	const token = req.get('Token');
@@ -11,10 +11,6 @@ function tokenChecker (req, res, next) {
 		// Setta l'utente loggato a null e prosegue con la prossima funzione di middleware o route
 		req.utenteLoggato = null;
 		return next();
-		/*return res.status(401).send({ 
-			success: false,
-			message: 'Nessun token fornito.'
-		});*/
 	}
 
 	// Decodifica il token, verifica il segreto e controlla se è scaduto
@@ -35,7 +31,7 @@ function tokenChecker (req, res, next) {
 };
 
 const functions = {
-    tokenChecker,
+    tokenChecker
 };
 
 // Esporta il middleware tokenChecker
