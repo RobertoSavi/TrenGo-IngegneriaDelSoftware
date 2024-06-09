@@ -5,6 +5,7 @@ import notificheRouter from "./notificheRoutes.mjs";
 import followRouter from "./followRoutes.mjs";
 import valutazioniRouter from "./valutazioniRoutes.mjs";
 import googleAuthRouter from "./googleAuthRoutes.mjs";
+import chatRouter from "./chatRoutes.mjs";
 import Router from "express";
 
 
@@ -18,5 +19,7 @@ router.use("/notifiche", notificheRouter); // Route per le notifiche
 router.use("/segui", followRouter); // Route per i follow
 router.use("/valutazioni", valutazioniRouter); // Route per le valutazioni
 router.use("/utenti/auth/google", googleAuthRouter); // Route per l'autenticazione con google
+router.use("/chat", chatRouter); // Route per la chat
+
 
 export default router;

@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for server/src/handlers/googleAuthHandlers.mjs</title>
+    <title>Code coverage report for server/src/validators/chatsValidators.mjs</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../../prettify.css" />
     <link rel="stylesheet" href="../../../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../../index.html">All files</a> / <a href="index.html">server/src/handlers</a> googleAuthHandlers.mjs</h1>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">server/src/validators</a> chatsValidators.mjs</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">30% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>3/10</span>
+                <span class='fraction'>0/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>0/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">37.5% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>3/8</span>
+                <span class='fraction'>0/3</span>
             </div>
         
             
@@ -79,69 +79,39 @@
 <a name='L14'></a><a href='#L14'>14</a>
 <a name='L15'></a><a href='#L15'>15</a>
 <a name='L16'></a><a href='#L16'>16</a>
-<a name='L17'></a><a href='#L17'>17</a>
-<a name='L18'></a><a href='#L18'>18</a>
-<a name='L19'></a><a href='#L19'>19</a>
-<a name='L20'></a><a href='#L20'>20</a>
-<a name='L21'></a><a href='#L21'>21</a>
-<a name='L22'></a><a href='#L22'>22</a>
-<a name='L23'></a><a href='#L23'>23</a>
-<a name='L24'></a><a href='#L24'>24</a>
-<a name='L25'></a><a href='#L25'>25</a>
-<a name='L26'></a><a href='#L26'>26</a>
-<a name='L27'></a><a href='#L27'>27</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L17'></a><a href='#L17'>17</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import passport from 'passport';
-import googleAuth from "../services/googleAuth.mjs";
-import dotenv from "dotenv";
-dotenv.config();
-&nbsp;
-const URL_FRONTEND = process.env.URL_FRONTEND;
-const URL_LOGIN = URL_FRONTEND + 'login';
-&nbsp;
-// Funzione per l'autenticazione con Google
-function <span class="fstat-no" title="function not covered" >googleAuthentication(</span>req, res, next) {
-<span class="cstat-no" title="statement not covered" >    googleAuth.authenticate('google', { scope: ['email', 'profile'] })(req, res, next);</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Validatore per il contenuto di un messaggio
+ * Verifica se il contenuto ha almeno un carattere
+ * @param {string} contenuto - Il contenuto da validare.
+ * @returns {boolean} - True se il contenuto è valido, altrimenti False.
+ */
+function <span class="fstat-no" title="function not covered" >validateContenuto(</span>contenuto) {
+    // Utilizza una regex per verificare che lo stato sia "accettata" o "rifiutata"
+<span class="cstat-no" title="statement not covered" >    if(contenuto.size&lt;1)</span>
+    {
+<span class="cstat-no" title="statement not covered" >		return false;</span>
+	}
+	
+<span class="cstat-no" title="statement not covered" >	return true;</span>
 }
 &nbsp;
-// Funzione per il callback dell'autenticazione con Google
-function <span class="fstat-no" title="function not covered" >googleCallback(</span>req, res, next) {
-<span class="cstat-no" title="statement not covered" >    googleAuth.authenticate('google', <span class="fstat-no" title="function not covered" >(e</span>rr, token) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        if (err) { <span class="cstat-no" title="statement not covered" >return next(err); </span>}</span>
-<span class="cstat-no" title="statement not covered" >        if (!token) { <span class="cstat-no" title="statement not covered" >return res.redirect(URL_LOGIN); </span>}</span>
-        // Redireziono l'utente alla pagina di login con il token in query string
-<span class="cstat-no" title="statement not covered" >        res.redirect(`${URL_LOGIN}?token=${encodeURIComponent(token.token)}&amp;loggedId=${encodeURIComponent(token.loggedId)}&amp;loggedUsername=${encodeURIComponent(token.loggedUsername)}&amp;self=${encodeURIComponent("utenti/" + token.loggedId)}`);</span>
-    })(req, res, next);
-}
-&nbsp;
-export {
-    googleAuthentication,
-    googleCallback
-}</pre></td></tr></table></pre>
+export default validateContenuto;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->

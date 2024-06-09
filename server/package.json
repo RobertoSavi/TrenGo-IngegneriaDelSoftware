@@ -40,9 +40,13 @@
     "verbose": true,
     "collectCoverage": true,
     "testEnvironment": "jest-environment-node",
-    "setupFilesAfterEnv": ["./jest.setup.js"],
-    "transform": {
-    },
-    "moduleFileExtensions": ["js", "mjs"]
+    "setupFilesAfterEnv": [
+      "./jest.setup.js"
+    ],
+    "transform": {},
+    "moduleFileExtensions": [
+      "js",
+      "mjs"
+    ]
   }
 }
