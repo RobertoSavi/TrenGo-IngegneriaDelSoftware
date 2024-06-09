@@ -51,6 +51,60 @@ async function getUtenteById(req, res) {
 }
 
 /**
+ * Ottiene le proposte dal database in base a query specifiche.
+ * @param {object} req - L'oggetto della richiesta.
+ * @param {object} res - L'oggetto della risposta.
+ */
+async function ricercaUtenti(req, res) {
+	try {
+		const loggedUsername = req.utenteLoggato ? req.utenteLoggato.loggedUsername : null; // Username dell'utente loggato
+		const query = {};
+
+		// Controlla i parametri della query
+		const { username, maxKarma, minKarma } = req.query;
+
+		if (username) {
+			query.username = { $regex: new RegExp(username, 'i') };
+		}
+
+		if (maxKarma && minKarma) {
+			query.numeroPartecipantiDesiderato = { $lte: maxKarma, $gte: minKarma };
+		}
+		else if (maxKarma) {
+			query.numeroPartecipantiDesiderato = { $lte: maxKarma };
+		}
+		else if (minKarma) {
+			query.numeroPartecipantiDesiderato = { $lte: minKarma };
+		}
+
+		// Se l'utente è loggato restituisco le proposte cercate
+		if (loggedUsername) {
+			const utenti = await Utente.find(query, { password:0, _id:0, email:0, following:0, followers:0, googleId:0 });
+			
+			if (!utenti) {
+				return res.status(404).json({ message: "Nessun utente disponibile." });
+			}
+
+			return res.status(200).json({ utenti });
+		}
+		// Se l'utente non è loggato restituisco solo le proposte cercate pubblicate da grandi organizzatori
+		else {
+			query.tipoUtente = "grandeOrganizzatore";
+			const utenti = await Utente.find(query, { password:0, _id:0, email:0, following:0, followers:0, googleId:0 });
+
+			if (!utenti) {
+				return res.status(404).json({ message: "Nessun utente disponibile." });
+			}
+
+			return res.status(200).json({ utenti });
+		}
+
+	} catch (error) {
+		return res.status(500).json({ message: "Errore durante il recupero degli utenti", error: error.message });
+	}
+}
+
+/**
  * Aggiorna un utente nel database utilizzando l'ID fornito e i dati di aggiornamento.
  * @param {object} req - L'oggetto della richiesta.
  * @param {object} res - L'oggetto della risposta.
@@ -405,6 +459,7 @@ export {
     getUtenteById,
     updateUtenteById,
     getUtenteByUsername,
+    ricercaUtenti,
     signupUtente,
     loginUtente,
     getInteressi,

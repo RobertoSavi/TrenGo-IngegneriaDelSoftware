@@ -9,6 +9,7 @@ import { loggedUser } from './states/loggedUser.mjs'
 		<RouterLink to="/notifiche">Notifiche</RouterLink>
 		<RouterLink to="/proposte/mie">Mie proposte</RouterLink>
 		<RouterLink to="/proposte/crea">Nuova proposta</RouterLink>
+		<RouterLink to="/chats">Chats</RouterLink>
 		<RouterLink :to="'/utenti/'+loggedUser.username">Account</RouterLink>
 		<RouterLink to="/">Home</RouterLink>
 	</div> 
@@ -19,6 +20,7 @@ import { loggedUser } from './states/loggedUser.mjs'
 </template>
 
 <style>
-	@import '@/assets/stile.css';
-	@import '@/assets/stileNotifiche.css';
+	@import 'assets/stile.css';
+	@import 'assets/stileNotifiche.css';
+	@import 'assets/chats.css';
 </style>

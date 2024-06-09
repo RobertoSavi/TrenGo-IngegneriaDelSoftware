@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, watch, onUpdated } from 'vue'
-import { loggedUser, setLoggedUser, clearLoggedUser } from '../states/loggedUser.mjs'
+import { ref, onMounted } from 'vue'
+import { loggedUser, setLoggedUser } from '../states/loggedUser.mjs'
 import { login } from '../states/utenti.mjs'
 import { RouterLink, useRoute } from 'vue-router'
 import router from '../router/index.mjs'
@@ -31,8 +31,8 @@ onMounted(() => {
 
 
 const dati = ref({
-	username: "example_username",
-	password: "example_passworD1"
+	username: "example_username2",
+	password: "example_passworD2"
 })
 
 async function loginButton() {

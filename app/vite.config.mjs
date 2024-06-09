@@ -12,6 +12,6 @@ export default defineConfig({
   },
   // base: process.env.BASE_PATH || '/'
   base: process.env.NODE_ENV === 'production'
-          ? '/EasyLibApp/' // prod
+          ? '/Trengo/' // prod
           : '/', // dev
 })

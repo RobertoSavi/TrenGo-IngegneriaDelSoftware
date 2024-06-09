@@ -3,6 +3,8 @@ import Utente from "../models/utenteModel.mjs"
 import Richiesta from "../models/richiestaModel.mjs"
 import Valutazione from "../models/valutazioneModel.mjs"
 import Notifica from "../models/notificaModel.mjs"
+import Chat from "../models/chatModel.mjs"
+import Messaggio from "../models/messaggioModel.mjs"
 import { tipoNotificaEnum } from "../models/enums.mjs";
 import * as validators from "../validators/proposteValidators.mjs";
 import mongoose from "mongoose";
@@ -317,6 +319,7 @@ async function ricercaProposte(req, res) {
 		else {
 			const grandiOrganizzatori = await Utente.find({ tipoUtente: "grandeOrganizzatore" });
 			query.usernameCreatore = { $in: grandiOrganizzatori.map(u => u.username) };
+			const proposte = await Proposta.find(query);
 
 			if (!proposte) {
 				return res.status(404).json({ message: "Nessuna proposta disponibile." });
@@ -366,8 +369,10 @@ async function postProposta(req, res) {
 
 		try {
 			// Creazione della proposta
-			const proposta = await Proposta.create({ loggedUsername, titolo, categorie, nomeLuogo, coordinate, descrizione, numeroPartecipantiDesiderato, data });
+			const proposta = await Proposta.create({ usernameCreatore: loggedUsername, titolo: titolo, categorie: categorie, nomeLuogo: nomeLuogo, coordinate: coordinate, descrizione: descrizione, numeroPartecipantiDesiderato: numeroPartecipantiDesiderato, data: data });
 			const propostaUrl = `${HOST_PROPOSTE}${proposta._id}`;
+			const chat = await Chat.create({ partecipanti: [loggedUsername], idProposta: proposta._id, messaggi: [] })
+			await Proposta.findByIdAndUpdate(proposta._id, { idChat: chat._id });
 			// Creo una notifica per ogni utente che segue l'utente creatore della proposta
 			utenteCreatore.followers.forEach(async follower => {
 				// Creo una notifica per il follower
@@ -452,6 +457,10 @@ async function annullaPartecipazioneById(req, res) {
 			partecipanti = partecipanti.filter(partecipanteUsername => partecipanteUsername !== loggedUsername);
 
 			await Proposta.findByIdAndUpdate(idProposta, { partecipanti: partecipanti, numeroPartecipanti: --proposta.numeroPartecipanti }, { new: true });
+
+			const chat = await Chat.findById(proposta.idChat);
+			chat.partecipanti=chat.partecipanti.filter(partecipanteUsername => partecipanteUsername !== loggedUsername);
+			chat.save();
 
 			return res.status(201).json({ self: "proposte/" + idProposta });
 
@@ -558,6 +567,10 @@ async function deletePropostaById(req, res) {
 				await Richiesta.deleteMany({ idProposta: id });
 				// Elimino tutte le valutazioni relative alla proposta
 				await Valutazione.deleteMany({ idProposta: id });
+				// Elimino tutte la chat relativa alla proposta
+				const chat = await Chat.findByIdAndDelete(proposta.idChat);
+				// Elimino tutti i messaggi relativi alla chat relative alla proposta
+				await Messaggio.deleteMany({ idChat: chat._id });
 			}
 			else {
 				return res.status(403).json({ message: "Impossibile eliminare proposte altrui" });

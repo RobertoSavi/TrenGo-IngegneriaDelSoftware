@@ -6,7 +6,7 @@ import { tipoNotificaEnum } from "../models/enums.mjs";
 import validateContenuto from "../validators/chatsValidators.mjs";
 import moment from 'moment-timezone'
 
-const HOST_PROPOSTE = 'proposte/';
+const HOST_CHAT = 'chats/';
 
 /**
  * Crea una nuova notifica.
@@ -17,7 +17,7 @@ async function getChatsByUsername(req, res) {
 	try {
 		const loggedUsername = req.utenteLoggato.loggedUsername;
 
-		const chats = await Chat.find({partecipanti: loggedUsername});
+		const chats = await Chat.find({partecipanti: loggedUsername}).sort({ updatedAt: -1 });
 
 		// Controllo se l'utente partecipa a qualche chat
 		if (!chats) {
@@ -160,14 +160,14 @@ async function postMessaggio(req, res) {
 			return res.status(401).json({ message: "Impossibile inviare un messaggio senza contenuto." });
 		}
 
-		const proposta= await Proposta.findById(chat.idProposta);
-		const propostaUrl = `${HOST_PROPOSTE}${chat.idProposta}`;
+		const chatUrl = `${HOST_CHAT}${chat._id}`;
 		const now=moment(new Date()).tz('Europe/Rome').format("DD-MM-YYYY HH:mm");
 		const messaggio = await Messaggio.create({ contenuto: contenuto, senderUsername: loggedUsername, idChat: idChat, data: now });
 
-		let messaggi = chat.messaggi;
-		messaggi.push(messaggio._id);
-		await Chat.findByIdAndUpdate(idChat, { messaggi: messaggi });
+		chat.messaggi.push(messaggio._id);
+		await chat.save();
+		
+		const proposta = await Proposta.find(chat.idProposta);
 
 		chat.partecipanti.forEach(async partecipante => {
 			// Crea una notifica per il partecipante
@@ -177,8 +177,8 @@ async function postMessaggio(req, res) {
 					sorgente: loggedUsername,
 					username: partecipante,
 					messaggio: `L'utente ${loggedUsername} ha mandato un messaggio nella proposta: ${proposta.titolo}`,
-					link: propostaUrl,
-					tipo: tipoNotificaEnum.MESSAGGIO
+					link: chatUrl,
+					tipo: tipoNotificaEnum.CHAT
 				});
 			}
 		});

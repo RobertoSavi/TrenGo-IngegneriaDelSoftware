@@ -64,7 +64,6 @@ const schemaProposta = new mongoose.Schema({
     // ID della chat associata all'attività proposta
     idChat: {
         type: ObjectId,
-        required: true,
         ref: "Chat" // Riferimento al modello chats
     },
     // Elenco degli utenti che partecipano all'attività proposta

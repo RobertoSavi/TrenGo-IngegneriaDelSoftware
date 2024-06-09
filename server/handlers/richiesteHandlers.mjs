@@ -2,6 +2,7 @@ import Richiesta from "../models/richiestaModel.mjs"
 import Proposta from "../models/propostaModel.mjs"
 import Notifica from "../models/notificaModel.mjs"
 import Utente from "../models/utenteModel.mjs"
+import Chat from "../models/chatModel.mjs"
 import { tipoNotificaEnum } from "../models/enums.mjs";
 import validateStato from "../validators/richiesteValidators.mjs";
 import mongoose from "mongoose";
@@ -251,6 +252,7 @@ async function handleRichiestaById(req, res) {
         const loggedUsername = req.utenteLoggato ? req.utenteLoggato.loggedUsername : null; // Username dell'utente loggato
         const stato = req.body;
         var richiesta = await Richiesta.findById(id);
+        var chat = await Chat.findById(proposta.idChat);
         const errors = [];
 
         // Se l'utente non è loggato
@@ -286,6 +288,8 @@ async function handleRichiestaById(req, res) {
                     proposta.partecipanti.push(richiesta.usernameRichiedente);
                     proposta.numeroPartecipanti = proposta.numeroPartecipanti + 1;
                     proposta.save();
+                    chat.partecipanti.push(richiesta.usernameRichiedente);
+                    chat.save();
                 }
                 const propostaUrl = `${HOST_PROPOSTE}${proposta._id}`;
                 // Creo una notifica per avvisare il richiedente dell'avvenuta processazione della richiesta

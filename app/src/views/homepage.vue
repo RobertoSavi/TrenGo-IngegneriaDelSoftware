@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
 import { loggedUser } from '../states/loggedUser.mjs';
-import { proposte, fetchProposte, fetchProposteNA, ricercaProposte, fetchProposteMie } from '../states/proposte.mjs';
+import { proposte, fetchProposte, fetchProposteNA, ricercaProposte } from '../states/proposte.mjs';
 import { RouterLink } from 'vue-router'
 import L from 'leaflet'
 
@@ -13,7 +13,6 @@ const markersGroup=ref();
 
 const query=ref({});
 const stringQuery=ref("");
-
 
 onMounted( async () => {
 	if(loggedUser.token)

@@ -12,6 +12,8 @@ import cambiop from '../views/cambioPassword.vue'
 import notifiche from '../views/notifiche.vue'
 import signup from '../views/signup.vue'
 import valutap from '../views/valutaProposte.vue'
+import listachats from '../views/listaChat.vue'
+import chat from '../views/chat.vue'
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -80,6 +82,16 @@ const router = createRouter({
 		path: '/valutazioni/:idProposta',
 		name: 'valutazioni',
 		component: valutap
+	},
+	{
+		path: '/chats',
+		name: 'listachats',
+		component: listachats
+	},
+	{
+		path: '/chats/:idChat',
+		name: 'chat',
+		component: chat
 	}
   ]
 })
