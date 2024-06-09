@@ -5,7 +5,7 @@
   "main": "index.mjs",
   "scripts": {
     "start": "node index.mjs",
-    "test": "jest",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "dev": "nodemon --experimental-modules index.mjs"
   },
   "dependencies": {
@@ -28,6 +28,9 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.7",
+    "@babel/preset-env": "^7.24.7",
+    "babel-jest": "^29.7.0",
     "jest": "^29.7.0",
     "node-fetch": "^3.3.2",
     "nodemon": "^2.0.12",
@@ -35,6 +38,11 @@
   },
   "jest": {
     "verbose": true,
-    "collectCoverage": true
+    "collectCoverage": true,
+    "testEnvironment": "jest-environment-node",
+    "setupFilesAfterEnv": ["./jest.setup.js"],
+    "transform": {
+    },
+    "moduleFileExtensions": ["js", "mjs"]
   }
 }
