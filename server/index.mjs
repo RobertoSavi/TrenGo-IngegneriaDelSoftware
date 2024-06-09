@@ -5,10 +5,11 @@ import richiesteRouter from "./routes/richiesteRoutes.mjs";
 import notificheRouter from "./routes/notificheRoutes.mjs";
 import followRouter from "./routes/followRoutes.mjs";
 import valutazioniRouter from "./routes/valutazioniRoutes.mjs";
+import googleAuthRouter from "./routes/googleAuthRoutes.mjs";
+import chatRouter from "./routes/chatRoutes.mjs";
 import { notificaProposteTerminate } from "./utils/cronSchedules.mjs";
 import session from 'express-session';
 import passport from 'passport';
-import googleAuthRouter from "./routes/googleAuthRoutes.mjs";
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -57,6 +58,7 @@ connectToMongoDB()
     app.use("/api/segui", followRouter); // Route per i follow
     app.use("/api/valutazioni", valutazioniRouter); // Route per le valutazioni
     app.use("/api/utenti/auth/google", googleAuthRouter); // Route per l'autenticazione con google
+    app.use("/api/chat", chatRouter); // Route per la chat
 
     // Gestione status 404
     app.use((req, res) => {
