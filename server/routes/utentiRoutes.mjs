@@ -10,6 +10,9 @@ router.post("/signup", handlers.signupUtente);
 // Permette il login di un utente
 router.post("/login", handlers.loginUtente);
 
+// Permette di ottenere le proposte che coincidono con la query passata
+router.get("/ricerca", handlers.ricercaUtenti);
+
 // Permette di ottenere tutti gli interessi disponibili
 router.get("/interessi", handlers.getInteressi);
 
