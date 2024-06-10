@@ -42,7 +42,8 @@ async function getUtenteById(req, res) {
                 nome: utente.nome,
                 cognome: utente.cognome,
                 karma: utente.karma,
-                interessi: utente.interessi
+                interessi: utente.interessi,
+                followers: utente.followers
             });
         }
     } catch (error) {
@@ -51,7 +52,7 @@ async function getUtenteById(req, res) {
 }
 
 /**
- * Ottiene le proposte dal database in base a query specifiche.
+ * Ottiene gli utenti dal database in base a query specifiche.
  * @param {object} req - L'oggetto della richiesta.
  * @param {object} res - L'oggetto della risposta.
  */
@@ -77,9 +78,9 @@ async function ricercaUtenti(req, res) {
 			query.numeroPartecipantiDesiderato = { $lte: minKarma };
 		}
 
-		// Se l'utente è loggato restituisco le proposte cercate
+		// Se l'utente è loggato restituisco gli utenti cercati
 		if (loggedUsername) {
-			const utenti = await Utente.find(query, { password:0, _id:0, email:0, following:0, followers:0, googleId:0 });
+			const utenti = await Utente.find(query, { password:0, _id:0, email:0, following:0, googleId:0 });
 			
 			if (!utenti) {
 				return res.status(404).json({ message: "Nessun utente disponibile." });
@@ -87,10 +88,10 @@ async function ricercaUtenti(req, res) {
 
 			return res.status(200).json({ utenti });
 		}
-		// Se l'utente non è loggato restituisco solo le proposte cercate pubblicate da grandi organizzatori
+		// Se l'utente non è loggato restituisco solo gli utenti grandi organizzatori
 		else {
 			query.tipoUtente = "grandeOrganizzatore";
-			const utenti = await Utente.find(query, { password:0, _id:0, email:0, following:0, followers:0, googleId:0 });
+			const utenti = await Utente.find(query, { password:0, _id:0, email:0, following:0, googleId:0 });
 
 			if (!utenti) {
 				return res.status(404).json({ message: "Nessun utente disponibile." });
@@ -170,7 +171,8 @@ async function getUtenteByUsername(req, res) {
                         nome: utente.nome,
                         cognome: utente.cognome,
                         karma: utente.karma,
-                        interessi: utente.interessi
+                        interessi: utente.interessi,
+                        followers: utente.followers
                     }
                 });
             }
@@ -203,7 +205,8 @@ async function getUtenteByUsername(req, res) {
                     nome: utente.nome,
                     cognome: utente.cognome,
                     karma: utente.karma,
-                    interessi: utente.interessi
+                    interessi: utente.interessi,
+                    followers: utente.followers
                 }
             });
         }

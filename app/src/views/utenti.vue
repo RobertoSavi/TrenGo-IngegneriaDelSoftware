@@ -1,7 +1,8 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { loggedUser, clearLoggedUser } from '../states/loggedUser.mjs';
 import { utenti, fetchUtenteUsername } from '../states/utenti.mjs';
+import { follow, unfollow } from '../states/follow.mjs';
 import { useRoute } from 'vue-router';
 import router from '../router/index.mjs'
 
@@ -23,6 +24,32 @@ function logout()
 {
 	clearLoggedUser();
 	router.push('/');
+}
+
+var isFollower = computed(() => {
+	if (utenti.value.utente.followers.includes(loggedUser.username)) {
+		return true;
+	}
+
+	return false;
+});
+
+async function follwButton()
+{
+	fetchDone.value=false;
+	await follow(username);
+	await fetchUtenteUsername(username);
+	isFollower=true;
+	fetchDone.value=true;
+}
+
+async function unfollwButton()
+{
+	fetchDone.value=false;
+	await unfollow(username);
+	await fetchUtenteUsername(username);
+	isFollower=false;
+	fetchDone.value=true;
 }
 </script>
 
@@ -47,8 +74,11 @@ function logout()
 			<button @click="modifica(loggedUser.id)">Modifica</button>
 			<button style="margin-left: 20px;" @click="logout()">Logout</button>
 		</div>
-		<div v-else>
-			<button>Segui</button>
+		<div v-else-if="isFollower&&loggedUser.token">
+			<button @click="unfollwButton()">Smetti di seguire</button>
+		</div>
+		<div v-else-if="!isFollower&&loggedUser.token">
+			<button @click="follwButton()">Segui</button>
 		</div>
 	</div>
 	<div v-else>Loading...</div>

@@ -31,8 +31,8 @@ onMounted(() => {
 
 
 const dati = ref({
-	username: "example_username2",
-	password: "example_passworD2"
+	username: "example_username",
+	password: "example_passworD1"
 })
 
 async function loginButton() {

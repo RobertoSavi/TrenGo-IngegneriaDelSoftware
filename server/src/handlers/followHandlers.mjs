@@ -1,4 +1,5 @@
 import Utente from "../models/utenteModel.mjs";
+import Notifica from "../models/notificaModel.mjs"
 import { tipoNotificaEnum } from "../models/enums.mjs";
 
 const HOST_UTENTI = 'utenti/';

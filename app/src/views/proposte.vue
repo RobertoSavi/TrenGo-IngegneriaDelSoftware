@@ -121,7 +121,7 @@ var isIscritto = computed(() => {
 				<label>Accettare la richiesta di: </label>
 				<RouterLink :to="HOST_UTENTI + richiesta.usernameRichiedente"> {{ richiesta.usernameRichiedente }}
 				</RouterLink>?
-				<button type="button" @click="gestisciRichiestaButton(richiesta._id, true)">Accetta</button>
+				<button type="button" style="margin-right: 10px;" @click="gestisciRichiestaButton(richiesta._id, true)">Accetta</button>
 				<button type="button" @click="gestisciRichiestaButton(richiesta._id, false)">Rifiuta</button>
 			</div>
 			<div>
