@@ -1,13 +1,13 @@
 <script setup>
 import { onMounted, ref, nextTick } from 'vue';
 import { loggedUser } from '../states/loggedUser.mjs';
-import { proposte, modificaProposta, fetchPropostaId } from '../states/proposte.mjs';
+import { errori, proposte, modificaProposta, fetchPropostaId } from '../states/proposte.mjs';
 import { useRoute } from 'vue-router';
 import { interessi, getInteressi } from '../states/utenti.mjs'
 import L from 'leaflet'
 import router from '../router/index.mjs'
 
-const luogoValido = ref(false);
+const luogoValido = ref(true);
 const leafletMap = ref();
 const marker = ref();
 const route = useRoute();
@@ -24,8 +24,14 @@ const dati = ref({
 	categorie: []
 });
 const fetchDone=ref(false);
+const erroreSuccesso = ref(false)
 
 onMounted( async () => {
+	if (!loggedUser.token) {
+		router.push('/');
+		return;
+	}
+	
 	await fetchPropostaId(id)
 	
 	dati.value.titolo=proposte.value.proposta.titolo;
@@ -103,9 +109,22 @@ async function getNomeLuogo(lat, lng) {
 	}
 }
 
-function modificaProposteButton() {
-  	modificaProposta(dati.value, id)
-	router.back();
+async function modificaProposteButton() {	
+	erroreSuccesso.value = false;
+	errori.value = [];
+	
+	await modificaProposta(dati.value, id)
+	
+	if (errori.value.length == 0 && luogoValido.value) {
+		await fetchPropostaId(id);
+		router.back();
+	}
+	else {
+		if (!luogoValido.value) {
+			errori.value.push({ message: "Luogo non valido" });
+		}
+		erroreSuccesso.value = true;
+	}
 };
 
 function addCategoria(interesse)
@@ -155,6 +174,11 @@ function addCategoria(interesse)
 				{{ interesse }}
 			</span>
 		</span>
+		<div class="alert" v-if="erroreSuccesso">
+			<span class="closebtn" @click="erroreSuccesso = false">&times;</span>
+			<p>Qualcosa è andato storto:</p>
+			<p v-for="errore in errori">{{ errore.message }}</p>
+		</div>
 		<div>
 			<button type="submit">Fine</button>
 		</div>

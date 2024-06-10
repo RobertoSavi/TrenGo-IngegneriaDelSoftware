@@ -3,10 +3,11 @@ import axios from 'axios'
 import { loggedUser } from './loggedUser.mjs'
 
 const URL_API = import.meta.env.VITE_URL_API;
-const UTENTI_URL = URL_API+'/utenti/'
+const UTENTI_URL = URL_API + '/utenti/'
 
 const utenti = ref({})
 const interessi = ref({})
+const errori = ref([])
 
 async function fetchUtenteUsername(username) {
 	const response = await axios.get(UTENTI_URL + "username/" + username, { headers: { 'Token': loggedUser.token } });
@@ -31,16 +32,29 @@ async function getInteressi() {
 	interessi.value = response.data.interessi;
 }
 
-async function signup(dati){
-	await axios.post(UTENTI_URL + "signup", dati, { headers: { 'Content-Type': 'application/json' } });
+async function signup(dati) {
+	await axios.post(UTENTI_URL + "signup", dati, { headers: { 'Content-Type': 'application/json' } })
+	.catch(
+		function(error) {
+			errori.value = JSON.parse(error.response.request.response).errors;
+		}
+	);
 }
 
-async function login(dati){
-	const response = await axios.post(UTENTI_URL + "login", dati, { headers: { 'Content-Type': 'application/json' } });
+async function login(dati) {
+	const response = await axios.post(UTENTI_URL + "login", dati, { headers: { 'Content-Type': 'application/json' } })
+	.catch(
+		function(error) {
+			errori.value = JSON.parse(error.response.request.response).errors;
+			return 1;
+		}
+	);
+	
 	return response;
 }
 
 export {
+	errori,
 	utenti,
 	interessi,
 	fetchUtenteUsername,

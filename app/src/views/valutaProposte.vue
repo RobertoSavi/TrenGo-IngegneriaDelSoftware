@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch, reactive } from 'vue';
+import { onMounted, ref, reactive } from 'vue';
 import { loggedUser } from '../states/loggedUser.mjs';
 import { proposte, fetchPropostaIdValutazioni } from '../states/proposte.mjs';
 import { valutaPartecipantiByIdProposta, valutaPartecipanteByUsername } from '../states/valutazioni.mjs';
@@ -12,13 +12,17 @@ import downvote from '../public/icons/valutazioni_downvote.svg';
 
 const route = useRoute();
 const id = route.params.idProposta;
-const warningMessage = ref('');
 const fetchDone = ref(false);
 const hover = ref({ upvote: false, downvote: false });
 const hoverPartecipante = reactive([]);
 const HOST_UTENTI = "/utenti/"
 
 onMounted(async () => {
+	if (!loggedUser.token) {
+		router.push('/');
+		return;
+	}
+	
 	try {
 		await fetchPropostaIdValutazioni(id);
 		if (proposte.value.proposta) {
@@ -45,11 +49,6 @@ async function valutaPartecipanteByUsernameButton(idProposta, username, valutazi
 	await fetchPropostaIdValutazioni(id);
 	fetchDone.value = true;
 }
-
-watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
-	warningMessage.value = ''
-});
-
 </script>
 
 <template>
@@ -78,8 +77,6 @@ watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
 			<label for="data" class="campo">Data dell'evento:</label>
 			<div>{{ proposta.data }}</div>
 		</div>
-		<span style="color: red">{{ warningMessage }}</span>
-
 		<div class="partecipanti">
 			<div class="contenitoreHeader valutazioni">
 				<h2>Partecipanti:</h2>

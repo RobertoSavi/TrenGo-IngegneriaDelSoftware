@@ -8,6 +8,7 @@ const PROPOSTE_URL = URL_API + '/proposte/'
 const proposte = ref({})
 const proposteIscritto = ref({})
 const proposteTerminate = ref({})
+const errori = ref([])
 
 async function fetchProposte() {
 	const response = await axios.get(PROPOSTE_URL, { headers: { 'Token': loggedUser.token } });
@@ -57,7 +58,12 @@ async function ricercaProposte(dati) {
 }
 
 async function creaProposta(dati) {
-	await axios.post(PROPOSTE_URL, dati, { headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token } });
+	await axios.post(PROPOSTE_URL, dati, { headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token } })
+	.catch(
+		function(error) {
+			errori.value = JSON.parse(error.response.request.response).errors;
+		}
+	);
 }
 
 async function annullaPartecipazione(id) {
@@ -65,7 +71,13 @@ async function annullaPartecipazione(id) {
 }
 
 async function modificaProposta(dati, id) {
-	await axios.put(PROPOSTE_URL + id, dati, { headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token } });
+	await axios.put(PROPOSTE_URL + id, dati, { headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token } })
+	.catch(
+		function(error) {
+			console.log(error);
+			errori.value = JSON.parse(error.response.request.response).errors;
+		}
+	);
 }
 
 async function eliminaProposta(id) {
@@ -73,6 +85,7 @@ async function eliminaProposta(id) {
 }
 
 export {
+	errori,
 	proposte,
 	proposteIscritto,
 	proposteTerminate,

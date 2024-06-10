@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { interessi, getInteressi, signup, login } from '../states/utenti.mjs'
+import { errori, interessi, getInteressi, signup, login } from '../states/utenti.mjs'
 import { setLoggedUser } from '../states/loggedUser.mjs'
 import router from '../router/index.mjs'
 
@@ -12,6 +12,7 @@ const dati = ref({
 	password: "",
 	interessi: []
 });
+const erroreSuccesso = ref(false)
 
 
 onMounted(() => {
@@ -19,10 +20,21 @@ onMounted(() => {
 });
 
 async function signupButton() {
+	erroreSuccesso.value = false;
+	errori.value = [];
+	
 	await signup(dati.value);
-	const response=await login({ "username": dati.value.username, "password": dati.value.password});
-	setLoggedUser(response.data);
-	router.push('/');
+	
+	if(errori.value.length==0)
+	{
+		const response=await login({ "username": dati.value.username, "password": dati.value.password});
+		setLoggedUser(response.data);
+		router.push('/');
+	}
+	else
+	{
+		erroreSuccesso.value = true;
+	}
 }
 
 function addInteresse(interesse)
@@ -71,6 +83,11 @@ function addInteresse(interesse)
 				{{ interesse }}
 			</span>
 		</span>
+		<div class="alert" v-if="erroreSuccesso">
+			<span class="closebtn" @click="erroreSuccesso = false">&times;</span>
+			<p>Qualcosa è andato storto:</p>
+			<p v-for="errore in errori">{{ errore.message }}</p>
+		</div>
 		<div>
 			<button type="submit">Sign Up</button>
 		</div>

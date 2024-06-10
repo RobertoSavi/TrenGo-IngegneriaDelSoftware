@@ -16,6 +16,11 @@ var interessiIniziali=[];
 const fetchDone=ref(false);
 
 onMounted( async () => {
+	if (!loggedUser.token) {
+		router.push('/');
+		return;
+	}
+	
 	await fetchUtenteUsername(loggedUser.username);
 	dati.value.username=utenti.value.utente.username;
 	dati.value.interessi=utenti.value.utente.interessi;

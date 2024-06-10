@@ -8,6 +8,11 @@ import { RouterLink } from 'vue-router'
 const HOST_UTENTI = "/utenti/";
 
 onMounted(() => {
+	if (!loggedUser.token) {
+		router.push('/');
+		return;
+	}
+	
 	fetchNotifiche();
 });
 </script>

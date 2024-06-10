@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
 import { loggedUser } from '../states/loggedUser.mjs';
-import { fetchProposte, creaProposta } from '../states/proposte.mjs';
+import { errori, fetchProposte, creaProposta } from '../states/proposte.mjs';
 import { interessi, getInteressi } from '../states/utenti.mjs'
 import L from 'leaflet'
 import router from '../router/index.mjs';
@@ -10,18 +10,23 @@ const luogoValido = ref(false);
 const leafletMap = ref();
 const marker = ref();
 const dati = ref({
-	usernameCreatore: loggedUser.username,
-	creatore: loggedUser.id,
-	titolo: "",
+	titolo: "a",
 	nomeLuogo: "Selezionare dalla mappa",
 	coordinate: [],
-	numeroPartecipantiDesiderato: "",
-	descrizione: "",
+	numeroPartecipantiDesiderato: "1",
+	descrizione: "a",
 	data: "",
 	categorie: []
 });
+const erroreSuccesso = ref(false)
 
 onMounted(async () => {
+	if(!loggedUser.token)
+	{
+		router.push('/');
+		return;
+	}
+	
 	await getInteressi();
 
 	nextTick(() => {
@@ -36,20 +41,19 @@ function initLeafletMap() {
 	leafletMap.value.on('click', clickMappa);
 }
 
-async function clickMappa(e) 
-{
+async function clickMappa(e) {
 	const { lat, lng } = e.latlng;
 
 	if (marker.value) {
 		leafletMap.value.removeLayer(marker.value);
 	}
-	
+
 	await getNomeLuogo(lat, lng);
 
 	if (!luogoValido.value) {
 		return 1;
 	}
-	
+
 	marker.value = L.marker([lat, lng]).addTo(leafletMap.value);
 
 	dati.value.coordinate[0] = lat;
@@ -57,28 +61,31 @@ async function clickMappa(e)
 }
 
 async function creaProposteButton() {
-	/*if (dati.value.titolo == "" || dati.value.nomeLuogo == "" || dati.value.descrizione == "" || dati.value.numeroPartecipantiDesiderato <= 1) {
-		warningMessage.value = 'Compilare i campi'
-		return;
-	}*/
+	erroreSuccesso.value = false;
+	errori.value = [];
 
-	if (luogoValido.value) {
-		await creaProposta(dati.value);
+	await creaProposta(dati.value);
+
+	if (errori.value.length == 0 && luogoValido.value) {
 		await fetchProposte();
 		router.push('/');
 	}
+	else {
+		if (!luogoValido.value) {
+			errori.value.push({ message: "Luogo non valido" });
+		}
+		erroreSuccesso.value = true;
+	}
+
 };
 
-function addCategoria(interesse)
-{
+function addCategoria(interesse) {
 	var index = dati.value.categorie.indexOf(interesse);
-	
-	if(index>-1)
-	{
+
+	if (index > -1) {
 		dati.value.categorie.splice(index, 1);
 	}
-	else
-	{
+	else {
 		dati.value.categorie.push(interesse);
 	}
 }
@@ -146,6 +153,11 @@ async function getNomeLuogo(lat, lng) {
 				{{ interesse }}
 			</span>
 		</span>
+		<div class="alert" v-if="erroreSuccesso">
+			<span class="closebtn" @click="erroreSuccesso = false">&times;</span>
+			<p>Qualcosa è andato storto:</p>
+			<p v-for="errore in errori">{{ errore.message }}</p>
+		</div>
 		<div>
 			<button type="submit">Fine</button>
 		</div>

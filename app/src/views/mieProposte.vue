@@ -10,6 +10,11 @@ const HOST_VALUTAZIONI = "/valutazioni/"
 const warningMessage = ref('');
 
 onMounted(() => {
+	if (!loggedUser.token) {
+		router.push('/');
+		return;
+	}
+	
 	fetchProposteMie()
 	fetchProposteIscritto()
 	fetchProposteTerminate()

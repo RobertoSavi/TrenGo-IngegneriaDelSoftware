@@ -20,7 +20,8 @@ import { loggedUser } from './states/loggedUser.mjs'
 </template>
 
 <style>
-	@import 'assets/stile.css';
-	@import 'assets/stileNotifiche.css';
-	@import 'assets/chats.css';
+	@import '@/assets/stile.css';
+	@import '@/assets/stileNotifiche.css';
+	@import '@/assets/chats.css';
+	@import '@/assets/stileAlert.css';
 </style>

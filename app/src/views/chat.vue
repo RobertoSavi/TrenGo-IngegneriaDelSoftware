@@ -78,7 +78,3 @@ async function postMessaggioKey() {
 		<input type="text" placeholder="Manda un messaggio" v-model="contenuto" @keyup.enter="postMessaggioKey()"/>
 	</div>
 </template>
-
-<style>
-@import '@/assets/chats.css';
-</style>

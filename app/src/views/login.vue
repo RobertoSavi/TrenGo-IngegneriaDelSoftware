@@ -1,13 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { loggedUser, setLoggedUser } from '../states/loggedUser.mjs'
-import { login } from '../states/utenti.mjs'
+import { errori, login } from '../states/utenti.mjs'
 import { RouterLink, useRoute } from 'vue-router'
 import router from '../router/index.mjs'
 
 const URL_API = import.meta.env.VITE_URL_API;
 const URL_GOOGLE_LOGIN = URL_API + '/utenti/auth/google';
-
+const erroreSuccesso = ref(false)
 const route = useRoute()
 
 const handleRouteChange = async () => {
@@ -36,9 +36,20 @@ const dati = ref({
 })
 
 async function loginButton() {
+	erroreSuccesso.value = false;
+	errori.value = [];
+	
 	const response = await login(dati.value)
-	setLoggedUser(response.data);
-	router.push('/');
+	
+	if(errori.value.length==0)
+	{
+		setLoggedUser(response.data);
+		router.push('/');
+	}
+	else
+	{
+		erroreSuccesso.value = true;
+	}
 };
 
 async function googleLoginButton() {
@@ -58,13 +69,17 @@ async function googleLoginButton() {
 			<label>Password:</label>
 			<input type="password" v-model="dati.password" required />
 		</div>
+		<div class="alert" v-if="erroreSuccesso">
+			<span class="closebtn" @click="erroreSuccesso = false">&times;</span>
+			<p>Qualcosa è andato storto:</p>
+			<p v-for="errore in errori">{{ errore.message }}</p>
+		</div>
 		<div>
 			<button type="submit">Accedi</button>
 			<button type="button" @click="googleLoginButton()">Accedi con Google</button>
 			<RouterLink :to="'/passworddimenticata'">Password dimenticata?</RouterLink>
 			<br>
 			<RouterLink :to="'/signup'">Non hai un account?</RouterLink>
-
 		</div>
 	</form>
 </template>

@@ -168,73 +168,73 @@ async function getProposteIscritto(req, res) {
 }*/
 
 async function getPropostaById(req, res) {
-    try {
-        console.log("Inizio handler getPropostaById");
-        const { id } = req.params;
-        const { valutazioni } = req.query;
-        const proposta = await Proposta.findById(id);
-        const loggedUsername = req.utenteLoggato ? req.utenteLoggato.loggedUsername : null; // Username dell'utente loggato
+	try {
+		console.log("Inizio handler getPropostaById");
+		const { id } = req.params;
+		const { valutazioni } = req.query;
+		const proposta = await Proposta.findById(id);
+		const loggedUsername = req.utenteLoggato ? req.utenteLoggato.loggedUsername : null; // Username dell'utente loggato
 
-        if (!proposta) {
-            console.log("Proposta non trovata");
-            return res.status(400).json({ message: "Proposta non trovata" });
-        }
+		if (!proposta) {
+			console.log("Proposta non trovata");
+			return res.status(400).json({ message: "Proposta non trovata" });
+		}
 
-        // Se l'utente è loggato
-        if (loggedUsername) {
-            console.log("Utente loggato:", loggedUsername);
-            if (valutazioni === 'true') {
-                console.log("Valutazioni richieste");
-                const propostaCopy = JSON.parse(JSON.stringify(proposta)); // Crea una copia dell'oggetto proposta
-                let utentiValutabili = 0;
+		// Se l'utente è loggato
+		if (loggedUsername) {
+			console.log("Utente loggato:", loggedUsername);
+			if (valutazioni === 'true') {
+				console.log("Valutazioni richieste");
+				const propostaCopy = JSON.parse(JSON.stringify(proposta)); // Crea una copia dell'oggetto proposta
+				let utentiValutabili = 0;
 
-                if (loggedUsername === propostaCopy.usernameCreatore) {
-                    for (let i = 0; i < propostaCopy.partecipanti.length; i++) {
-                        const valutazioneEsistente = await Valutazione.findOne({ idProposta: id, usernameValutato: propostaCopy.partecipanti[i], usernameValutatore: loggedUsername });
-                        if (!valutazioneEsistente) {
-                            utentiValutabili++;
-                        }
-                        propostaCopy.partecipanti[i] = [propostaCopy.partecipanti[i], !!valutazioneEsistente];
-                    }
-                } else {
-                    propostaCopy.partecipanti = propostaCopy.partecipanti.filter(partecipante => partecipante !== loggedUsername);
-                    for (let i = 0; i < propostaCopy.partecipanti.length; i++) {
-                        const valutazioneEsistente = await Valutazione.findOne({ idProposta: id, usernameValutato: propostaCopy.partecipanti[i], usernameValutatore: loggedUsername });
-                        if (!valutazioneEsistente) {
-                            utentiValutabili++;
-                        }
-                        propostaCopy.partecipanti[i] = [propostaCopy.partecipanti[i], !!valutazioneEsistente];
-                    }
-                    const valutazioneEsistente = await Valutazione.findOne({ idProposta: id, usernameValutato: propostaCopy.usernameCreatore, usernameValutatore: loggedUsername });
-                    if (!valutazioneEsistente) {
-                        utentiValutabili++;
-                    }
-                    propostaCopy.partecipanti.push([propostaCopy.usernameCreatore, !!valutazioneEsistente]);
-                }
-                propostaCopy.utentiValutabili = utentiValutabili;
-                console.log("Risposta con proposta e valutazioni");
-                return res.status(200).json({ proposta: propostaCopy });
-            } else {
-                console.log("Risposta con proposta senza valutazioni");
-                return res.status(200).json({ proposta });
-            }
-        }
-        // Se l'utente non è loggato
-        else {
-            console.log("Utente non loggato");
-            const utenteCreatore = await Utente.findOne({ username: proposta.usernameCreatore });
-            if (utenteCreatore.tipoUtente === 'grandeOrganizzatore') {
-                console.log("Risposta con proposta per grande organizzatore");
-                return res.status(200).json({ proposta });
-            } else {
-                console.log("Non autorizzato");
-                return res.status(401).json({ message: "Non sei autorizzato a visualizzare questa proposta" });
-            }
-        }
-    } catch (error) {
-        console.error("Errore durante il recupero della proposta:", error);
-        return res.status(500).json({ message: "Errore durante il recupero della proposta", error: error.message });
-    }
+				if (loggedUsername === propostaCopy.usernameCreatore) {
+					for (let i = 0; i < propostaCopy.partecipanti.length; i++) {
+						const valutazioneEsistente = await Valutazione.findOne({ idProposta: id, usernameValutato: propostaCopy.partecipanti[i], usernameValutatore: loggedUsername });
+						if (!valutazioneEsistente) {
+							utentiValutabili++;
+						}
+						propostaCopy.partecipanti[i] = [propostaCopy.partecipanti[i], !!valutazioneEsistente];
+					}
+				} else {
+					propostaCopy.partecipanti = propostaCopy.partecipanti.filter(partecipante => partecipante !== loggedUsername);
+					for (let i = 0; i < propostaCopy.partecipanti.length; i++) {
+						const valutazioneEsistente = await Valutazione.findOne({ idProposta: id, usernameValutato: propostaCopy.partecipanti[i], usernameValutatore: loggedUsername });
+						if (!valutazioneEsistente) {
+							utentiValutabili++;
+						}
+						propostaCopy.partecipanti[i] = [propostaCopy.partecipanti[i], !!valutazioneEsistente];
+					}
+					const valutazioneEsistente = await Valutazione.findOne({ idProposta: id, usernameValutato: propostaCopy.usernameCreatore, usernameValutatore: loggedUsername });
+					if (!valutazioneEsistente) {
+						utentiValutabili++;
+					}
+					propostaCopy.partecipanti.push([propostaCopy.usernameCreatore, !!valutazioneEsistente]);
+				}
+				propostaCopy.utentiValutabili = utentiValutabili;
+				console.log("Risposta con proposta e valutazioni");
+				return res.status(200).json({ proposta: propostaCopy });
+			} else {
+				console.log("Risposta con proposta senza valutazioni");
+				return res.status(200).json({ proposta });
+			}
+		}
+		// Se l'utente non è loggato
+		else {
+			console.log("Utente non loggato");
+			const utenteCreatore = await Utente.findOne({ username: proposta.usernameCreatore });
+			if (utenteCreatore.tipoUtente === 'grandeOrganizzatore') {
+				console.log("Risposta con proposta per grande organizzatore");
+				return res.status(200).json({ proposta });
+			} else {
+				console.log("Non autorizzato");
+				return res.status(401).json({ message: "Non sei autorizzato a visualizzare questa proposta" });
+			}
+		}
+	} catch (error) {
+		console.error("Errore durante il recupero della proposta:", error);
+		return res.status(500).json({ message: "Errore durante il recupero della proposta", error: error.message });
+	}
 }
 
 /**
@@ -362,9 +362,17 @@ async function postProposta(req, res) {
 		if (!validators.validateDescrizione(descrizione))
 			errors.push({ field: "descrizione", message: "Descrizione troppo lunga" });
 
+		// Validazione della della data	
+		if (!validators.validateData(data)) {
+			errors.push({ field: "descrizione", message: "Data non valida" });
+		}
+
 		// Gestione degli errori
 		if (errors.length > 0)
 			return res.status(400).json({ message: "error", errors });
+
+		if (!categorie)
+			categorie = ["Altro"];
 
 		try {
 			// Creazione della proposta
@@ -375,13 +383,15 @@ async function postProposta(req, res) {
 			// Creo una notifica per ogni utente che segue l'utente creatore della proposta
 			utenteCreatore.followers.forEach(async follower => {
 				// Creo una notifica per il follower
-				await Notifica.create({
+				const notifica = await Notifica.create({
 					sorgente: 'System',
 					username: follower,
 					messaggio: `L'utente ${proposta.usernameCreatore} ha pubblicato una nuova proposta: ${proposta.titolo}`,
 					link: propostaUrl,
 					tipo: tipoNotificaEnum.PROPOSTA
 				});
+
+				console.log(notifica.messaggio);
 			});
 			return res.status(201).json({ self: "proposte/" + proposta._id });
 
@@ -458,7 +468,7 @@ async function annullaPartecipazioneById(req, res) {
 			await Proposta.findByIdAndUpdate(idProposta, { partecipanti: partecipanti, numeroPartecipanti: --proposta.numeroPartecipanti }, { new: true });
 
 			const chat = await Chat.findById(proposta.idChat);
-			chat.partecipanti=chat.partecipanti.filter(partecipanteUsername => partecipanteUsername !== loggedUsername);
+			chat.partecipanti = chat.partecipanti.filter(partecipanteUsername => partecipanteUsername !== loggedUsername);
 			chat.save();
 
 			return res.status(201).json({ self: "proposte/" + idProposta });
@@ -475,6 +485,7 @@ async function modifyPropostaById(req, res) {
 		const { id } = req.params;
 		const updates = req.body;
 		const loggedUsername = req.utenteLoggato ? req.utenteLoggato.loggedUsername : null; // ID dell'utente loggato
+		const errors = [];
 
 		// Se l'utente non è loggato
 		if (!loggedUsername) {
@@ -490,6 +501,34 @@ async function modifyPropostaById(req, res) {
 			if (!proposta) {
 				return res.status(404).json({ message: "Proposta non trovata" });
 			}
+
+			// Validazione delle categorie
+			if (!validators.categorieInEnum(updates.categorie))
+				errors.push({ field: "categorie", message: "Categorie non valide" });
+
+			// Validazione del titolo
+			if (!validators.validateTitolo(updates.titolo))
+				errors.push({ field: "titolo", message: "Titolo troppo lungo o troppo corto" });
+
+			// Validazione delle coordinate	
+			if (!validators.validateCoordinate(updates.coordinate))
+				errors.push({ field: "titolo", message: "Latitudine o longitudine non valide" });
+
+			// Validazione della descrizione
+			if (!validators.validateDescrizione(updates.descrizione))
+				errors.push({ field: "descrizione", message: "Descrizione troppo lunga" });
+
+			// Validazione della della data	
+			if (!validators.validateData(updates.data)) {
+				errors.push({ field: "descrizione", message: "Data non valida" });
+			}
+
+			// Gestione degli errori
+			if (errors.length > 0)
+				return res.status(400).json({ message: "error", errors });
+
+			if (!updates.categorie)
+				updates.categorie = ["Altro"];
 
 			// Permetto la modifica dei dati utente solo se il chiamante dell'API è il creatore della proposta
 			if (proposta.usernameCreatore == loggedUsername) {

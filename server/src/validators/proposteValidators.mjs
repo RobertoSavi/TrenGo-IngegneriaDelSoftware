@@ -34,11 +34,10 @@ function validateTitolo(titolo) {
  */
 function validateCoordinate(coordinate) {
 	// Utilizza una regex per verificare la lunghezza del titolo
-	if(coordinate[0]<-180||coordinate[0]>180||coordinate[1]<-180||coordinate[1]>180)
-	{
+	if (coordinate[0] < -180 || coordinate[0] > 180 || coordinate[1] < -180 || coordinate[1] > 180) {
 		return false
 	}
-	
+
 	return true
 };
 
@@ -53,10 +52,22 @@ function validateDescrizione(descrizione) {
 	return /^(?=.{0,200}$).*$/.test(descrizione);
 };
 
+/**
+ * Validatore per la data delle proposte.
+ * Verifica che la data immessa sia dopo la data corrente.
+ * @param {Date} data - La descrizione da validare.
+ * @returns {boolean} - True se la data è valida, altrimenti False.
+ */
+function validateData(data) {
+	return new Date(data) >= new Date();
+};
+
+
 export {
 	categorieInEnum,
 	validateTitolo,
 	validateCoordinate,
-	validateDescrizione
+	validateDescrizione,
+	validateData
 }
 
