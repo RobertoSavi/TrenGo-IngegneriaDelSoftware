@@ -37,8 +37,9 @@ async function follow(req, res) {
 
             // Restituisce la risposta con lo stato 200 se il follow ha successo
             utenteLoggato.following.push(username);
-            utenteLoggato.save();
+            await utenteLoggato.save();
             utente.followers.push(loggedUsername);
+            await utente.save();
 
             // Creo una notifica per l'utente seguito
             const utenteUrl = `${HOST_UTENTI}username/${loggedUsername}`;

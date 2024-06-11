@@ -4,6 +4,7 @@ import { loggedUser } from '../states/loggedUser.mjs';
 import { proposte, fetchProposte, fetchProposteNA, ricercaProposte } from '../states/proposte.mjs';
 import { RouterLink } from 'vue-router'
 import L from 'leaflet'
+import router from '../router/index.mjs'
 
 const leafletMap=ref(); 
 const HOST_PROPOSTA="/proposte/"

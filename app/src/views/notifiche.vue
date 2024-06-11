@@ -4,6 +4,7 @@ import { loggedUser } from '../states/loggedUser.mjs';
 import { notifiche, fetchNotifiche, setAllAsRead, deleteAll, readNotifica, deleteNotifica} from '../states/notifiche.mjs';
 import { statoNotificaEnum, tipoNotificaEnum } from '../../../server/src/models/enums.mjs';
 import { RouterLink } from 'vue-router'
+import router from '../router/index.mjs'
 
 const HOST_UTENTI = "/utenti/";
 
