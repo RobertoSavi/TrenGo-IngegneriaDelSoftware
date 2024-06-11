@@ -1,6 +1,6 @@
 import axios from 'axios'
-import { loggedUser } from '../states/loggedUser.mjs'
 
+const token=localStorage.getItem('token');
 const URL_API = import.meta.env.VITE_URL_API;
 const PROPOSTE_URL = URL_API+'/proposte/'
 const VALUTAZIONI_URL = URL_API+'/valutazioni/'
@@ -10,7 +10,7 @@ async function valutaPartecipantiByIdProposta(idProposta, valutazione) {
         const response = await axios.post(
             `${VALUTAZIONI_URL}${idProposta}`,
             { valutazione },
-            { headers: { 'Token': loggedUser.token } }
+            { headers: { 'Token': token } }
         );
         return response.data;
     } catch (error) {
@@ -23,7 +23,7 @@ async function valutaPartecipanteByUsername(idProposta, username, valutazione) {
         const response = await axios.post(
             `${VALUTAZIONI_URL}${idProposta}/${username}`,
             { valutazione },
-            { headers: { 'Token': loggedUser.token } }
+            { headers: { 'Token': token } }
         );
         return response.data;
     } catch (error) {

@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { errori, interessi, getInteressi, signup, login } from '../states/utenti.mjs'
-import { setLoggedUser } from '../states/loggedUser.mjs'
 import router from '../router/index.mjs'
 
 const dati = ref({
@@ -28,8 +27,11 @@ async function signupButton() {
 	if(errori.value.length==0)
 	{
 		const response=await login({ "username": dati.value.username, "password": dati.value.password});
-		setLoggedUser(response.data);
-		router.push('/');
+		localStorage.setItem('token', response.data.token);
+		localStorage.setItem('username', response.data.loggedUsername);
+		localStorage.setItem('id', response.data.id);
+		await router.push('/');
+		router.go(0);
 	}
 	else
 	{

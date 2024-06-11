@@ -1,6 +1,5 @@
 <script setup>
 import { onMounted, ref, reactive } from 'vue';
-import { loggedUser } from '../states/loggedUser.mjs';
 import { proposte, fetchPropostaIdValutazioni } from '../states/proposte.mjs';
 import { valutaPartecipantiByIdProposta, valutaPartecipanteByUsername } from '../states/valutazioni.mjs';
 import { useRoute } from 'vue-router';
@@ -10,6 +9,7 @@ import upvote from '../public/icons/valutazioni_upvote.svg';
 import downvoteBlack from '../public/icons/valutazioni_downvote_black.svg';
 import downvote from '../public/icons/valutazioni_downvote.svg';
 
+const token=localStorage.getItem('token');
 const route = useRoute();
 const id = route.params.idProposta;
 const fetchDone = ref(false);
@@ -18,7 +18,7 @@ const hoverPartecipante = reactive([]);
 const HOST_UTENTI = "/utenti/"
 
 onMounted(async () => {
-	if (!loggedUser.token) {
+	if (token==null) {
 		router.push('/');
 		return;
 	}

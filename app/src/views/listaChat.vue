@@ -1,10 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { loggedUser } from '../states/loggedUser.mjs';
 import { chats, messaggi, fetchChats, fetchMessaggioById } from '../states/chats.mjs'
 import { proposte, fetchPropostaId } from '../states/proposte.mjs';
 import router from '../router/index.mjs'
 
+const token=localStorage.getItem('token');
 const fetchDone = ref(false);
 const titoliProposte = ref([]);
 const ultimiMessaggi = ref([]);
@@ -12,7 +12,7 @@ const senders = ref([]);
 const date = ref([]);
 
 onMounted(async () => {
-	if (!loggedUser.token) {
+	if (token==null) {
 		router.push('/')
 	}
 	

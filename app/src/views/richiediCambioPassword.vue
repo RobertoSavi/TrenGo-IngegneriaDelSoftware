@@ -1,6 +1,4 @@
 <script setup>
-import {ref} from 'vue';
-import {useRoute} from 'vue-router'
 import router from '../router/index.mjs';
 import {changePasswordRequest} from '../states/utenti.mjs';
 

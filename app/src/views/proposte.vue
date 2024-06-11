@@ -1,11 +1,14 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { loggedUser } from '../states/loggedUser.mjs';
+
 import { proposte, fetchPropostaId, eliminaProposta, annullaPartecipazione } from '../states/proposte.mjs';
 import { RouterLink, useRoute } from 'vue-router';
 import { richieste, fetchRichieste, creaRichiesta, gestisciRichiesta, annullaRichiesta } from '../states/richieste.mjs';
 import router from '../router/index.mjs'
 
+const token = localStorage.getItem('token');
+const loggedUsername = localStorage.getItem('username')
+const loggedId = localStorage.getItem('id');
 const route = useRoute();
 const id = route.params.id;
 const HOST_UTENTI = "/utenti/";
@@ -30,7 +33,7 @@ async function eliminaPropostaButton() {
 }
 
 async function inviaRichiestaButton() {
-	const dati = ref({ 'usernameRichiedente': loggedUser.username });
+	const dati = ref({ 'usernameRichiedente': loggedUsername });
 	await creaRichiesta(dati.value, id);
 
 	fetchDone.value = false;
@@ -72,7 +75,7 @@ async function gestisciRichiestaButton(idRichiesta, acc) {
 
 var isRichiedente = computed(() => {
 	for (var index in richieste.value) {
-		if (richieste.value[index].usernameRichiedente == loggedUser.username) {
+		if (richieste.value[index].usernameRichiedente == loggedUsername) {
 			return true;
 		}
 	}
@@ -82,7 +85,7 @@ var isRichiedente = computed(() => {
 });
 
 var isIscritto = computed(() => {
-	return proposte.value.proposta.partecipanti.includes(loggedUser.username);
+	return proposte.value.proposta.partecipanti.includes(loggedUsername);
 });
 </script>
 
@@ -121,6 +124,7 @@ var isIscritto = computed(() => {
 				<h2>Partecipanti:</h2>
 			</div>
 			<div v-if="proposta.partecipanti.length == 0">Ancora nessun partecipante</div>
+			<div v-if="proposta.partecipanti.length == 0">Ancora nessun partecipante</div>
 			<ul v-else>
 				<li v-for="partecipante in proposta.partecipanti">
 					<div class="contenitorePartecipante">
@@ -129,7 +133,8 @@ var isIscritto = computed(() => {
 				</li>
 			</ul>
 		</div>
-		<div v-if="proposta.usernameCreatore == loggedUser.username && loggedUser.username">
+		<div v-if="proposta.usernameCreatore == loggedUsername && token != null">
+
 			<div v-for="richiesta in richieste">
 				<label>Accettare la richiesta di: </label>
 				<RouterLink :to="HOST_UTENTI + richiesta.usernameRichiedente"> {{ richiesta.usernameRichiedente }}
@@ -143,7 +148,7 @@ var isIscritto = computed(() => {
 				<button style="margin-left: 20px;" @click="eliminaPropostaButton()">Elimina</button>
 			</div>
 		</div>
-		<div v-else-if="proposta.usernameCreatore != loggedUser.username && loggedUser.username">
+		<div v-else-if="proposta.usernameCreatore != loggedUsername && token != null">
 			<button type="button" @click="annullaPartecipazioneButton()" v-if="isIscritto">Annulla
 				partecipazione</button>
 			<button v-for="richiesta in richieste" type="button" @click="annullaRichiestaButton(richiesta._id)"

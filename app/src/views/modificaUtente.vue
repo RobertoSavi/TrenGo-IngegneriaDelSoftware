@@ -1,11 +1,11 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { errori, utenti, interessi, fetchUtenteUsername, getInteressi, modificaUtente } from '../states/utenti.mjs'
-
-import { loggedUser } from '../states/loggedUser.mjs'
 import router from '../router/index.mjs'
 
-const id=loggedUser.id;
+const token=localStorage.getItem('token');
+const loggedUsername=localStorage.getItem('username')
+const loggedId=localStorage.getItem('id');
 const dati = ref({
 	username: "",
 	interessi: []
@@ -14,12 +14,12 @@ const erroreSuccesso = ref(false)
 const fetchDone=ref(false);
 
 onMounted( async () => {
-	if (!loggedUser.token) {
+	if (token==null) {
 		router.push('/');
 		return;
 	}
 	
-	await fetchUtenteUsername(loggedUser.username);
+	await fetchUtenteUsername(loggedUsername);
 	dati.value.username=utenti.value.utente.username;
 	dati.value.interessi=utenti.value.utente.interessi;
 		
@@ -32,11 +32,11 @@ async function modificaButton() {
 	erroreSuccesso.value = false;
 	errori.value = [];
 	
-	await modificaUtente(dati.value, id);
+	await modificaUtente(dati.value, loggedId);
 	
 	if (errori.value.length == 0) {
-		loggedUser.username=dati.value.username;
-		router.push('/utenti/'+loggedUser.username);
+		localStorage.setItem('username', dati.value.username);
+		router.push('/utenti/'+localStorage.getItem('username'));
 	}
 	else {
 		erroreSuccesso.value = true;

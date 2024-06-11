@@ -1,11 +1,11 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
-import { loggedUser } from '../states/loggedUser.mjs';
 import { errori, fetchProposte, creaProposta } from '../states/proposte.mjs';
 import { interessi, getInteressi } from '../states/utenti.mjs'
 import L from 'leaflet'
 import router from '../router/index.mjs';
 
+const token=localStorage.getItem('token');
 const luogoValido = ref(false);
 const leafletMap = ref();
 const marker = ref();
@@ -21,7 +21,7 @@ const dati = ref({
 const erroreSuccesso = ref(false)
 
 onMounted(async () => {
-	if(!loggedUser.token)
+	if(token==null)
 	{
 		router.push('/');
 		return;
@@ -64,7 +64,8 @@ async function creaProposteButton() {
 	erroreSuccesso.value = false;
 	errori.value = [];
 
-	await creaProposta(dati.value);
+	if(luogoValido.value)
+		await creaProposta(dati.value);
 
 	if (errori.value.length == 0 && luogoValido.value) {
 		await fetchProposte();
