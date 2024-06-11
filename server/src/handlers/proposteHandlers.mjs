@@ -222,7 +222,7 @@ async function postProposta(req, res) {
 
 		// Validazione delle coordinate	
 		if (!validators.validateCoordinate(coordinate))
-			errors.push({ field: "titolo", message: "Latitudine o longitudine non valide" });
+			errors.push({ field: "coordinate", message: "Latitudine o longitudine non valide" });
 
 		// Validazione della descrizione
 		if (!validators.validateDescrizione(descrizione))
@@ -230,7 +230,7 @@ async function postProposta(req, res) {
 
 		// Validazione della della data	
 		if (!validators.validateData(data)) {
-			errors.push({ field: "descrizione", message: "Data non valida" });
+			errors.push({ field: "data", message: "Data non valida" });
 		}
 
 		// Gestione degli errori

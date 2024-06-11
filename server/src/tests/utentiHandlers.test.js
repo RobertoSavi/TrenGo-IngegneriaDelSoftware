@@ -16,14 +16,9 @@ import app from '../../app.mjs';
 import validators from "../validators/utentiValidators.mjs";
 import Utente from '../models/utenteModel.mjs';
 import tokenChecker from '../middlewares/tokenChecker.mjs';
-import { sendResetPasswordMail } from '../services/emailService.mjs';
-import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
-
-
-
 
 describe('utentiHandlers', () => {
 
@@ -63,7 +58,7 @@ describe('utentiHandlers', () => {
         googleId: null,
         following: [],
         followers: [],
-        interessi: ['Altro'],
+        interessi: ['Altro', 'Cucina'],
     };
 
     const grandeOrganizzatore = {
@@ -151,7 +146,7 @@ describe('utentiHandlers', () => {
             expect(response.status).toBe(400);
             expect(response.body).toEqual({
                 message: "error",
-                errors: [{ field: 'username', message: 'Username non valido' }],
+                errors: [{ field: 'username', message: 'L\'username deve essere lungo tra 3 e 20 caratteri e può contenere solo caratteri alfanumerici, underscore e punto' }],
             });
         });
 
@@ -190,7 +185,7 @@ describe('utentiHandlers', () => {
             expect(response.status).toBe(400);
             expect(response.body).toEqual({
                 message: "error",
-                errors: [{ field: 'password', message: 'Password non valida' }],
+                errors: [{ field: 'password', message: 'La password deve essere lunga almeno 8 caratteri e contenere almeno una lettera maiuscola, una minuscola, un numero e un carattere speciale' }],
             });
         });
 
@@ -273,8 +268,13 @@ describe('utentiHandlers', () => {
 
             expect(response.status).toBe(401);
             expect(response.body).toEqual({
-                success: false,
-                message: 'Utente non trovato',
+                "errors": [
+                    {
+                        "field": "username",
+                        "message": "Utente non esistente",
+                    },
+                ],
+                "message": "error",
             });
         });
 
@@ -290,8 +290,13 @@ describe('utentiHandlers', () => {
 
             expect(response.status).toBe(401);
             expect(response.body).toEqual({
-                success: false,
-                message: 'Password sbagliata',
+                "errors": [
+                    {
+                        "field": "password",
+                        "message": "Password errata",
+                    },
+                ],
+                "message": "error",
             });
         });
 
@@ -402,12 +407,13 @@ describe('utentiHandlers', () => {
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual({
-                username: 'utenteTest2',
-                tipoUtente: 'autenticato',
-                nome: 'utente2',
-                cognome: 'test2',
-                karma: 1,
-                interessi: ['Sport'],
+                username: otherUser.username,
+                tipoUtente: otherUser.tipoUtente,
+                nome: otherUser.nome,
+                cognome: otherUser.cognome,
+                followers: otherUser.followers,
+                karma: otherUser.karma,
+                interessi: otherUser.interessi
             });
         });
 
@@ -433,7 +439,7 @@ describe('utentiHandlers', () => {
         test('Dovrebbe restituire errore se nessun token è fornito', async () => {
             const response = await request(app)
                 .put(`/api/utenti/${loggedUser._id}`)
-                .send({ nome: updatedUser.nome });
+                .send({ interessi: updatedUser.interessi });
 
             expect(response.status).toBe(401);
             expect(response.body).toEqual({
@@ -448,7 +454,7 @@ describe('utentiHandlers', () => {
             const response = await request(app)
                 .put(`/api/utenti/${loggedUser._id}`)
                 .set('Token', token)
-                .send({ nome: updatedUser.nome });
+                .send({ interessi: updatedUser.interessi });
 
             expect(response.status).toBe(404);
             expect(response.body).toEqual({ message: "Utente non trovato" });
@@ -460,7 +466,7 @@ describe('utentiHandlers', () => {
             const response = await request(app)
                 .put(`/api/utenti/${otherUser._id}`)
                 .set('Token', token)
-                .send({ nome: updatedUser.nome });
+                .send({ interessi: updatedUser.interessi });
 
             expect(response.status).toBe(403);
             expect(response.body).toEqual({ message: "Impossibile modificare account altrui" });
@@ -472,7 +478,7 @@ describe('utentiHandlers', () => {
             const response = await request(app)
                 .put(`/api/utenti/${loggedUser._id}`)
                 .set('Token', token)
-                .send({ nome: updatedUser.nome });
+                .send({ interessi: updatedUser.interessi });
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual({ self: `utenti/${loggedUser._id}` });
@@ -486,7 +492,7 @@ describe('utentiHandlers', () => {
             const response = await request(app)
                 .put(`/api/utenti/${loggedUser._id}`)
                 .set('Token', token)
-                .send({ nome: updatedUser.nome });
+                .send({ interessi: updatedUser.interessi });
 
             expect(response.status).toBe(500);
             expect(response.body).toEqual({
@@ -518,6 +524,7 @@ describe('utentiHandlers', () => {
                     tipoUtente: grandeOrganizzatore.tipoUtente,
                     nome: grandeOrganizzatore.nome,
                     cognome: grandeOrganizzatore.cognome,
+                    followers: grandeOrganizzatore.followers,
                     karma: grandeOrganizzatore.karma,
                     interessi: grandeOrganizzatore.interessi
                 }
@@ -573,6 +580,7 @@ describe('utentiHandlers', () => {
                     tipoUtente: otherUser.tipoUtente,
                     nome: otherUser.nome,
                     cognome: otherUser.cognome,
+                    followers: otherUser.followers,
                     karma: otherUser.karma,
                     interessi: otherUser.interessi
                 }

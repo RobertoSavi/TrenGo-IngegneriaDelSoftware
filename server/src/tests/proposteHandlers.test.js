@@ -9,8 +9,6 @@ import Notifica from '../models/notificaModel.mjs';
 import Chat from '../models/chatModel.mjs';
 import { tipoNotificaEnum } from '../models/enums.mjs';
 import tokenChecker from '../middlewares/tokenChecker.mjs';
-import { sendResetPasswordMail } from '../services/emailService.mjs';
-import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -31,21 +29,6 @@ describe('proposteHandlers', () => {
         following: [],
         followers: ['utenteTest2'],
         interessi: ['Altro'],
-    };
-
-    const otherUser = {
-        _id: '543210',
-        nome: 'utente2',
-        cognome: 'test2',
-        email: 'utente2.test@testing.com',
-        password: 'utentePassword2@',
-        username: 'utenteTest2',
-        karma: 1,
-        tipoUtente: 'autenticato',
-        googleId: null,
-        following: [],
-        followers: [],
-        interessi: ['Sport'],
     };
 
     const grandeOrganizzatore = {
@@ -70,7 +53,7 @@ describe('proposteHandlers', () => {
         coordinate: { lat: 45.0, lon: 9.0 },
         descrizione: 'Descrizione della proposta',
         numeroPartecipantiDesiderato: 10,
-        data: new Date().toDateString(),
+        data: new Date(new Date().setDate(new Date().getDate() + 1)).toDateString(),
 
     };
     const propostaByLoggedUser = {
@@ -85,7 +68,7 @@ describe('proposteHandlers', () => {
         _id: '678910',
         titolo: 'Proposta di utenteTest2',
         descrizione: 'Descrizione della proposta',
-        data: new Date().toDateString(),
+        data: new Date(new Date().setDate(new Date().getDate() + 1)).toDateString(),
         nomeLuogo: 'Park',
         coordinate: { lat: 45.0, lon: 9.0 },
         usernameCreatore: 'utenteTest2',
@@ -99,7 +82,7 @@ describe('proposteHandlers', () => {
         _id: '098765',
         titolo: 'Proposta di grandeOrganizzatore',
         descrizione: 'Descrizione della proposta',
-        data: new Date().toDateString(),
+        data: new Date(new Date().setDate(new Date().getDate() + 1)).toDateString(),
         nomeLuogo: 'Park',
         coordinate: { lat: 45.0, lon: 9.0 },
         usernameCreatore: 'grandeOrganizzatore',
@@ -109,7 +92,6 @@ describe('proposteHandlers', () => {
     };
 
     const token = 'sampleToken';
-    const token2 = 'sampleToken2';
 
     describe('GET /api/proposte', () => {
 
@@ -303,6 +285,7 @@ describe('proposteHandlers', () => {
             jest.spyOn(validators, 'validateTitolo').mockReturnValue(true);
             jest.spyOn(validators, 'validateCoordinate').mockReturnValue(true);
             jest.spyOn(validators, 'validateDescrizione').mockReturnValue(true);
+            jest.spyOn(validators, 'validateData').mockReturnValue(true);
             jest.spyOn(Proposta, 'create');
             jest.spyOn(Chat, 'create');
             jest.spyOn(Proposta, 'findByIdAndUpdate');
@@ -365,7 +348,7 @@ describe('proposteHandlers', () => {
             expect(response.status).toBe(400);
             expect(response.body).toEqual({
                 message: 'error',
-                errors: [{ field: 'titolo', message: 'Latitudine o longitudine non valide' }],
+                errors: [{ field: 'coordinate', message: 'Latitudine o longitudine non valide' }],
             });
         });
 
@@ -387,11 +370,31 @@ describe('proposteHandlers', () => {
             });
         });
 
+        test('Dovrebbe restituire 400 per data non valida', async () => {
+            validators.categorieInEnum.mockReturnValue(true);
+            validators.validateTitolo.mockReturnValue(true);
+            validators.validateCoordinate.mockReturnValue(true);
+            validators.validateDescrizione.mockReturnValue(true);
+            validators.validateData.mockReturnValue(false);
+
+            const response = await request(app)
+                .post('/api/proposte')
+                .set('Token', token)
+                .send(propostaByLoggedUser);
+
+            expect(response.status).toBe(400);
+            expect(response.body).toEqual({
+                message: 'error',
+                errors: [{ field: 'data', message: 'Data non valida' }],
+            });
+        });
+
         test('Dovrebbe creare una nuova proposta se i dati sono validi', async () => {
             validators.categorieInEnum.mockReturnValue(true);
             validators.validateTitolo.mockReturnValue(true);
             validators.validateCoordinate.mockReturnValue(true);
             validators.validateDescrizione.mockReturnValue(true);
+            validators.validateData.mockReturnValue(true);
             Proposta.create.mockResolvedValue({ ...newProposta, _id: '12345' });
             Proposta.findByIdAndUpdate.mockResolvedValue({ ...propostaByLoggedUser, _id: '12345' });
             Chat.create.mockResolvedValue({ _id: 'chat123', partecipanti: [loggedUser.username], idProposta: '12345', messaggi: [] });
@@ -413,6 +416,7 @@ describe('proposteHandlers', () => {
             validators.validateTitolo.mockReturnValue(true);
             validators.validateCoordinate.mockReturnValue(true);
             validators.validateDescrizione.mockReturnValue(true);
+            validators.validateData.mockReturnValue(true);
 
             const proposta = {
                 ...propostaByLoggedUser,
@@ -445,6 +449,7 @@ describe('proposteHandlers', () => {
             validators.validateTitolo.mockReturnValue(true);
             validators.validateCoordinate.mockReturnValue(true);
             validators.validateDescrizione.mockReturnValue(true);
+            validators.validateData.mockReturnValue(true);
             Proposta.create.mockRejectedValue(new Error('Database error'));
 
             const response = await request(app)
@@ -459,6 +464,5 @@ describe('proposteHandlers', () => {
             });
         });
     });
-
 });
 

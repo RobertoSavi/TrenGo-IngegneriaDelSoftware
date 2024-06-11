@@ -113,13 +113,22 @@ async function updateUtenteById(req, res) {
 		const { id } = req.params;
 		var updates = req.body;
 		const loggedId = req.utenteLoggato ? req.utenteLoggato.loggedId : null; // ID dell'utente loggato (se presente)
+		const loggedUsername = req.utenteLoggato ? req.utenteLoggato.loggedUsername : null; // Username dell'utente loggato (se presente)
 		const errors = [];
+
+		// Se l'utente non è loggato
+		if (!loggedId) {
+			return res.status(401).send({
+				success: false,
+				message: 'Nessun token fornito.'
+			});
+		}
 
 		// Validazione dello username
 		if (!validators.isUsernameValid(updates.username))
 			errors.push({ field: "username", message: "Username troppo corto" });
 
-		if (updates.username != req.utenteLoggato.loggedUsername) {
+		if (updates.username != loggedUsername) {
 			// Verifica se lo username è già in uso
 			if (await validators.isUsernameTaken(updates.username)){
 				errors.push({ field: "username", message: "Username già in uso" });
@@ -135,13 +144,6 @@ async function updateUtenteById(req, res) {
 			updates.interessi = ["Altro"];
 		}
 
-		// Se l'utente non è loggato
-		if (!loggedId) {
-			return res.status(401).send({
-				success: false,
-				message: 'Nessun token fornito.'
-			});
-		}
 		else {
 			// Aggiorna il documento utente con tutti i campi forniti nel corpo della richiesta
 			const utente = await Utente.findByIdAndUpdate(id, updates, { new: true });
@@ -249,7 +251,7 @@ async function signupUtente(req, res) {
 
 		// Validazione dello username
 		if (!validators.isUsernameValid(username))
-			errors.push({ field: "username", message: "Username troppo corto" });
+			errors.push({ field: "username", message: "L'username deve essere lungo tra 3 e 20 caratteri e può contenere solo caratteri alfanumerici, underscore e punto" });
 
 		// Validazione dell'email
 		if (!validators.isEmailValid(email))
