@@ -93,7 +93,7 @@ describe('proposteHandlers', () => {
 
     const token = 'sampleToken';
 
-    describe('GET /api/proposte', () => {
+    describe('GET /apiv2/proposte', () => {
 
         beforeEach(() => {
             jest.clearAllMocks();
@@ -105,7 +105,7 @@ describe('proposteHandlers', () => {
             Proposta.find.mockResolvedValue([propostaByLoggedUser]);
 
             const response = await request(app)
-                .get('/api/proposte')
+                .get('/apiv2/proposte')
                 .set('Token', token)
                 .query({ mie: 'true' });
 
@@ -117,7 +117,7 @@ describe('proposteHandlers', () => {
             Proposta.find.mockResolvedValue([propostaByLoggedUser]);
 
             const response = await request(app)
-                .get('/api/proposte')
+                .get('/apiv2/proposte')
                 .set('Token', token)
                 .query({ iscritto: 'true' });
 
@@ -133,7 +133,7 @@ describe('proposteHandlers', () => {
             Proposta.find.mockResolvedValue([propostaByLoggedUser]);
 
             const response = await request(app)
-                .get('/api/proposte')
+                .get('/apiv2/proposte')
                 .set('Token', token)
                 .query({ terminate: 'true' });
 
@@ -145,7 +145,7 @@ describe('proposteHandlers', () => {
             Proposta.find.mockResolvedValue([]);
 
             const response = await request(app)
-                .get('/api/proposte')
+                .get('/apiv2/proposte')
                 .set('Token', token);
 
             expect(response.status).toBe(200);
@@ -157,7 +157,7 @@ describe('proposteHandlers', () => {
             Proposta.find.mockResolvedValue([propostaByGrandeOrganizzatore]);
 
             const response = await request(app)
-                .get('/api/proposte');
+                .get('/apiv2/proposte');
 
             expect(response.status).toBe(200);
             expect(response.body.proposte).toEqual([propostaByGrandeOrganizzatore]);
@@ -167,7 +167,7 @@ describe('proposteHandlers', () => {
             Proposta.find.mockRejectedValue(new Error('Database error'));
 
             const response = await request(app)
-                .get('/api/proposte')
+                .get('/apiv2/proposte')
                 .set('Token', token);
 
             expect(response.status).toBe(500);
@@ -180,7 +180,7 @@ describe('proposteHandlers', () => {
 
     });
 
-    describe('GET /api/proposte/:id', () => {
+    describe('GET /apiv2/proposte/:id', () => {
         beforeEach(() => {
             jest.clearAllMocks();
             jest.spyOn(Proposta, 'findById');
@@ -192,7 +192,7 @@ describe('proposteHandlers', () => {
             Proposta.findById.mockResolvedValue(propostaByLoggedUser);
 
             const response = await request(app)
-                .get(`/api/proposte/${propostaByLoggedUser._id}`)
+                .get(`/apiv2/proposte/${propostaByLoggedUser._id}`)
                 .set('Token', token);
 
             expect(response.status).toBe(200);
@@ -203,7 +203,7 @@ describe('proposteHandlers', () => {
             Proposta.findById.mockResolvedValue(null);
 
             const response = await request(app)
-                .get(`/api/proposte/${propostaByLoggedUser._id}`)
+                .get(`/apiv2/proposte/${propostaByLoggedUser._id}`)
                 .set('Token', token);
 
             expect(response.status).toBe(400);
@@ -215,7 +215,7 @@ describe('proposteHandlers', () => {
             Valutazione.findOne.mockResolvedValue(null);
 
             const response = await request(app)
-                .get(`/api/proposte/${propostaByLoggedUser._id}`)
+                .get(`/apiv2/proposte/${propostaByLoggedUser._id}`)
                 .set('Token', token)
                 .query({ valutazioni: 'true' });
 
@@ -229,7 +229,7 @@ describe('proposteHandlers', () => {
             Valutazione.findOne.mockResolvedValue(null);
 
             const response = await request(app)
-                .get(`/api/proposte/${propostaByOtherUser._id}`)
+                .get(`/apiv2/proposte/${propostaByOtherUser._id}`)
                 .set('Token', token)
                 .query({ valutazioni: 'true' });
 
@@ -244,7 +244,7 @@ describe('proposteHandlers', () => {
             Utente.findOne.mockResolvedValue(grandeOrganizzatore);
 
             const response = await request(app)
-                .get(`/api/proposte/${propostaByLoggedUser._id}`);
+                .get(`/apiv2/proposte/${propostaByLoggedUser._id}`);
 
             expect(response.status).toBe(200);
             expect(response.body.proposta).toEqual(propostaByLoggedUser);
@@ -255,7 +255,7 @@ describe('proposteHandlers', () => {
             Utente.findOne.mockResolvedValue(loggedUser);
 
             const response = await request(app)
-                .get(`/api/proposte/${propostaByLoggedUser._id}`);
+                .get(`/apiv2/proposte/${propostaByLoggedUser._id}`);
 
             expect(response.status).toBe(401);
             expect(response.body).toEqual({ message: "Non sei autorizzato a visualizzare questa proposta" });
@@ -265,7 +265,7 @@ describe('proposteHandlers', () => {
             Proposta.findById.mockRejectedValue(new Error('Database error'));
 
             const response = await request(app)
-                .get(`/api/proposte/${propostaByLoggedUser._id}`)
+                .get(`/apiv2/proposte/${propostaByLoggedUser._id}`)
                 .set('Token', token);
 
             expect(response.status).toBe(500);
@@ -276,7 +276,7 @@ describe('proposteHandlers', () => {
         });
     });
 
-    describe('POST /api/proposte', () => {
+    describe('POST /apiv2/proposte', () => {
 
         beforeEach(() => {
             jest.clearAllMocks();
@@ -294,7 +294,7 @@ describe('proposteHandlers', () => {
 
         test('Dovrebbe restituire 401 se l\'utente non è loggato', async () => {
             const response = await request(app)
-                .post('/api/proposte')
+                .post('/apiv2/proposte')
                 .send(propostaByLoggedUser);
 
             expect(response.status).toBe(401);
@@ -308,7 +308,7 @@ describe('proposteHandlers', () => {
             validators.categorieInEnum.mockReturnValue(false);
 
             const response = await request(app)
-                .post('/api/proposte')
+                .post('/apiv2/proposte')
                 .set('Token', token)
                 .send(propostaByLoggedUser);
 
@@ -324,7 +324,7 @@ describe('proposteHandlers', () => {
             validators.validateTitolo.mockReturnValue(false);
 
             const response = await request(app)
-                .post('/api/proposte')
+                .post('/apiv2/proposte')
                 .set('Token', token)
                 .send(propostaByLoggedUser);
 
@@ -341,7 +341,7 @@ describe('proposteHandlers', () => {
             validators.validateCoordinate.mockReturnValue(false);
 
             const response = await request(app)
-                .post('/api/proposte')
+                .post('/apiv2/proposte')
                 .set('Token', token)
                 .send(propostaByLoggedUser);
 
@@ -359,7 +359,7 @@ describe('proposteHandlers', () => {
             validators.validateDescrizione.mockReturnValue(false);
 
             const response = await request(app)
-                .post('/api/proposte')
+                .post('/apiv2/proposte')
                 .set('Token', token)
                 .send(propostaByLoggedUser);
 
@@ -378,7 +378,7 @@ describe('proposteHandlers', () => {
             validators.validateData.mockReturnValue(false);
 
             const response = await request(app)
-                .post('/api/proposte')
+                .post('/apiv2/proposte')
                 .set('Token', token)
                 .send(propostaByLoggedUser);
 
@@ -400,7 +400,7 @@ describe('proposteHandlers', () => {
             Chat.create.mockResolvedValue({ _id: 'chat123', partecipanti: [loggedUser.username], idProposta: '12345', messaggi: [] });
 
             const response = await request(app)
-                .post('/api/proposte')
+                .post('/apiv2/proposte')
                 .set('Token', token)
                 .send(newProposta);
 
@@ -428,7 +428,7 @@ describe('proposteHandlers', () => {
             Chat.create.mockResolvedValue({ _id: 'chat123', partecipanti: [loggedUser.username], idProposta: '12345', messaggi: [] });
 
             await request(app)
-                .post('/api/proposte')
+                .post('/apiv2/proposte')
                 .set('Token', token)
                 .send(newProposta);
 
@@ -453,7 +453,7 @@ describe('proposteHandlers', () => {
             Proposta.create.mockRejectedValue(new Error('Database error'));
 
             const response = await request(app)
-                .post('/api/proposte')
+                .post('/apiv2/proposte')
                 .set('Token', token)
                 .send(propostaByLoggedUser);
 

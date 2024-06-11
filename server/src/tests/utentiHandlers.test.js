@@ -97,7 +97,7 @@ describe('utentiHandlers', () => {
         jest.clearAllMocks(); // Reset all mocks
     });
 
-    describe('POST /api/utenti/signup', () => {
+    describe('POST /apiv2/utenti/signup', () => {
         jest.spyOn(Utente, 'create').mockResolvedValue({
             _id: '012345',
             nome: 'utente',
@@ -113,7 +113,7 @@ describe('utentiHandlers', () => {
             interessi: ['Altro'],
         });
         test('Dovrebbe registrare un nuovo utente con successo', async () => {
-            const response = await request(app).post('/api/utenti/signup').send({
+            const response = await request(app).post('/apiv2/utenti/signup').send({
                 nome: 'utente',
                 cognome: 'test',
                 email: 'utente.test@testing.com',
@@ -135,7 +135,7 @@ describe('utentiHandlers', () => {
         test('Dovrebbe restituire errore per username non valido', async () => {
             validators.isUsernameValid.mockReturnValue(false);
 
-            const response = await request(app).post('/api/utenti/signup').send({
+            const response = await request(app).post('/apiv2/utenti/signup').send({
                 nome: 'utente',
                 cognome: 'test',
                 email: 'utente.test@testing.com',
@@ -154,7 +154,7 @@ describe('utentiHandlers', () => {
             validators.isUsernameValid.mockReturnValue(true);
             validators.isEmailValid.mockReturnValue(false);
 
-            const response = await request(app).post('/api/utenti/signup').send({
+            const response = await request(app).post('/apiv2/utenti/signup').send({
                 nome: 'utente',
                 cognome: 'test',
                 email: 'invalidEmail',
@@ -174,7 +174,7 @@ describe('utentiHandlers', () => {
             validators.isEmailValid.mockReturnValue(true);
             validators.isPasswordValid.mockReturnValue(false);
 
-            const response = await request(app).post('/api/utenti/signup').send({
+            const response = await request(app).post('/apiv2/utenti/signup').send({
                 nome: 'utente',
                 cognome: 'test',
                 email: 'utente.test@testing.com',
@@ -195,7 +195,7 @@ describe('utentiHandlers', () => {
             validators.isPasswordValid.mockReturnValue(true);
             validators.isUsernameTaken.mockResolvedValue(true);
 
-            const response = await request(app).post('/api/utenti/signup').send({
+            const response = await request(app).post('/apiv2/utenti/signup').send({
                 nome: 'utente',
                 cognome: 'test',
                 email: 'utente.test@testing.com',
@@ -217,7 +217,7 @@ describe('utentiHandlers', () => {
             validators.isUsernameTaken.mockResolvedValue(false);
             validators.isEmailTaken.mockResolvedValue(true);
 
-            const response = await request(app).post('/api/utenti/signup').send({
+            const response = await request(app).post('/apiv2/utenti/signup').send({
                 nome: 'utente',
                 cognome: 'test',
                 email: 'utente.test@testing.com',
@@ -240,7 +240,7 @@ describe('utentiHandlers', () => {
             validators.isEmailTaken.mockResolvedValue(false);
             Utente.create.mockRejectedValue(new Error('Database error'));
 
-            const response = await request(app).post('/api/utenti/signup').send({
+            const response = await request(app).post('/apiv2/utenti/signup').send({
                 nome: 'utente',
                 cognome: 'test',
                 email: 'utente.test@testing.com',
@@ -257,11 +257,11 @@ describe('utentiHandlers', () => {
 
     });
 
-    describe('POST /api/utenti/login', () => {
+    describe('POST /apiv2/utenti/login', () => {
         test('Dovrebbe restituire errore per utente non trovato', async () => {
             validators.getUtente.mockResolvedValue(null);
 
-            const response = await request(app).post('/api/utenti/login').send({
+            const response = await request(app).post('/apiv2/utenti/login').send({
                 username: 'nonEsiste',
                 password: 'passwordQualsiasi',
             });
@@ -283,7 +283,7 @@ describe('utentiHandlers', () => {
             validators.getUtente.mockResolvedValue(mockUtente);
             validators.verifyPasswordByUsername.mockResolvedValue(false);
 
-            const response = await request(app).post('/api/utenti/login').send({
+            const response = await request(app).post('/apiv2/utenti/login').send({
                 username: 'utenteTest',
                 password: 'passwordSbagliata',
             });
@@ -305,7 +305,7 @@ describe('utentiHandlers', () => {
             validators.getUtente.mockResolvedValue(mockUtente);
             validators.verifyPasswordByUsername.mockResolvedValue(true);
 
-            const response = await request(app).post('/api/utenti/login').send({
+            const response = await request(app).post('/apiv2/utenti/login').send({
                 username: 'utenteTest',
                 password: 'passwordCorretta',
             });
@@ -323,7 +323,7 @@ describe('utentiHandlers', () => {
         test('Dovrebbe restituire errore del server durante il login', async () => {
             validators.getUtente.mockRejectedValue(new Error('Database error'));
 
-            const response = await request(app).post('/api/utenti/login').send({
+            const response = await request(app).post('/apiv2/utenti/login').send({
                 username: 'utenteTest',
                 password: 'passwordCorretta',
             });
@@ -336,7 +336,7 @@ describe('utentiHandlers', () => {
         });
     });
 
-    describe('GET /api/utenti/:id', () => {
+    describe('GET /apiv2/utenti/:id', () => {
         beforeEach(() => {
             jest.clearAllMocks();
 
@@ -358,7 +358,7 @@ describe('utentiHandlers', () => {
         });
 
         test('Dovrebbe restituire errore se nessun token è fornito', async () => {
-            const response = await request(app).get(`/api/utenti/${loggedUser._id}`);
+            const response = await request(app).get(`/apiv2/utenti/${loggedUser._id}`);
 
             expect(response.status).toBe(401);
             expect(response.body).toEqual({
@@ -369,7 +369,7 @@ describe('utentiHandlers', () => {
 
         test('Dovrebbe restituire le informazioni complete dell\'utente se l\'utente cercato è l\'utente loggato', async () => {
             const response = await request(app)
-                .get(`/api/utenti/${loggedUser._id}`)
+                .get(`/apiv2/utenti/${loggedUser._id}`)
                 .set('Token', token);
 
             expect(response.status).toBe(200);
@@ -395,7 +395,7 @@ describe('utentiHandlers', () => {
         test('Dovrebbe restituire errore se l\'utente non è trovato', async () => {
             Utente.findById.mockResolvedValue(null);
 
-            const response = await request(app).get('/api/utenti/notFoundId').set('Token', token);;
+            const response = await request(app).get('/apiv2/utenti/notFoundId').set('Token', token);;
 
             expect(response.status).toBe(404);
             expect(response.body).toEqual({ message: 'Utente non trovato' });
@@ -403,7 +403,7 @@ describe('utentiHandlers', () => {
 
         test('Dovrebbe restituire solo le informazioni pubbliche dell\'utente se l\'utente cercato non è l\'utente loggato', async () => {
             Utente.findById.mockResolvedValue(otherUser);
-            const response = await request(app).get(`/api/utenti/${otherUser._id}`).set('Token', token);;
+            const response = await request(app).get(`/apiv2/utenti/${otherUser._id}`).set('Token', token);;
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual({
@@ -420,7 +420,7 @@ describe('utentiHandlers', () => {
         test('Dovrebbe restituire errore del server durante il recupero dell\'utente', async () => {
             Utente.findById.mockRejectedValue(new Error('Database error'));
 
-            const response = await request(app).get(`/api/utenti/${loggedUser._id}`).set('Token', token);;
+            const response = await request(app).get(`/apiv2/utenti/${loggedUser._id}`).set('Token', token);;
 
             expect(response.status).toBe(500);
             expect(response.body).toEqual({
@@ -430,7 +430,7 @@ describe('utentiHandlers', () => {
         });
     });
 
-    describe('PUT /api/utenti/:id', () => {
+    describe('PUT /apiv2/utenti/:id', () => {
         beforeEach(() => {
             jest.clearAllMocks();
             jest.spyOn(Utente, 'findByIdAndUpdate').mockResolvedValue(updatedUser);
@@ -438,7 +438,7 @@ describe('utentiHandlers', () => {
 
         test('Dovrebbe restituire errore se nessun token è fornito', async () => {
             const response = await request(app)
-                .put(`/api/utenti/${loggedUser._id}`)
+                .put(`/apiv2/utenti/${loggedUser._id}`)
                 .send({ interessi: updatedUser.interessi });
 
             expect(response.status).toBe(401);
@@ -452,7 +452,7 @@ describe('utentiHandlers', () => {
             Utente.findByIdAndUpdate.mockResolvedValue(null); // Simula utente non trovato
 
             const response = await request(app)
-                .put(`/api/utenti/${loggedUser._id}`)
+                .put(`/apiv2/utenti/${loggedUser._id}`)
                 .set('Token', token)
                 .send({ interessi: updatedUser.interessi });
 
@@ -464,7 +464,7 @@ describe('utentiHandlers', () => {
             Utente.findByIdAndUpdate.mockResolvedValue(otherUser);
 
             const response = await request(app)
-                .put(`/api/utenti/${otherUser._id}`)
+                .put(`/apiv2/utenti/${otherUser._id}`)
                 .set('Token', token)
                 .send({ interessi: updatedUser.interessi });
 
@@ -476,7 +476,7 @@ describe('utentiHandlers', () => {
             Utente.findByIdAndUpdate.mockResolvedValue(updatedUser);
 
             const response = await request(app)
-                .put(`/api/utenti/${loggedUser._id}`)
+                .put(`/apiv2/utenti/${loggedUser._id}`)
                 .set('Token', token)
                 .send({ interessi: updatedUser.interessi });
 
@@ -490,7 +490,7 @@ describe('utentiHandlers', () => {
             });
 
             const response = await request(app)
-                .put(`/api/utenti/${loggedUser._id}`)
+                .put(`/apiv2/utenti/${loggedUser._id}`)
                 .set('Token', token)
                 .send({ interessi: updatedUser.interessi });
 
@@ -502,7 +502,7 @@ describe('utentiHandlers', () => {
         });
     });
 
-    describe('GET /api/utenti/username/:username', () => {
+    describe('GET /apiv2/utenti/username/:username', () => {
         beforeEach(() => {
             jest.clearAllMocks();
 
@@ -515,7 +515,7 @@ describe('utentiHandlers', () => {
             Utente.findOne.mockResolvedValue(grandeOrganizzatore);
 
             const response = await request(app)
-                .get(`/api/utenti/username/${grandeOrganizzatore.username}`);
+                .get(`/apiv2/utenti/username/${grandeOrganizzatore.username}`);
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual({
@@ -535,7 +535,7 @@ describe('utentiHandlers', () => {
             Utente.find.mockResolvedValue([grandeOrganizzatore]);
 
             const response = await request(app)
-                .get(`/api/utenti/username/${otherUser.username}`);
+                .get(`/apiv2/utenti/username/${otherUser.username}`);
 
             expect(response.status).toBe(401);
             expect(response.body).toEqual({
@@ -548,7 +548,7 @@ describe('utentiHandlers', () => {
             Utente.findOne.mockResolvedValue(null);
 
             const response = await request(app)
-                .get(`/api/utenti/username/notFoundUser`)
+                .get(`/apiv2/utenti/username/notFoundUser`)
                 .set('Token', token);
 
             expect(response.status).toBe(404);
@@ -559,7 +559,7 @@ describe('utentiHandlers', () => {
             Utente.findOne.mockResolvedValue(loggedUser);
 
             const response = await request(app)
-                .get(`/api/utenti/username/${loggedUser.username}`)
+                .get(`/apiv2/utenti/username/${loggedUser.username}`)
                 .set('Token', token);
 
             expect(response.status).toBe(200);
@@ -570,7 +570,7 @@ describe('utentiHandlers', () => {
             Utente.findOne.mockResolvedValue(otherUser);
 
             const response = await request(app)
-                .get(`/api/utenti/username/${otherUser.username}`)
+                .get(`/apiv2/utenti/username/${otherUser.username}`)
                 .set('Token', token);
 
             expect(response.status).toBe(200);
@@ -591,7 +591,7 @@ describe('utentiHandlers', () => {
             Utente.findOne.mockRejectedValue(new Error('Database error'));
 
             const response = await request(app)
-                .get(`/api/utenti/username/${loggedUser.username}`)
+                .get(`/apiv2/utenti/username/${loggedUser.username}`)
                 .set('Token', token);
 
             expect(response.status).toBe(500);

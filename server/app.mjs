@@ -26,6 +26,6 @@ router.use(
   swaggerui.serve,
   swaggerui.setup(swaggerFile)
 );
-router.use('/api', routes);
+router.use('/apiv2', routes);
 
 export default router;

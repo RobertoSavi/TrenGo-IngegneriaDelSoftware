@@ -32,7 +32,7 @@ describe('proposteHandlers', () => {
 
     const token = 'sampleToken';
 
-    describe('POST /api/proposte/:idProposta/richieste', () => {
+    describe('POST /apiv2/proposte/:idProposta/richieste', () => {
 
         beforeEach(() => {
             jest.clearAllMocks();
@@ -47,7 +47,7 @@ describe('proposteHandlers', () => {
 
         test('Dovrebbe restituire 401 se l\'utente non è loggato', async () => {
             const response = await request(app)
-                .post(`/api/proposte/${idProposta}/richieste`)
+                .post(`/apiv2/proposte/${idProposta}/richieste`)
                 .send(newRichiesta);
 
             expect(response.status).toBe(401);
@@ -61,7 +61,7 @@ describe('proposteHandlers', () => {
             Proposta.findById.mockResolvedValue(null);
 
             const response = await request(app)
-                .post(`/api/proposte/${idProposta}/richieste`)
+                .post(`/apiv2/proposte/${idProposta}/richieste`)
                 .set('Token', token)
                 .send(newRichiesta);
 
@@ -78,7 +78,7 @@ describe('proposteHandlers', () => {
             Proposta.findById.mockResolvedValue(proposta);
 
             const response = await request(app)
-                .post(`/api/proposte/${idProposta}/richieste`)
+                .post(`/apiv2/proposte/${idProposta}/richieste`)
                 .set('Token', token)
                 .send(newRichiesta);
 
@@ -103,7 +103,7 @@ describe('proposteHandlers', () => {
             });
 
             const response = await request(app)
-                .post(`/api/proposte/${idProposta}/richieste`)
+                .post(`/apiv2/proposte/${idProposta}/richieste`)
                 .set('Token', token)
                 .send(newRichiesta);
 
@@ -129,7 +129,7 @@ describe('proposteHandlers', () => {
             Richiesta.create.mockRejectedValue(new Error('Database error'));
 
             const response = await request(app)
-                .post(`/api/proposte/${idProposta}/richieste`)
+                .post(`/apiv2/proposte/${idProposta}/richieste`)
                 .set('Token', token)
                 .send(newRichiesta);
 
