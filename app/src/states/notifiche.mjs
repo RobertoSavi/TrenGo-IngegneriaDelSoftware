@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import axios from 'axios'
 
 const token=localStorage.getItem('token');
+const loggedUsername=localStorage.getItem('username');
 const URL_API = import.meta.env.VITE_URL_API;
 const PROPOSTE_URL = URL_API+'/proposte/'
 const NOTIFICHE_URL = URL_API+'/notifiche/'
