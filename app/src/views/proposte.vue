@@ -117,24 +117,25 @@ var isIscritto = computed(() => {
 			</label>
 		</div>
 		<div class="partecipanti">
-					<div class="contenitoreHeader">
-						<h2>Partecipanti:</h2>
+			<div class="contenitoreHeader">
+				<h2>Partecipanti:</h2>
+			</div>
+			<div v-if="proposta.partecipanti.length == 0">Ancora nessun partecipante</div>
+			<ul v-else>
+				<li v-for="partecipante in proposta.partecipanti">
+					<div class="contenitorePartecipante">
+						<div>{{ partecipante }}</div>
 					</div>
-					<div v-if="proposta.partecipanti.length==0">Ancora nessun partecipante</div>
-					<ul v-else>
-						<li v-for="partecipante in proposta.partecipanti">
-							<div class="contenitorePartecipante">
-								<div>{{ partecipante }}</div>
-							</div>
-						</li>
-					</ul>
-				</div>
+				</li>
+			</ul>
+		</div>
 		<div v-if="proposta.usernameCreatore == loggedUser.username && loggedUser.username">
 			<div v-for="richiesta in richieste">
 				<label>Accettare la richiesta di: </label>
 				<RouterLink :to="HOST_UTENTI + richiesta.usernameRichiedente"> {{ richiesta.usernameRichiedente }}
 				</RouterLink>?
-				<button type="button" style="margin-right: 10px;" @click="gestisciRichiestaButton(richiesta._id, true)">Accetta</button>
+				<button type="button" style="margin-right: 10px;"
+					@click="gestisciRichiestaButton(richiesta._id, true)">Accetta</button>
 				<button type="button" @click="gestisciRichiestaButton(richiesta._id, false)">Rifiuta</button>
 			</div>
 			<div>

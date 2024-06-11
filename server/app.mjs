@@ -7,8 +7,8 @@ import cors from "cors";
 import swaggerui from "swagger-ui-express";
 import YAML from "yamljs";
 
-const swaggerFile = YAML.load('./swagger.yml');
-const swaggerFilev2 = YAML.load('./swaggerv2.yml');
+const swaggerFile = YAML.load('./swagger.yaml');
+const swaggerFilev2 = YAML.load('./swaggerv2.yaml');
 
 const router = Router();
 

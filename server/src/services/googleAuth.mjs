@@ -14,7 +14,6 @@ async function (request, accessToken, refreshToken, profile, done) { // Mark thi
     try {
         // Await the Promise returned by googleLogin
         const token = await googleLogin(profile); // Adjusted to pass profile directly
-        console.log(token);
         return done(null, token); // On success, pass null as the first argument to indicate no error
     } catch (err) {
         return done(err); // Pass the error to done if something goes wrong

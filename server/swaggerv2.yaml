@@ -4,7 +4,7 @@ info:
   description: API per la gestione delle proposte
   version: 2.2.13
 servers:
-  - url: http://localhost:3000/api
+  - url: http://trengo-apiv2.onrender.com/apiv2
 paths:
   /proposte:
     get:
