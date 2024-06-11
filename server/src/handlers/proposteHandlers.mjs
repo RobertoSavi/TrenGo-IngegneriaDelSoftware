@@ -221,6 +221,11 @@ async function postProposta(req, res) {
 		if (!validators.validateTitolo(titolo))
 			errors.push({ field: "titolo", message: "Titolo troppo lungo o troppo corto" });
 
+		// Validazione del luogo
+		if(nomeLuogo === "Selezionare dalla mappa"){
+			errors.push({ field: "nomeLuogo", message: "Selezionare un luogo dalla mappa" });
+		}
+
 		// Validazione delle coordinate	
 		if (!validators.validateCoordinate(coordinate))
 			errors.push({ field: "coordinate", message: "Latitudine o longitudine non valide" });
