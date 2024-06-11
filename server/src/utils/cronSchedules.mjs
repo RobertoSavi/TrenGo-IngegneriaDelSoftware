@@ -8,14 +8,18 @@ dotenv.config();
 // const URL_FRONTEND = process.env.URL_FRONTEND;
 const HOST_PROPOSTE = 'proposte/';
 
+
+// Funzione che cerca le proposte terminate da almeno un giorno e per la quale non sono ancora stati notificati i partecipanti,
+// Invia una notifica a tutti i partecipanti e al creatore della proposta per informarli che la proposta è 
+// terminata e che possono valutare i partecipanti, inoltre setta valutabile a true in modo che non venga inviata più di una notifica
 async function notificaProposteTerminate(){
     try {
-      console.log('eseguendo cron');
+      console.log('Controllo proposte terminate e non notificate...');
       const proposteTerminate = await getProposteTerminate();
       proposteTerminate.forEach(async proposta => {
         const partecipanti = proposta.partecipanti.concat(proposta.usernameCreatore);
-        const propostaUrl = `${HOST_PROPOSTA}${proposta._id}`;
-        console.log(propostaUrl);
+        const propostaUrl = `${HOST_PROPOSTE}${proposta._id}`;
+        console.log(`Invio notifica per la proposta ${proposta.titolo} ai partecipanti: ${partecipanti}`);
         for (const partecipante of partecipanti) {
           await Notifica.create({
             sorgente: 'System',

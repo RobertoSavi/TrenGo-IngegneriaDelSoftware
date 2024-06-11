@@ -167,7 +167,7 @@ async function postMessaggio(req, res) {
 		chat.messaggi.push(messaggio._id);
 		await chat.save();
 		
-		const proposta = await Proposta.find(chat.idProposta);
+		const proposta = await Proposta.findById(chat.idProposta);
 
 		chat.partecipanti.forEach(async partecipante => {
 			// Crea una notifica per il partecipante

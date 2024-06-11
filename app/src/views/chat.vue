@@ -38,7 +38,6 @@ function scroll() {
 }
 
 async function postMessaggioKey() {
-	console.log(contenuto.value);
 	
 	if (contenuto.value != "") {
 		await postMessaggio(idChat, contenuto.value);

@@ -36,14 +36,14 @@ async function getProposte(req, res) {
 				query.partecipanti = loggedUsername;
 			}
 			if (terminate === 'true') {
-				const now = new Date();
-				const yesterday = new Date(now.setDate(now.getDate() - 1));
-
 				// Aggiungi condizione per le proposte completate alle quali l'utente loggato ha partecipato o è il creatore
 				query.$or = [
-					{ data: { $lte: yesterday }, partecipanti: loggedUsername },
-					{ data: { $lte: yesterday }, usernameCreatore: loggedUsername }
+					{ valutabile: true, partecipanti: loggedUsername },
+					{ valutabile: true, usernameCreatore: loggedUsername }
 				];
+			}
+			if(!terminate){
+				query.valutabile = false;
 			}
 			// Ottiene le proposte in base ai criteri di ricerca combinati
 			const proposte = await Proposta.find(query);
@@ -91,15 +91,16 @@ async function getPropostaById(req, res) {
 				const propostaCopy = JSON.parse(JSON.stringify(proposta)); // Crea una copia dell'oggetto proposta
 				let utentiValutabili = 0;
 				if (loggedUsername === proposta.usernameCreatore) {
-					for (let i = 0; i < propostaCopy.partecipanti.length; i++) {
-						const valutazioneEsistente = await Valutazione.findOne({ idProposta: id, usernameValutato: propostaCopy.partecipanti[i], usernameValutatore: loggedUsername });
+					for (let i = 0; i < proposta.partecipanti.length; i++) {
+						const valutazioneEsistente = await Valutazione.findOne({ idProposta: id, usernameValutato: proposta.partecipanti[i], usernameValutatore: loggedUsername });
 						if (!valutazioneEsistente) {
 							utentiValutabili++;
 						}
 						propostaCopy.partecipanti[i] = [propostaCopy.partecipanti[i], !!valutazioneEsistente];
 						propostaCopy.utentiValutabili = utentiValutabili;
-						return res.status(200).json({ proposta: propostaCopy });
+						
 					}
+					return res.status(200).json({ proposta: propostaCopy });
 				} else if(proposta.partecipanti.includes(loggedUsername)){
 					propostaCopy.partecipanti = propostaCopy.partecipanti.filter(partecipante => partecipante !== loggedUsername);
 					for (let i = 0; i < propostaCopy.partecipanti.length; i++) {
@@ -109,7 +110,7 @@ async function getPropostaById(req, res) {
 						}
 						propostaCopy.partecipanti[i] = [propostaCopy.partecipanti[i], !!valutazioneEsistente];
 					}
-					const valutazioneEsistente = await Valutazione.findOne({ idProposta: id, usernameValutato: propostaCopy.usernameCreatore, usernameValutatore: loggedUsername });
+					const valutazioneEsistente = await Valutazione.findOne({ idProposta: id, usernameValutato: proposta.usernameCreatore, usernameValutatore: loggedUsername });
 					if (!valutazioneEsistente) {
 						utentiValutabili++;
 					}
@@ -143,7 +144,7 @@ async function getPropostaById(req, res) {
 async function ricercaProposte(req, res) {
 	try {
 		const loggedUsername = req.utenteLoggato ? req.utenteLoggato.loggedUsername : null; // Username dell'utente loggato
-		const query = {};
+		const query = {valutabile: false};
 
 		// Controlla i parametri del body
 		const { usernameCreatore, nomeLuogo, maxPartecipanti, minPartecipanti } = req.query;

@@ -27,8 +27,6 @@ onMounted(async () => {
 		{	
 			await fetchMessaggioById(chats.value[index]._id, chats.value[index].messaggi[(chats.value[index].messaggi.length)-1]);
 			
-			console.log(messaggi.value.contenuto);
-			
 			ultimiMessaggi.value.push(messaggi.value.contenuto);
 			senders.value.push(messaggi.value.senderUsername+":");
 			date.value.push(messaggi.value.data);

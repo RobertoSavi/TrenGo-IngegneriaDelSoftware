@@ -30,7 +30,6 @@ async function fetchMessaggioById(idChat, idMessaggio) {
 
 async function postMessaggio(idChat, contenuto) {
     await axios.post(CHAT_URL+idChat+"/messaggi", {contenuto: contenuto}, {headers: {'Token': loggedUser.token}});
-    console.log(contenuto+"postato");
 }
 
 export { 

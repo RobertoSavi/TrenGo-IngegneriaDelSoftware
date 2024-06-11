@@ -196,7 +196,7 @@ async function getNotificheByUsername(req, res) {
       }
 
       // Recupera tutte le notifiche per l'utente specificato
-      const notifiche = await Notifica.find(filter).sort({ stato: 'asc' });
+      const notifiche = await Notifica.find(filter).sort({ stato: 'asc', createdAt: 'desc' });
 
       // Restituisce la risposta con lo stato 200 e le notifiche trovate
       res.status(200).json(notifiche);
