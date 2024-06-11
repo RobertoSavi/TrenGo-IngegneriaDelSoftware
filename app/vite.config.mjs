@@ -8,6 +8,7 @@ export default defineConfig({
 	server: {
 		host: true,
 		port: process.env.VITE_PORT, 
+		protocol: "ws",
 	},
 	resolve: {
 		alias: {
