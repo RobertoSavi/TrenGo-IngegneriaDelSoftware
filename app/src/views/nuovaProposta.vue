@@ -76,7 +76,6 @@ async function creaProposteButton() {
 		}
 		erroreSuccesso.value = true;
 	}
-
 };
 
 function addCategoria(interesse) {

@@ -10,9 +10,7 @@ const dati = ref({
 	username: "",
 	interessi: []
 });
-
-var interessiIniziali=[];
-
+const erroreSuccesso = ref(false)
 const fetchDone=ref(false);
 
 onMounted( async () => {
@@ -32,10 +30,22 @@ onMounted( async () => {
 	fetchDone.value="true";
 });
 
-async function modificaButton() {
+async function modificaButton() {	
+	erroreSuccesso.value = false;
+	errori.value = [];
+	
 	await modificaUtente(dati.value, id);
-	loggedUser.username=dati.value.username;
-	router.back();
+	
+	if (errori.value.length == 0 && luogoValido.value) {
+		loggedUser.username=dati.value.username;
+		router.push('/utenti/'+loggedUser.username);
+	}
+	else {
+		if (!luogoValido.value) {
+			errori.value.push({ message: "Luogo non valido" });
+		}
+		erroreSuccesso.value = true;
+	}
 }
 
 function addInteresse(interesse)
@@ -69,6 +79,11 @@ function addInteresse(interesse)
 				{{ interesse }}
 			</span>
 		</span>
+		<div class="alert" v-if="erroreSuccesso">
+			<span class="closebtn" @click="erroreSuccesso = false">&times;</span>
+			<p>Qualcosa è andato storto:</p>
+			<p v-for="errore in errori">{{ errore.message }}</p>
+		</div>
 		<div>
 			<button type="submit">Fine</button>
 		</div>
