@@ -22,12 +22,14 @@ const schemaUtente = new mongoose.Schema({
     // Nome dell'utente
     nome: {
         type: String,
+        required: true,
         minLength: 2,
         maxLength: 30
     },
     // Cognome dell'utente
     cognome: {
         type: String,
+        required: true,
         minLength: 2,
         maxLength: 30
     },

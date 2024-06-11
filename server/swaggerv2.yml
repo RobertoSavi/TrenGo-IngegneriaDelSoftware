@@ -1,0 +1,1432 @@
+openapi: 3.0.1
+info:
+  title: Trengo APIs documentation
+  description: API per la gestione delle proposte
+  version: 2.2.13
+servers:
+  - url: http://localhost:3000/api
+paths:
+  /proposte:
+    get:
+      tags:
+        - proposte
+      summary: Ottiene le proposte
+      parameters:
+        - in: query
+          name: mie
+          schema:
+            type: string
+          description: Filtra per le proposte dell'utente loggato
+        - in: query
+          name: iscritto
+          schema:
+            type: string
+          description: Filtra per le proposte alle quali l'utente loggato partecipa
+        - in: query
+          name: terminate
+          schema:
+            type: string
+          description: Filtra per le proposte terminate
+      responses:
+        "200":
+          description: Lista delle proposte
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  proposte:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Proposta"
+        "400":
+          description: Nessuna proposta disponibile
+        "500":
+          description: Errore durante il recupero delle proposte
+    post:
+      tags:
+        - proposte
+      summary: Inserisce una nuova proposta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Proposta"
+      responses:
+        "201":
+          description: Proposta creata con successo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  self:
+                    type: string
+                    description: URL della nuova proposta
+        "400":
+          description: Errori di validazione
+        "500":
+          description: Errore durante la creazione della proposta
+  /proposte/ricerca:
+    get:
+      tags:
+        - proposte
+      summary: Cerca le proposte in base a query specifiche
+      parameters:
+        - in: query
+          name: usernameCreatore
+          schema:
+            type: string
+          description: Filtra per nome dell'utente creatore
+        - in: query
+          name: nomeLuogo
+          schema:
+            type: string
+          description: Filtra per nome del luogo
+        - in: query
+          name: maxPartecipanti
+          schema:
+            type: integer
+          description: Numero massimo di partecipanti desiderato
+        - in: query
+          name: minPartecipanti
+          schema:
+            type: integer
+          description: Numero minimo di partecipanti desiderato
+      responses:
+        "200":
+          description: Lista delle proposte trovate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  proposte:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Proposta"
+        "404":
+          description: Nessuna proposta disponibile
+        "500":
+          description: Errore durante il recupero delle proposte
+  /proposte/{id}:
+    get:
+      tags:
+        - proposte
+      summary: Ottiene una proposta per ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID della proposta
+        - in: query
+          name: valutazioni
+          schema:
+            type: string
+          description: Include le valutazioni nella risposta
+      responses:
+        "200":
+          description: Proposta trovata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  proposta:
+                    $ref: "#/components/schemas/Proposta"
+        "400":
+          description: Proposta non trovata
+        "401":
+          description: Non autorizzato a visualizzare questa proposta
+        "500":
+          description: Errore durante il recupero della proposta
+    put:
+      tags:
+        - proposte
+      summary: Modifica una proposta per ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID della proposta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Proposta"
+      responses:
+        "200":
+          description: Proposta modificata con successo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  proposta:
+                    $ref: "#/components/schemas/Proposta"
+        "400":
+          description: Errori di validazione
+        "403":
+          description: Impossibile modificare proposte altrui
+        "500":
+          description: Errore durante la modifica della proposta
+    delete:
+      tags:
+        - proposte
+      summary: Elimina una proposta per ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID della proposta
+      responses:
+        "200":
+          description: Proposta eliminata con successo
+        "500":
+          description: Errore durante l'eliminazione della proposta
+  /proposte/{id}/annullaPartecipazione:
+    put:
+      tags:
+        - proposte
+      summary: Annulla la partecipazione dell'utente loggato ad una proposta
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID della proposta
+      responses:
+        "201":
+          description: Partecipazione annullata con successo
+        "401":
+          description: Non sei un partecipante di questa proposta
+        "500":
+          description: Errore durante la modifica della proposta
+  /utenti/{id}:
+    get:
+      tags:
+        - utenti
+      summary: Ottiene un utente dal database utilizzando l'ID fornito
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID dell'utente
+      responses:
+        "200":
+          description: Utente trovato
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  utente:
+                    type: object
+                    properties:
+                      username:
+                        type: string
+                      tipoUtente:
+                        type: string
+                      nome:
+                        type: string
+                      cognome:
+                        type: string
+                      karma:
+                        type: number
+                      interessi:
+                        type: array
+                        items:
+                          type: string
+                      followers:
+                        type: number
+        "401":
+          description: Nessun token fornito
+        "404":
+          description: Utente non trovato
+        "500":
+          description: Errore durante il recupero dell'utente
+    put:
+      tags:
+        - utenti
+      summary: Aggiorna un utente nel database utilizzando l'ID fornito e i dati di aggiornamento
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID dell'utente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                nome:
+                  type: string
+                cognome:
+                  type: string
+                interessi:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: Utente aggiornato con successo
+        "400":
+          description: Errore di validazione
+        "401":
+          description: Nessun token fornito
+        "403":
+          description: Impossibile modificare account altrui
+        "404":
+          description: Utente non trovato
+        "500":
+          description: Errore durante l'aggiornamento dell'utente
+  /utenti/ricerca:
+    get:
+      tags:
+        - utenti
+      summary: Ottiene gli utenti dal database in base a query specifiche
+      parameters:
+        - name: username
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Username dell'utente
+        - name: maxKarma
+          in: query
+          required: false
+          schema:
+            type: number
+          description: Karma massimo
+        - name: minKarma
+          in: query
+          required: false
+          schema:
+            type: number
+          description: Karma minimo
+      responses:
+        "200":
+          description: Utenti trovati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  utenti:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        username:
+                          type: string
+                        tipoUtente:
+                          type: string
+                        nome:
+                          type: string
+                        cognome:
+                          type: string
+                        karma:
+                          type: number
+                        interessi:
+                          type: array
+                          items:
+                            type: string
+                        followers:
+                          type: number
+        "404":
+          description: Nessun utente disponibile
+        "500":
+          description: Errore durante il recupero degli utenti
+  /utenti/signup:
+    post:
+      tags:
+        - utenti
+      summary: Effettua la registrazione di un utente con i dati passati nel body
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome:
+                  type: string
+                cognome:
+                  type: string
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                interessi:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "201":
+          description: Utente creato
+        "400":
+          description: Errore di validazione
+        "500":
+          description: Errore durante la registrazione dell'utente
+  /utenti/login:
+    post:
+      tags:
+        - utenti
+      summary: Effettua il login di un utente con i dati passati nel body
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Login avvenuto con successo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  loggedId:
+                    type: string
+                  loggedUsername:
+                    type: string
+                  self:
+                    type: string
+        "401":
+          description: Errore di autenticazione
+        "500":
+          description: Errore durante l'accesso dell'utente
+  /utenti/username/{username}:
+    get:
+      tags:
+        - utenti
+      summary: Ottiene un utente dal database utilizzando l'username fornito
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Username dell'utente
+      responses:
+        "200":
+          description: Utente trovato
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  utente:
+                    type: object
+                    properties:
+                      username:
+                        type: string
+                      tipoUtente:
+                        type: string
+                      nome:
+                        type: string
+                      cognome:
+                        type: string
+                      karma:
+                        type: number
+                      interessi:
+                        type: array
+                        items:
+                          type: string
+                      followers:
+                        type: number
+        "401":
+          description: Nessun token fornito
+        "404":
+          description: Utente non trovato
+        "500":
+          description: Errore durante il recupero dell'utente
+  /utenti/interessi:
+    get:
+      tags:
+        - utenti
+      summary: Restituisce l'elenco degli interessi
+      responses:
+        "200":
+          description: Interessi trovati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  interessi:
+                    type: array
+                    items:
+                      type: string
+        "500":
+          description: Errore durante il recupero degli interessi
+  /utenti/passworddimenticata:
+    post:
+      tags:
+        - utenti
+      summary: Invia una email per il reset della password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+      responses:
+        "200":
+          description: Email per il reset della password inviata
+        "400":
+          description: Utente non trovato
+        "500":
+          description: Errore nell'invio dell'email per il reset della password
+  /utenti/cambiopassword/{token}:
+    post:
+      tags:
+        - utenti
+      summary: Aggiorna la password dell'utente utilizzando il token fornito
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Token per il reset della password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                new_password:
+                  type: string
+      responses:
+        "200":
+          description: Password aggiornata con successo
+        "400":
+          description: Errore di validazione
+        "404":
+          description: Token non valido o scaduto
+        "500":
+          description: Errore nell'aggiornamento della password
+  /proposte/{idProposta}/richieste:
+    get:
+      tags:
+        - richieste
+      summary: Ottiene le richieste di partecipazione dal database
+      parameters:
+        - in: path
+          name: idProposta
+          required: true
+          schema:
+            type: string
+          description: ID della proposta
+      responses:
+        "200":
+          description: Richieste trovate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  richieste:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        usernameRichiedente:
+                          type: string
+                        idProposta:
+                          type: string
+                        titoloProposta:
+                          type: string
+                        stato:
+                          type: string
+        "401":
+          description: Nessun token fornito
+        "403":
+          description: Impossibile ottenere le richieste alle proposte altrui
+        "404":
+          description: Proposta non trovata o nessuna richiesta trovata
+    post:
+      tags:
+        - richieste
+      summary: Crea una nuova richiesta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                usernameRichiedente:
+                  type: string
+      responses:
+        "201":
+          description: Proposta creata con successo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  self:
+                    type: string
+                    description: URL della nuova proposta
+        "400":
+          description: Errori di validazione
+        "500":
+          description: Errore durante la creazione della proposta
+
+  /proposte/{idProposta}/richieste/{id}:
+    get:
+      tags:
+        - richieste
+      summary: Ottiene una richiesta di partecipazione dal database
+      parameters:
+        - in: path
+          name: idProposta
+          required: true
+          schema:
+            type: string
+          description: ID della proposta
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID della richiesta
+      responses:
+        "200":
+          description: Richiesta trovata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  richiesta:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      usernameRichiedente:
+                        type: string
+                      idProposta:
+                        type: string
+                      titoloProposta:
+                        type: string
+                      stato:
+                        type: string
+        "401":
+          description: Nessun token fornito
+        "403":
+          description: Impossibile ottenere una richiesta ad una proposta altrui
+        "404":
+          description: Proposta non trovata o richiesta non trovata
+    put:
+      tags:
+        - richieste
+      summary: Modifica una richiesta nel database
+      parameters:
+        - in: path
+          name: idProposta
+          required: true
+          schema:
+            type: string
+          description: ID della proposta
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID della richiesta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                stato:
+                  type: string
+      responses:
+        "200":
+          description: Richiesta modificata con successo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  self:
+                    type: string
+        "400":
+          description: Errore di validazione
+        "401":
+          description: Nessun token fornito
+        "403":
+          description: Impossibile modificare una richiesta ad una proposta altrui
+        "404":
+          description: Proposta non trovata o richiesta non trovata
+    delete:
+      tags:
+        - richieste
+      summary: Elimina una richiesta pending dal database
+      parameters:
+        - in: path
+          name: idProposta
+          required: true
+          schema:
+            type: string
+          description: ID della proposta
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID della richiesta
+      responses:
+        "204":
+          description: Richiesta eliminata con successo
+        "401":
+          description: Nessun token fornito
+        "403":
+          description: Impossibile eliminare richieste altrui
+        "404":
+          description: Richiesta non trovata
+  /notifiche:
+    post:
+      tags:
+        - "notifiche"
+      summary: "Crea una nuova notifica"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Notifica"
+      responses:
+        201:
+          description: "Creata"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  self:
+                    type: string
+  /notifiche/{id}:
+    put:
+      tags:
+        - "notifiche"
+      summary: "Imposta una specifica notifica come letta tramite il suo ID"
+      description: "Imposta una specifica notifica come letta tramite il suo ID."
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID della notifica da modificare
+      responses:
+        200:
+          description: "Successo"
+        404:
+          description: "Non trovato"
+    delete:
+      tags:
+        - "notifiche"
+      summary: "Elimina una specifica notifica tramite il suo ID"
+      description: "Elimina una specifica notifica tramite il suo ID."
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID della notifica da eliminare
+      responses:
+        200:
+          description: "Successo"
+        404:
+          description: "Non trovato"
+  /notifiche/utenti/{username}:
+    get:
+      tags:
+        - "notifiche"
+      summary: "Imposta una specifica notifica come letta tramite il suo ID"
+      description: "Imposta una specifica notifica come letta tramite il suo ID."
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID della notifica da modificare
+      responses:
+        200:
+          description: "Successo"
+        404:
+          description: "Non trovato"
+    put:
+      tags:
+        - "notifiche"
+      summary: "Imposta una specifica notifica come letta tramite il suo ID"
+      description: "Imposta una specifica notifica come letta tramite il suo ID."
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID della notifica da modificare
+      responses:
+        200:
+          description: "Successo"
+        404:
+          description: "Non trovato"
+    delete:
+      tags:
+        - "notifiche"
+      summary: "Imposta una specifica notifica come letta tramite il suo ID"
+      description: "Imposta una specifica notifica come letta tramite il suo ID."
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID della notifica da modificare
+      responses:
+        200:
+          description: "Successo"
+        404:
+          description: "Non trovato"
+  /valutazioni/partecipanti/{idProposta}:
+    post:
+      summary: Valutazione dei partecipanti di una proposta
+      description: Permette all'utente loggato di valutare i partecipanti di una proposta tramite l'ID della proposta.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                valutazione:
+                  type: integer
+                  description: valutazione di tutti i partecipanti alla proposta
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID della proposta da valutare
+      responses:
+        "200":
+          description: Valutazioni effettuate con successo
+        "400":
+          description: Tutti i partecipanti sono già stati valutati
+        "401":
+          description: Nessun token fornito
+        "404":
+          description: Proposta non trovata
+        "500":
+          description: Errore durante la valutazione dei partecipanti
+  /valutazioni/partecipanti/{idProposta}/{username}:
+    post:
+      summary: Valutazione di un partecipante ad una proposta
+      description: Permette all'utente loggato di valutare un partecipante ad una proposta tramite l'ID della proposta e lo username del partecipante.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                valutazione:
+                  type: integer
+                  description: Valutazione da assegnare al partecipante
+      parameters:
+        - in: path
+          name: idProposta
+          description: ID della proposta da valutare
+          required: true
+          schema:
+            type: string
+        - name: username
+          in: path
+          description: Username del partecipante da valutare
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Valutazione effettuata con successo
+        "400":
+          description: Valutazione già effettuata o impossibile valutare se stessi
+        "401":
+          description: Nessun token fornito
+        "404":
+          description: Proposta non trovata o utente non trovato
+        "500":
+          description: Errore durante la valutazione del partecipante
+  /utenti/auth/google:
+    get:
+      tags:
+        - google
+      summary: Avvia il processo di autenticazione con Google
+      description: Reindirizza l'utente alla pagina di autorizzazione di Google.
+      responses:
+        "302":
+          description: Redirezione alla pagina di autorizzazione di Google
+  /utenti/auth/google/callback:
+    get:
+      tags:
+        - google
+      summary: Callback dell'autenticazione con Google
+      description: Gestisce il callback dopo che l'utente ha autorizzato l'accesso a Google.
+      responses:
+        "302":
+          description: Redirezione alla pagina di login con il token di autenticazione
+  /segui/follow/{username}:
+    put:
+      tags:
+        - follow
+      summary: Permette all'utente loggato di seguire un altro utente tramite username.
+      parameters:
+        - in: path
+          name: username
+          description: Username dell'utente che si desidera seguire.
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK. L'utente è stato seguito con successo.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Messaggio di conferma del follow.
+        400:
+          description: Bad Request. L'utente potrebbe già essere stato seguito.
+        401:
+          description: Unauthorized. Nessun token fornito.
+        404:
+          description: Not Found. L'utente specificato non è stato trovato.
+        500:
+          description: Internal Server Error. Errore nel follow dell'utente.
+  /segui/unfollow/{username}:
+    put:
+      tags:
+        - follow
+      summary: Permette all'utente loggato di smettere di seguire un altro utente tramite username.
+      parameters:
+        - in: path
+          name: username
+          description: Username dell'utente che si desidera smettere di seguire.
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK. L'utente è stato smesso di seguire con successo.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: essaggio di conferma dell'unfollow.
+        400:
+          description: Bad Request. L'utente potrebbe non essere stato seguito in precedenza.
+        401:
+          description: Unauthorized. Nessun token fornito.
+        404:
+          description: Not Found. L'utente specificato non è stato trovato.
+        500:
+          description: Internal Server Error. Errore nello smettere di seguire l'utente.
+  /chats:
+    get:
+      tags:
+        - chats
+      summary: Ottieni tutte le chats a cui logged user partecipa
+      responses:
+        200:
+          description: Operazione riuscita
+        400:
+          description: Richiesta non valida o utente non parte della chat
+        404:
+          description: Chat non trovata
+        500:
+          description: Errore interno del server
+  /chats/{idChat}:
+    get:
+      tags:
+        - chats
+      summary: Ottieni una chat tramite ID
+      parameters:
+        - in: path
+          name: idChat
+          description: ID della chat da recuperare
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Operazione riuscita
+          content:
+            application/json:
+              schema:
+                name: self
+                $ref: "#/components/schemas/Chat"
+        400:
+          description: Richiesta non valida o utente non parte della chat
+        404:
+          description: Chat non trovata
+        500:
+          description: Errore interno del server
+  /chats/{idChat}/messaggi:
+    get:
+      tags:
+        - chats
+      summary: Ottieni i messaggi di una chat tramite ID
+      parameters:
+        - name: idChat
+          in: path
+          description: ID della chat da cui recuperare i messaggi
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Operazione riuscita
+          content:
+            application/json:
+              schema:
+                name: self
+                $ref: "#/components/schemas/Messaggio"
+        400:
+          description: Richiesta non valida o utente non parte della chat
+        404:
+          description: Chat non trovata
+        500:
+          description: Errore interno del server
+    post:
+      tags:
+        - chats
+      summary: Invia un messaggio in una chat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                contenuto:
+                  type: integer
+                  description: Corpo del messaggio da inviare
+      parameters:
+        - name: idChat
+          in: path
+          description: ID della chat in cui inviare il messaggio
+          required: true
+          schema:
+            type: string
+      responses:
+        201:
+          description: Messaggio inviato con successo
+          content:
+            application/json:
+              schema:
+                name: self
+                $ref: "#/components/schemas/Messaggio"
+        400:
+          description: Richiesta non valida o utente non parte della chat
+        401:
+          description: Impossibile inviare un messaggio senza contenuto
+        404:
+          description: Chat non trovata
+        500:
+          description: Errore interno del server
+  /chats/{idChat}/messaggi/{idMessaggio}:
+    get:
+      tags:
+        - chats
+      summary: Ottieni un messaggio di una chat tramite ID messaggio
+      parameters:
+        - name: idChat
+          in: path
+          description: ID della chat in cui cercare il messaggio
+          required: true
+          schema:
+            type: string
+        - name: idMessaggio
+          in: path
+          description: ID del messaggio da recuperare
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Operazione riuscita
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Messaggio"
+        400:
+          description: Richiesta non valida o utente non parte della chat
+        404:
+          description: Messaggio non trovato
+        500:
+          description: Errore interno del server
+components:
+  schemas:
+    Utente:
+      type: object
+      required:
+        - username
+        - nome
+        - cognome
+        - email
+        - password
+      properties:
+        _id:
+          type: integer
+          format: int64
+          description: Id dell'Utente
+          example: 10
+        username:
+          type: string
+          description: Username dell'utente
+          example: Marcolino
+        tipoUtente:
+          type: string
+          description: Il tipo di utente
+          example: autenticato
+          enum:
+            - autenticato
+            - grandeOrganizzatore
+        nome:
+          type: string
+          description: Nome dell'utente
+          example: Marco
+        cognome:
+          type: string
+          description: Cognome dell'utente
+          example: Lino
+        email:
+          type: string
+          description: Email dell'utente
+          example: marcolino@email.com
+        password:
+          type: string
+          description: Password dell'utente
+          example: Marcolino1!
+        karma:
+          type: integer
+          description: Karma dell'utente
+          example: 70
+        interessi:
+          type: array
+          description: Interessi dell'utente
+          items:
+            type: string
+          example: ["arrampicata", "escursioni", "corse"]
+          minItems: 0
+        following:
+          type: array
+          description: Lista degli username degli utenti seguiti dall'utente
+          items:
+            type: string
+          example: ["Marcolino", " Marcoseta", "Marcolana"]
+          minItems: 0
+        followers:
+          type: array
+          description: Lista degli username che l'utente segue
+          items:
+            type: string
+          example: ["Marcolino", " Marcoseta", "Marcolana"]
+          minItems: 0
+        googleId:
+          type: string
+          description: ID dell'utente su Google
+          example: 123456789
+      xml:
+        name: utente
+    Proposta:
+      type: object
+      required:
+        - usernameCreatore
+        - categorie
+        - nomeLuogo
+        - numeroPartecipantiDesiderato
+        - data
+      properties:
+        _id:
+          type: integer
+          format: int64
+          description: Id della proposta
+          example: 10
+        usernameCreatore:
+          type: string
+          description: Username del creatore della proposta
+          example: Marcotone
+        titolo:
+          type: string
+          description: Titolo della proposta
+          example: Arrampicata vicino via Brennero
+        categorie:
+          type: array
+          items:
+            type: string
+          description: Lista delle categorie alle quali appartiene la proposta
+          example: ["Scalata", "Escursioni", "Sport"]
+          minItems: 1
+        nomeLuogo:
+          type: string
+          description: Nome del luogo della proposta
+          example: Piazza Dante
+        coordinate:
+          type: array
+          items:
+            type: number
+          description: Coordinate del luogo della proposta
+          example: [4.49965, 52.06891]
+          minItems: 2
+        descrizione:
+          type: string
+          description: Descrizione della proposta
+          maxLength: 200
+          example: Vediamoci in piazza per poi andare a fare un giro
+        numeroPartecipantiDesiderato:
+          type: integer
+          format: int64
+          description: Numero di partecipanti desiderato dal creatore della proposta
+          example: 10
+        numeroPartecipanti:
+          type: integer
+          format: int64
+          description: Numero di partecipanti attuali della proposta
+          example: 10
+        data:
+          type: string
+          format: date-time
+          description: Data prevista per la proposta
+          example: 2024-07-21T17:32:28Z
+        idChat:
+          type: integer
+          description: Id della chat allegata alla proposta
+          format: int64
+        partecipanti:
+          type: array
+          items:
+            type: string
+          description: username dei partecipanti
+          example: ["Marcolino", " Marcoseta", "Marcolana"]
+          minItems: 1
+        stato:
+          type: boolean
+          description: Stato della proposta [false = chiusa, true = aperta]
+          default: true
+          example: true
+        valutabile:
+          type: boolean
+          description: Indica se la proposta è valutabile
+          default: false
+          example: false
+      xml:
+        name: proposta
+    Notifica:
+      type: object
+      required:
+        - sorgente
+        - username
+        - messaggio
+        - tipo
+      properties:
+        _id:
+          type: integer
+          format: int64
+          description: Id della notifica
+          example: 10
+        sorgente:
+          type: string
+          example: Marcolana
+        username:
+          type: string
+          example: Marcolino
+        messaggio:
+          type: string
+          example: 'Hai ricevuto una nuova richiesta di partecipazione'
+        link:
+          type: string
+          example: /proposte/12343
+        stato:
+          type: string
+          default: 'Non letta'
+          example: 'Letta'
+        tipo:
+          type: string
+          example: 'Proposta'
+      xml:
+        name: notifica
+    Chat:
+      type: object
+      required:
+        - tipoChat
+        - partecipanti
+        - idProposta
+      properties:
+        _id:
+          type: integer
+          format: int64
+          description: Id della chat
+          example: 10
+        partecipanti:
+          type: array
+          items:
+            type: string
+          default: ["CreatoreProposta"]
+          example: ["Marcolino", " Marcoseta", "Marcolana"]
+        messaggi:
+          type: array
+          items:
+            type: integer
+          default: []
+          example: [123, 124, 125]
+      xml:
+        name: chat
+    Messaggio:
+      type: object
+      required:
+        - contenuto
+        - senderUsername
+        - idChat
+        - data
+      properties:
+        _id:
+          type: integer
+          format: int64
+          description: Id del messaggio
+          example: 10
+        contenuto:
+          type: string
+          description: Contenuto del messaggio
+          example: Ciao a tutti
+        senderUsername:
+          type: string
+          description: Username del mittente del messaggio
+          example: Marcolino
+        idChat:
+          type: integer
+          description: Id della chat a cui appartiene il messaggio
+          example: 10
+        data:
+          type: string
+          format: date-time
+          description: Data del messaggio
+          example: 12-07-2024 17:32
+      xml:
+        name: messaggio
+    Richiesta:
+      type: object
+      required:
+        - usernameRichiedente
+        - idProposta
+        - titoloProposta
+      properties:
+        _id:
+          type: integer
+          format: int64
+          description: Id della richiesta
+          example: 10
+        usernameRichiedente:
+          type: string
+          description: Username del richiedente
+          example: Marcolino
+        idProposta:
+          type: string
+          description: Id della proposta
+          example: 10
+        titoloProposta:
+          type: string
+          description: Titolo della proposta
+          example: Arrampicata vicino via Brennero
+        stato:
+          type: string
+          description: Stato della richiesta
+          example: 'accettata'
+          default: 'pending'
+          enum:
+            - pending
+            - accettata
+            - rifiutata
+      xml:
+        name: richiesta
+    Valutazione:
+      type: object
+      required:
+        - usernameValutatore
+        - usernameValutato
+        - idProposta
+        - valutazione
+      properties:
+        _id:
+          type: integer
+          format: int64
+          description: Id della valutazione
+          example: 10
+        usernameValutatore:
+          type: string
+          description: Username del valutatore
+          example: Marcolino
+        usernameValutato:
+          type: string
+          description: Username del valutato
+          example: Marcoseta
+        idProposta:
+          type: string
+          description: Id della proposta
+          example: 10
+        valutazione:
+          type: integer
+          description: Valutazione assegnata
+          example: 5
+      xml:
+        name: valutazione

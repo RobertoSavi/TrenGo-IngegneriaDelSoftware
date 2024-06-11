@@ -8,6 +8,7 @@ import swaggerui from "swagger-ui-express";
 import YAML from "yamljs";
 
 const swaggerFile = YAML.load('./swagger.yml');
+const swaggerFilev2 = YAML.load('./swaggerv2.yml');
 
 const router = Router();
 
@@ -25,6 +26,11 @@ router.use(
   "/api-docs",
   swaggerui.serve,
   swaggerui.setup(swaggerFile)
+);
+router.use(
+  "/apiv2-docs",
+  swaggerui.serve,
+  swaggerui.setup(swaggerFilev2)
 );
 router.use('/apiv2', routes);
 

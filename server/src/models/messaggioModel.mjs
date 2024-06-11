@@ -11,11 +11,13 @@ const schemaMessaggio = new mongoose.Schema({
 	// Username dell'untente che manda il messaggio
 	senderUsername: {
 		type: String,
+		required: true,
 		ref: "Utente" // Riferimento al modello utente
 	},
 	// Id della chat che contiene il messaggio
 	idChat: {
 		type: ObjectId,
+		required: true,
 		ref: "Chat"
 	},
 	// Data e ora dell'invio del messaggio
