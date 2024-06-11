@@ -783,54 +783,90 @@ paths:
     get:
       tags:
         - "notifiche"
-      summary: "Imposta una specifica notifica come letta tramite il suo ID"
-      description: "Imposta una specifica notifica come letta tramite il suo ID."
+      summary: "Ritorna le notifiche di un utente"
+      description: "Ritorna le notifiche di un utente"
       parameters:
         - in: path
-          name: id
+          name: username
           required: true
           schema:
             type: string
-          description: ID della notifica da modificare
+          description: username
+        - in: query
+          name: from
+          required: false
+          schema:
+            type: string
+          description: "Filtro per sorgente della notifica"
       responses:
         200:
           description: "Successo"
+        401:
+          description: "Non autorizzato"
+        403:
+          description: "Accesso negato"
         404:
-          description: "Non trovato"
+          description: "Utente non trovato"
+        500:
+          description: "Errore durante il recupero delle notifiche"
     put:
       tags:
         - "notifiche"
-      summary: "Imposta una specifica notifica come letta tramite il suo ID"
-      description: "Imposta una specifica notifica come letta tramite il suo ID."
+      summary: "Imposta tutte le notifiche come lette per un utente specifico"
+      description: "Imposta tutte le notifiche come lette per un utente specifico."
       parameters:
         - in: path
-          name: id
+          name: username
           required: true
           schema:
             type: string
-          description: ID della notifica da modificare
+          description: username
+        - in: query
+          name: from
+          required: false
+          schema:
+            type: string
+          description: "Filtro per sorgente della notifica"
       responses:
         200:
           description: "Successo"
+        401:
+          description: "Non autorizzato"
+        403:
+          description: "Accesso negato"
         404:
-          description: "Non trovato"
+          description: "Utente non trovato"
+        500:
+          description: "Errore nell'aggiornamento dello stato delle notifiche"
     delete:
       tags:
         - "notifiche"
-      summary: "Imposta una specifica notifica come letta tramite il suo ID"
-      description: "Imposta una specifica notifica come letta tramite il suo ID."
+      summary: "Elimina tutte le notifiche per un utente specifico"
+      description: "Elimina tutte le notifiche per un utente specifico."
       parameters:
         - in: path
-          name: id
+          name: username
           required: true
           schema:
             type: string
-          description: ID della notifica da modificare
+          description: username
+        - in: query
+          name: from
+          required: false
+          schema:
+            type: string
+          description: "Filtro per sorgente della notifica"
       responses:
         200:
           description: "Successo"
+        401:
+          description: "Non autorizzato"
+        403:
+          description: "Accesso negato"
         404:
-          description: "Non trovato"
+          description: "Utente non trovato"
+        500:
+          description: "Errore nell'eliminazione delle notifiche"
   /valutazioni/partecipanti/{idProposta}:
     post:
       summary: Valutazione dei partecipanti di una proposta
@@ -1293,17 +1329,17 @@ components:
           example: Marcolino
         messaggio:
           type: string
-          example: 'Hai ricevuto una nuova richiesta di partecipazione'
+          example: "Hai ricevuto una nuova richiesta di partecipazione"
         link:
           type: string
           example: /proposte/12343
         stato:
           type: string
-          default: 'Non letta'
-          example: 'Letta'
+          default: "Non letta"
+          example: "Letta"
         tipo:
           type: string
-          example: 'Proposta'
+          example: "Proposta"
       xml:
         name: notifica
     Chat:
@@ -1391,8 +1427,8 @@ components:
         stato:
           type: string
           description: Stato della richiesta
-          example: 'accettata'
-          default: 'pending'
+          example: "accettata"
+          default: "pending"
           enum:
             - pending
             - accettata
@@ -1430,3 +1466,8 @@ components:
           example: 5
       xml:
         name: valutazione
+  securitySchemes:
+    TokenAuth:
+      type: apiKey
+      in: header
+      name: Token # Custom header name
