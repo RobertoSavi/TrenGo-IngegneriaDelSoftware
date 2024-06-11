@@ -10,8 +10,6 @@ const luogoValido = ref(false);
 const leafletMap = ref();
 const marker = ref();
 const dati = ref({
-	usernameCreatore: loggedUser.username,
-	creatore: loggedUser.id,
 	titolo: "",
 	nomeLuogo: "Selezionare dalla mappa",
 	coordinate: [],
@@ -57,10 +55,6 @@ async function clickMappa(e)
 }
 
 async function creaProposteButton() {
-	/*if (dati.value.titolo == "" || dati.value.nomeLuogo == "" || dati.value.descrizione == "" || dati.value.numeroPartecipantiDesiderato <= 1) {
-		warningMessage.value = 'Compilare i campi'
-		return;
-	}*/
 
 	if (luogoValido.value) {
 		await creaProposta(dati.value);

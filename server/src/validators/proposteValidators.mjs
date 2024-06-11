@@ -53,10 +53,12 @@ function validateDescrizione(descrizione) {
 	return /^(?=.{0,200}$).*$/.test(descrizione);
 };
 
-export {
+const functions = {
 	categorieInEnum,
 	validateTitolo,
 	validateCoordinate,
 	validateDescrizione
 }
+
+export default functions;
 

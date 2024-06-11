@@ -4,20 +4,11 @@ import tokenChecker from "../middlewares/tokenChecker.mjs";
 
 const router = Router();
 
-// Permette di ottenere le proposte pubblicate da grandi organizzatori
-router.get("/NA", handlers.getProposteNA);
-
 // Uso il middleware per verificare che l'utente sia utenticato
 router.use("", tokenChecker.tokenChecker);
 
 // Permette di ottenere le proposte
 router.get("", handlers.getProposte);
-
-// Permette di ottenere le mie proposte
-router.get("/mie", handlers.getMieProposte);
-
-// Permette di ottenere le proposte alle quali sono iscritto
-router.get("/iscritto", handlers.getProposteIscritto);
 
 // Permette di ottenere le proposte che coincidono con la query passata
 router.get("/ricerca", handlers.ricercaProposte);

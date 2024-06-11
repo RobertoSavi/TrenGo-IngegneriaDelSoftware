@@ -31,7 +31,7 @@ async function getUtenteById(req, res) {
             }
 
             // Se l'utente cercato è uguale all'utente loggato resituisco tutte le informazioni dell'utente
-            if (utente.id == loggedId) {
+            if (utente._id == loggedId) {
                 return res.status(200).json({ utente });
             }
 
@@ -130,7 +130,7 @@ async function updateUtenteById(req, res) {
             }
 
             // Permetto la modifica dei dati utente solo se il chiamante dell'API è l'utente da modificare
-            if (utente.id == loggedId) {
+            if (utente._id == loggedId) {
                 // Aggiorna il documento utente con tutti i campi forniti nel corpo della richiesta
                 const utente = await Utente.findByIdAndUpdate(id, updates, { new: true });
                 return res.status(200).json({ self: "utenti/" + utente._id });
@@ -428,7 +428,7 @@ async function googleLogin(profile) {
                     cognome: profile.family_name,
                     password: generateRandomPassword(), // Genera una password casuale per l'utente Google
                 };
-                utente = new Utente(nuovoUtente);
+                utente = Utente.create(nuovoUtente);
                 await utente.save();
             }
         } else {

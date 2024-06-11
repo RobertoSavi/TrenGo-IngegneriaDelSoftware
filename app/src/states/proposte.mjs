@@ -40,7 +40,7 @@ async function fetchProposteTerminate() {
 }
 
 async function fetchProposteNA() {
-	const response = await axios.get(PROPOSTE_URL + 'NA');
+	const response = await axios.get(PROPOSTE_URL);
 	proposte.value = response.data.proposte;
 }
 
