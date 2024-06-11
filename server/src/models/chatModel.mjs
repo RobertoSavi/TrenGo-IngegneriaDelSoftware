@@ -6,7 +6,6 @@ const schemaChat = new mongoose.Schema({
 	tipoChat: {
 		type: String,
 		enum: ["chat", "forum"],
-		required: true,
 		dafault: "chat"
 	},
 	// Elenco degli utenti che partecipano alla chat
