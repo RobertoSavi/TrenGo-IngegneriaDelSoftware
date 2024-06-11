@@ -62,12 +62,13 @@ function validateData(data) {
 	return new Date(data) >= new Date();
 };
 
-
-export {
+const functions = {
 	categorieInEnum,
 	validateTitolo,
 	validateCoordinate,
 	validateDescrizione,
 	validateData
 }
+
+export default functions;
 

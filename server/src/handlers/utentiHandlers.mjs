@@ -29,12 +29,10 @@ async function getUtenteById(req, res) {
 			if (!utente) {
 				return res.status(404).json({ message: "Utente non trovato" });
 			}
-
 			// Se l'utente cercato è uguale all'utente loggato resituisco tutte le informazioni dell'utente
-			if (utente.id == loggedId) {
+			if (utente._id == loggedId) {
 				return res.status(200).json({ utente });
 			}
-
 			// Altrimenti ritorna solo le informazioni pubbliche
 			return res.status(200).json({
 				username: utente.username,
@@ -149,7 +147,7 @@ async function updateUtenteById(req, res) {
 			}
 
 			// Permetto la modifica dei dati utente solo se il chiamante dell'API è l'utente da modificare
-			if (utente.id == loggedId) {
+			if (utente._id == loggedId) {
 				// Aggiorna il documento utente con tutti i campi forniti nel corpo della richiesta
 				const utente = await Utente.findByIdAndUpdate(id, updates, { new: true });
 				return res.status(200).json({ self: "utenti/" + utente._id });

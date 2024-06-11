@@ -10,11 +10,11 @@ const luogoValido = ref(false);
 const leafletMap = ref();
 const marker = ref();
 const dati = ref({
-	titolo: "a",
+	titolo: "",
 	nomeLuogo: "Selezionare dalla mappa",
 	coordinate: [],
-	numeroPartecipantiDesiderato: "1",
-	descrizione: "a",
+	numeroPartecipantiDesiderato: "",
+	descrizione: "",
 	data: "",
 	categorie: []
 });
