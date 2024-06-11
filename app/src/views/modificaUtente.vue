@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { utenti, interessi, fetchUtenteUsername, getInteressi, modificaUtente } from '../states/utenti.mjs'
+import { errori, utenti, interessi, fetchUtenteUsername, getInteressi, modificaUtente } from '../states/utenti.mjs'
 
 import { loggedUser } from '../states/loggedUser.mjs'
 import router from '../router/index.mjs'
@@ -22,8 +22,6 @@ onMounted( async () => {
 	await fetchUtenteUsername(loggedUser.username);
 	dati.value.username=utenti.value.utente.username;
 	dati.value.interessi=utenti.value.utente.interessi;
-	
-	interessiIniziali=dati.value.interessi;
 		
 	await getInteressi();
 	
@@ -36,14 +34,11 @@ async function modificaButton() {
 	
 	await modificaUtente(dati.value, id);
 	
-	if (errori.value.length == 0 && luogoValido.value) {
+	if (errori.value.length == 0) {
 		loggedUser.username=dati.value.username;
 		router.push('/utenti/'+loggedUser.username);
 	}
 	else {
-		if (!luogoValido.value) {
-			errori.value.push({ message: "Luogo non valido" });
-		}
 		erroreSuccesso.value = true;
 	}
 }

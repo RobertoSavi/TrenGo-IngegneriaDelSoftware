@@ -116,6 +116,19 @@ var isIscritto = computed(() => {
 				<span>{{ categoria }}&nbsp;</span>
 			</label>
 		</div>
+		<div class="partecipanti">
+					<div class="contenitoreHeader">
+						<h2>Partecipanti:</h2>
+					</div>
+					<div v-if="proposta.partecipanti.length==0">Ancora nessun partecipante</div>
+					<ul v-else>
+						<li v-for="partecipante in proposta.partecipanti">
+							<div class="contenitorePartecipante">
+								<div>{{ partecipante }}</div>
+							</div>
+						</li>
+					</ul>
+				</div>
 		<div v-if="proposta.usernameCreatore == loggedUser.username && loggedUser.username">
 			<div v-for="richiesta in richieste">
 				<label>Accettare la richiesta di: </label>
