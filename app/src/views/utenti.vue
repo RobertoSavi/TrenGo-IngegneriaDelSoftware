@@ -1,11 +1,13 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { loggedUser, clearLoggedUser } from '../states/loggedUser.mjs';
 import { utenti, fetchUtenteUsername } from '../states/utenti.mjs';
 import { follow, unfollow } from '../states/follow.mjs';
 import { useRoute } from 'vue-router';
 import router from '../router/index.mjs'
 
+const token=localStorage.getItem('token');
+const loggedUsername=localStorage.getItem('username')
+const loggedId=localStorage.getItem('id');
 const route = useRoute();
 const username=route.params.username;
 const fetchDone=ref(false);
@@ -22,12 +24,12 @@ function modifica()
 
 function logout()
 {
-	clearLoggedUser();
-	router.push('/');
+	localStorage.clear()
+	router.push('/').then(router.go(0));
 }
 
 var isFollower = computed(() => {
-	if (utenti.value.utente.followers.includes(loggedUser.username)) {
+	if (utenti.value.utente.followers.includes(loggedUsername)) {
 		return true;
 	}
 
@@ -63,21 +65,21 @@ async function unfollwButton()
 		<div>
 			<label>Cognome: </label>{{ utente.cognome }}
 		</div>
-		<div v-if="utente.username==loggedUser.username">
+		<div v-if="utente.username==loggedUsername">
 			<label>Email: </label>{{ utente.email }}
 		</div>
 		<div>
 			<label>Interessi: </label>
 			<span v-for="interesse in utente.interessi">{{ interesse+" " }}</span>
 		</div>
-		<div v-if="utente.username==loggedUser.username">
-			<button @click="modifica(loggedUser.id)">Modifica</button>
+		<div v-if="utente.username==loggedUsername">
+			<button @click="modifica(loggedId)">Modifica</button>
 			<button style="margin-left: 20px;" @click="logout()">Logout</button>
 		</div>
-		<div v-else-if="isFollower&&loggedUser.token">
+		<div v-else-if="isFollower&&token">
 			<button @click="unfollwButton()">Smetti di seguire</button>
 		</div>
-		<div v-else-if="!isFollower&&loggedUser.token">
+		<div v-else-if="!isFollower&&token">
 			<button @click="follwButton()">Segui</button>
 		</div>
 	</div>

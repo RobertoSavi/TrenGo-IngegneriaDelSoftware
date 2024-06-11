@@ -1,28 +1,23 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { loggedUser } from '../states/loggedUser.mjs';
+import { ref, onMounted } from 'vue';
 import { proposte, proposteIscritto, proposteTerminate, fetchProposteMie, fetchProposteIscritto, fetchProposteTerminate } from '../states/proposte.mjs';
 import { RouterLink } from 'vue-router'
 import router from '../router/index.mjs'
 
+const token=localStorage.getItem('token');
 const HOST_PROPOSTA = "/proposte/"
 const HOST_UTENTI = "/utenti/"
 const HOST_VALUTAZIONI = "/valutazioni/"
-const warningMessage = ref('');
 
-onMounted(() => {
-	if (!loggedUser.token) {
+onMounted( async () => {
+	if (token==null) {
 		router.push('/');
 		return;
 	}
 
-	fetchProposteMie()
-	fetchProposteIscritto()
-	fetchProposteTerminate()
-});
-
-watch(loggedUser, (_loggedUser, _prevLoggedUser) => {
-	warningMessage.value = ''
+	await fetchProposteMie()
+	await fetchProposteIscritto()
+	await fetchProposteTerminate()
 });
 </script>
 

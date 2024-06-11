@@ -1,20 +1,22 @@
 <script setup>
 import { onMounted, ref, nextTick } from 'vue';
-import { loggedUser } from '../states/loggedUser.mjs';
 import { errori, proposte, modificaProposta, fetchPropostaId } from '../states/proposte.mjs';
 import { useRoute } from 'vue-router';
 import { interessi, getInteressi } from '../states/utenti.mjs'
 import L from 'leaflet'
 import router from '../router/index.mjs'
 
+const token=localStorage.getItem('token');
+const loggedUsername=localStorage.getItem('username')
+const loggedId=localStorage.getItem('id');
 const luogoValido = ref(true);
 const leafletMap = ref();
 const marker = ref();
 const route = useRoute();
 const id=route.params.id;
 const dati = ref({
-	usernameCreatore: loggedUser.username,
-	creatore: loggedUser.id,
+	usernameCreatore: loggedUsername,
+	creatore: loggedId,
 	titolo: "",
 	nomeLuogo: "",
 	coordinate: [],
@@ -27,7 +29,7 @@ const fetchDone=ref(false);
 const erroreSuccesso = ref(false)
 
 onMounted( async () => {
-	if (!loggedUser.token) {
+	if (token==null) {
 		router.push('/');
 		return;
 	}

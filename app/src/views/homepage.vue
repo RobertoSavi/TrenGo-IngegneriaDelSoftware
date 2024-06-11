@@ -1,11 +1,11 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
-import { loggedUser } from '../states/loggedUser.mjs';
 import { proposte, fetchProposte, fetchProposteNA, ricercaProposte } from '../states/proposte.mjs';
 import { RouterLink } from 'vue-router'
 import L from 'leaflet'
 import router from '../router/index.mjs'
 
+const token=localStorage.getItem('token');
 const leafletMap=ref(); 
 const HOST_PROPOSTA="/proposte/"
 const HOST_UTENTI="/utenti/"
@@ -16,7 +16,7 @@ const query=ref({});
 const stringQuery=ref("");
 
 onMounted( async () => {
-	if(loggedUser.token)
+	if(token)
 	{
 		await fetchProposte();
 	}

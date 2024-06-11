@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
-import { loggedUser } from './loggedUser.mjs'
 
+const token=localStorage.getItem('token');
 const URL_API = import.meta.env.VITE_URL_API;
 const UTENTI_URL = URL_API + '/utenti/'
 
@@ -10,12 +10,12 @@ const interessi = ref({})
 const errori = ref([])
 
 async function fetchUtenteUsername(username) {
-	const response = await axios.get(UTENTI_URL + "username/" + username, { headers: { 'Token': loggedUser.token } });
+	const response = await axios.get(UTENTI_URL + "username/" + username, { headers: { 'Token': token } });
 	utenti.value = response.data;
 }
 
 async function modificaUtente(dati, id) {
-	await axios.put(UTENTI_URL + id, dati, { headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token } })
+	await axios.put(UTENTI_URL + id, dati, { headers: { 'Content-Type': 'application/json', 'Token': token } })
 	.catch(
 		function(error) {
 			errori.value = JSON.parse(error.response.request.response).errors;
