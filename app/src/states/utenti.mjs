@@ -15,7 +15,12 @@ async function fetchUtenteUsername(username) {
 }
 
 async function modificaUtente(dati, id) {
-	await axios.put(UTENTI_URL + id, dati, { headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token } });
+	await axios.put(UTENTI_URL + id, dati, { headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token } })
+	.catch(
+		function(error) {
+			errori.value = JSON.parse(error.response.request.response).errors;
+		}
+	);
 };
 
 async function changePasswordRequest(dati) {
@@ -24,7 +29,6 @@ async function changePasswordRequest(dati) {
 
 async function changePassword(dati, token) {
 	await axios.post(UTENTI_URL + "cambiopassword/" + token, dati, { headers: { 'Content-Type': 'application/json' } });
-	await axios.put(UTENTI_URL + id, dati, { headers: { 'Content-Type': 'application/json', 'Token': loggedUser.token } });;
 };
 
 async function getInteressi() {

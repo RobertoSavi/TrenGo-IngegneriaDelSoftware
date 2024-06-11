@@ -10,8 +10,8 @@ import bcrypt from "bcrypt";
  */
 function isUsernameValid(username) {
     console.log("isUsernameValid")
-    // L'username deve essere lungo tra 3 e 20 caratteri e può contenere solo caratteri alfanumerici e underscore
-    return /^[a-zA-Z0-9_]{3,20}$/.test(username);
+    // L'username deve essere lungo tra 3 e 20 caratteri e può contenere solo caratteri alfanumerici, underscore e punto
+    return /^[a-zA-Z0-9_.]{3,20}$/.test(username);
 }
 
 /**

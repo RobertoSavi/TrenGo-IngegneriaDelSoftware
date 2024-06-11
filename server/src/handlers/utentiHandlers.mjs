@@ -119,9 +119,12 @@ async function updateUtenteById(req, res) {
 		if (!validators.isUsernameValid(updates.username))
 			errors.push({ field: "username", message: "Username troppo corto" });
 
-		// Verifica se lo username è già in uso
-		if (await validators.isUsernameTaken(updates.username))
-			errors.push({ field: "username", message: "Username già in uso" });
+		if (updates.username != req.utenteLoggato.loggedUsername) {
+			// Verifica se lo username è già in uso
+			if (await validators.isUsernameTaken(updates.username)){
+				errors.push({ field: "username", message: "Username già in uso" });
+			}
+		}
 
 		// Gestione degli errori
 		if (errors.length > 0) {
@@ -363,7 +366,7 @@ async function changePasswordRequest(req, res) {
 
 		// Crea il link per il reset della password
 		const urlFrontend = process.env.URL_FRONTEND;
-		const resetLink = `${urlFrontend}/cambiopassword/${token}`;
+		const resetLink = `${urlFrontend}cambiopassword/${token}`;
 
 		// Send password reset email to the usesr
 		await sendResetPasswordMail(utente.email, resetLink);
@@ -390,7 +393,7 @@ async function changePassword(req, res) {
 		}
 
 		// Validazione della password
-		if (!validators.isPasswordValid(password))
+		if (!validators.isPasswordValid(new_password))
 			errors.push({ field: "password", message: "La password deve essere lunga almeno 8 caratteri e contenere almeno una lettera maiuscola, una minuscola, un numero e un carattere speciale" });
 
 
@@ -442,7 +445,7 @@ async function googleLogin(profile) {
 				// Crea un nuovo utente con il profilo Google
 				const nuovoUtente = {
 					googleId: profile.id,
-					username: profile.displayName,
+					username: profile.email.split('@')[0],
 					email: profile.email,
 					nome: profile.given_name,
 					cognome: profile.family_name,

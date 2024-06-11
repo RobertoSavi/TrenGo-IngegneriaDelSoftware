@@ -22,7 +22,7 @@ async function cambioPassword() {
 </script>
 
 <template>
-    <form class="container-flex">
+    <form class="container">
         <label for="new_password">Nuova password:</label>
         <input type="password" id="new_password" name="new_password" required>
         <label for="confirm_password">Conferma nuova password:</label>
