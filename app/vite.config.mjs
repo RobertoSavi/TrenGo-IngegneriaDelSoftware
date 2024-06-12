@@ -10,9 +10,7 @@ export default defineConfig({
 		host: true,
 		port: process.env.VITE_PORT||3000,
 		hmr: {
-			protocol: isDevelopment ? 'ws' : 'wss', // Use secure WebSockets in production
-			host: isDevelopment ? 'localhost' : undefined, // Don't set the host in production
-			port: isDevelopment ? 3000 : undefined // Don't set the port in production
+			protocol: 'ws', // Use secure WebSockets in production
 		},
 	},
 	resolve: {
