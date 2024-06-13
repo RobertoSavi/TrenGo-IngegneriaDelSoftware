@@ -11,7 +11,8 @@ export default defineConfig({
 		hmr: {
 			host: process.env.VITE_HOST,
 			protocol: 'wss',
-			clientPort: process.env.VITE_PORT||3000
+			clientPort: process.env.VITE_PORT||3000,
+			port: process.env.VITE_PORT||3000
 		},
 	},
 	resolve: {
