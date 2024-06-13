@@ -18,18 +18,18 @@ const stringQuery=ref("");
 onMounted( async () => {
 	if(token)
 	{
-		await fetchProposte();
+		//await fetchProposte();
 	}
 	else
 	{
-		await fetchProposteNA();
+		//await fetchProposteNA();
 	}
 	
-	fetchDone.value=true;
+	//fetchDone.value=true;
 	
-	nextTick(() => {
+	/*nextTick(() => {
 		initLeafletMap()
-	})
+	})*/
 });
 
 function initLeafletMap()

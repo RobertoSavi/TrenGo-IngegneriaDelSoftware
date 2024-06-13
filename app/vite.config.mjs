@@ -1,18 +1,15 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import mkcert from 'vite-plugin-mkcert'
 
 // https://vitejs.dev/config/
 export default defineConfig({
 	plugins: [vue()],
 	server: {
 		host: true,
-		port: process.env.VITE_PORT||3000,
+		port: process.env.VITE_PORT,
 		hmr: {
-			host: process.env.VITE_HOST,
-			protocol: 'wss',
-			clientPort: process.env.VITE_PORT||3000,
-			port: 443
+			host: true,
+			port: process.env.VITE_PORT
 		},
 	},
 	resolve: {
