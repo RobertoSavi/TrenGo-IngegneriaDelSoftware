@@ -6,11 +6,7 @@ export default defineConfig({
 	plugins: [vue()],
 	server: {
 		host: true,
-		port: process.env.VITE_PORT,
-		hmr: {
-			host: true,
-			port: process.env.VITE_PORT
-		},
+		port: process.env.VITE_PORT
 	},
 	resolve: {
 		alias: {
