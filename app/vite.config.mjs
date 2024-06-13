@@ -12,7 +12,7 @@ export default defineConfig({
 			host: process.env.VITE_HOST,
 			protocol: 'wss',
 			clientPort: process.env.VITE_PORT||3000,
-			port: process.env.VITE_PORT||3000
+			port: 443
 		},
 	},
 	resolve: {
