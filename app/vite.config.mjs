@@ -10,7 +10,6 @@ export default defineConfig({
 		port: process.env.VITE_PORT||3000,
 		hmr: {
 			host: process.env.VITE_HOST,
-			protocol: 'ws',
 			clientPort: process.env.VITE_PORT||3000
 		},
 	},
