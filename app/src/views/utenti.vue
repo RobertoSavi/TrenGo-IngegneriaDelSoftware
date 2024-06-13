@@ -22,10 +22,11 @@ function modifica()
 	router.push('modifica');
 }
 
-function logout()
+async function logout()
 {
 	localStorage.clear()
-	router.push('/').then(router.go(0));
+	await router.push('/')
+	router.go(0);
 }
 
 var isFollower = computed(() => {
