@@ -16,6 +16,7 @@ import listachats from '../views/listaChat.vue'
 import chat from '../views/chat.vue'
 
 const router = createRouter({
+	mode: history,
 	history: createWebHistory(import.meta.env.BASE_URL),
 	routes: [
 	{
