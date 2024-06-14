@@ -6,7 +6,7 @@ import { proposte, fetchPropostaId } from '../states/proposte.mjs';
 import router from '../router/index.mjs'
 
 const token=localStorage.getItem('token');
-const loggedUsername=localStorage.getItem('loggedUsername');
+const loggedUsername=localStorage.getItem('username');
 const route = useRoute();
 const idChat = route.params.idChat;
 const fetchDone = ref(false);
