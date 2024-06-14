@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: my-vue-app
+    staticPublishPath: dist
+    buildCommand: npm run build
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
