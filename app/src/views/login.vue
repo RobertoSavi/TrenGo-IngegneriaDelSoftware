@@ -46,9 +46,10 @@ async function loginButton() {
 	
 	if(errori.value.length==0)
 	{
+		console.log(response.data);
 		localStorage.setItem('token', response.data.token);
 		localStorage.setItem('username', response.data.loggedUsername);
-		localStorage.setItem('id', response.data.id);
+		localStorage.setItem('id', response.data.loggedId);
 		await router.push('/');
 		router.go(0);
 	}
